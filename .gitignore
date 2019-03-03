@@ -1,0 +1,53 @@
+## Java
+
+*.class
+*.war
+*.ear
+hs_err_pid*
+
+## Android Studio and Intellij and Android in general
+.idea/
+*.ipr
+*.iws
+*.iml
+/android/out/
+com_crashlytics_export_strings.xml
+
+## Eclipse
+
+.classpath
+.project
+.metadata/
+*.tmp
+*.bak
+*.swp
+*~.nib
+.settings/
+.loadpath
+.externalToolBuilders/
+*.launch
+
+## NetBeans
+/private/
+
+/build/
+
+/nbbuild/
+
+/dist/
+
+/nbdist/
+
+nbactions.xml
+nb-configuration.xml
+
+## Gradle
+
+/local.properties
+.gradle/
+gradle-app.setting
+/build/
+
+## OS Specific
+.DS_Store
+Thumbs.db
