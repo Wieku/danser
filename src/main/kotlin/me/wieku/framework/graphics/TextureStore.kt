@@ -3,7 +3,7 @@ package me.wieku.framework.graphics
 import org.lwjgl.opengl.ARBTextureStorage.glTexStorage3D
 import org.lwjgl.opengl.GL33.*
 
-enum class Filtering(var glId: Int) {
+enum class TextureFilter(var glId: Int) {
 	Nearest(GL_NEAREST),
 	Linear(GL_LINEAR),
 	MipMap(GL_LINEAR_MIPMAP_LINEAR),
@@ -31,9 +31,9 @@ private class TextureStore(var layers: Int, var width: Int, var height: Int, var
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
 
 		if (mipmaps > 1) {
-			setFiltering(Filtering.MipMap, Filtering.Linear)
+			setFiltering(TextureFilter.MipMap, TextureFilter.Linear)
 		} else {
-			setFiltering(Filtering.Linear, Filtering.Linear)
+			setFiltering(TextureFilter.Linear, TextureFilter.Linear)
 		}
 
 	}
@@ -44,7 +44,7 @@ private class TextureStore(var layers: Int, var width: Int, var height: Int, var
 		glBindTexture(GL_TEXTURE_2D_ARRAY, id)
 	}
 
-	fun setFiltering(min:Filtering, mag :Filtering) {
+	fun setFiltering(min:TextureFilter, mag :TextureFilter) {
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, min.glId)
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, mag.glId)
 	}
