@@ -16,7 +16,20 @@ enum class VertexAttributeType(val glId: Int) {
 	Mat34(GL_FLOAT_MAT3x4),
 	Mat4(GL_FLOAT_MAT4),
 	Mat42(GL_FLOAT_MAT4x2),
-	Mat43(GL_FLOAT_MAT4x3),
+	Mat43(GL_FLOAT_MAT4x3);
+
+	companion object {
+		private var attributeMap = HashMap<Int, VertexAttributeType>()
+
+		init {
+			for (attrType in values()) {
+				attributeMap[attrType.glId] = attrType
+			}
+		}
+
+		fun getAttributeByGlType(type: Int) = attributeMap[type]!!
+
+	}
 }
 
-data class VertexAttribute(val attributeName: String, val attributeType: VertexAttributeType, val attributeIndex: Int)
+data class VertexAttribute(val attributeName: String, val attributeType: VertexAttributeType, val attributeIndex: Int, var location: Int = 0)
