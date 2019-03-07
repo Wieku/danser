@@ -1,17 +1,94 @@
 package me.wieku.framework.graphics
 
 import org.lwjgl.opengl.GL33.*
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 
-enum class ShaderType(glInt: Int) {
+enum class ShaderType(val glId: Int) {
 	Vertex(GL_VERTEX_SHADER),
-	Fragment(GL_VERTEX_SHADER),
-	Geometry(GL_VERTEX_SHADER)
+	Fragment(GL_FRAGMENT_SHADER),
+	Geometry(GL_GEOMETRY_SHADER)
 }
+
+data class ShaderResult(val glId: Int, val successful: Boolean, val log: String)
 
 object ShaderHelper {
 
-	fun loadShader(type: Int, source: String) {
+	fun loadShader(type: ShaderType, source: String): ShaderResult {
+		var shaderId = glCreateShader(type.glId)
+		glShaderSource(shaderId, source)
+		glCompileShader(shaderId)
 
+		var status = glGetShaderi(shaderId, GL_COMPILE_STATUS)
+
+		var log = ""
+
+		if (status == 0) {
+			log = glGetShaderInfoLog(shaderId)
+		}
+
+		return ShaderResult(shaderId, status == 1, log)
+	}
+
+	fun createProgram(): Int = glCreateProgram()
+	fun removeProgram(program: Int) = glDeleteProgram(program)
+
+	fun linkShader(program: Int, vararg shaders: Int): ShaderResult {
+		for (shader in shaders) {
+			glAttachShader(program, shader)
+		}
+
+		glLinkProgram(program)
+
+		val status = glGetProgrami(program, GL_LINK_STATUS)
+
+		var log = ""
+
+		if (status == 0) {
+			log = glGetProgramInfoLog(program)
+		}
+
+		return ShaderResult(program, status == 1, log)
+	}
+
+	fun getAttributesLocations(program: Int): Map<String, VertexAttribute> {
+		val max = glGetProgrami(program, GL_ACTIVE_ATTRIBUTES)
+
+		val attributes = HashMap<String, VertexAttribute>()
+
+		val size = ByteBuffer.allocate(4).order(ByteOrder.nativeOrder()).asIntBuffer()
+		val type = ByteBuffer.allocate(4).order(ByteOrder.nativeOrder()).asIntBuffer()
+
+		for (i in 0 until max) {
+			size.clear()
+			type.clear()
+
+			val name = glGetActiveAttrib(program, i, size, type)
+			val location = glGetAttribLocation(max, name)
+			attributes[name] = VertexAttribute(name, VertexAttributeType.getAttributeByGlType(type.get()), i, location)
+		}
+
+		return attributes
+	}
+
+	fun getUniformLocations(program: Int): Map<String, VertexAttribute> {
+		val max = glGetProgrami(program, GL_ACTIVE_UNIFORMS)
+
+		val uniforms = HashMap<String, VertexAttribute>()
+
+		val size = ByteBuffer.allocate(4).order(ByteOrder.nativeOrder()).asIntBuffer()
+		val type = ByteBuffer.allocate(4).order(ByteOrder.nativeOrder()).asIntBuffer()
+
+		for (i in 0 until max) {
+			size.clear()
+			type.clear()
+
+			val name = glGetActiveUniform(program, i, size, type)
+			val location = glGetUniformLocation(max, name)
+			uniforms[name] = VertexAttribute(name, VertexAttributeType.getAttributeByGlType(type.get()), i, location)
+		}
+
+		return uniforms
 	}
 
 }
