@@ -27,7 +27,7 @@ enum class VertexAttributeType(val glId: Int) {
 			}
 		}
 
-		fun getAttributeByGlType(type: Int) = attributeMap[type]!!
+		fun getAttributeByGlType(type: Int) = attributeMap.getOrDefault(type, GlInt)
 
 	}
 }

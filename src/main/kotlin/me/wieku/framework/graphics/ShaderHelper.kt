@@ -1,8 +1,7 @@
 package me.wieku.framework.graphics
 
 import org.lwjgl.opengl.GL33.*
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
+import org.lwjgl.system.MemoryUtil
 
 enum class ShaderType(val glId: Int) {
 	Vertex(GL_VERTEX_SHADER),
@@ -51,13 +50,13 @@ object ShaderHelper {
 		return ShaderResult(program, status == 1, log)
 	}
 
-	fun getAttributesLocations(program: Int): Map<String, VertexAttribute> {
+	fun getAttributesLocations(program: Int): HashMap<String, VertexAttribute> {
 		val max = glGetProgrami(program, GL_ACTIVE_ATTRIBUTES)
 
 		val attributes = HashMap<String, VertexAttribute>()
 
-		val size = ByteBuffer.allocate(4).order(ByteOrder.nativeOrder()).asIntBuffer()
-		val type = ByteBuffer.allocate(4).order(ByteOrder.nativeOrder()).asIntBuffer()
+		val size = MemoryUtil.memAllocInt(1)
+		val type = MemoryUtil.memAllocInt(1)
 
 		for (i in 0 until max) {
 			size.clear()
@@ -68,25 +67,32 @@ object ShaderHelper {
 			attributes[name] = VertexAttribute(name, VertexAttributeType.getAttributeByGlType(type.get()), i, location)
 		}
 
+		MemoryUtil.memFree(size)
+		MemoryUtil.memFree(type)
+
 		return attributes
 	}
 
-	fun getUniformLocations(program: Int): Map<String, VertexAttribute> {
+	fun getUniformsLocations(program: Int): HashMap<String, VertexAttribute> {
 		val max = glGetProgrami(program, GL_ACTIVE_UNIFORMS)
 
 		val uniforms = HashMap<String, VertexAttribute>()
 
-		val size = ByteBuffer.allocate(4).order(ByteOrder.nativeOrder()).asIntBuffer()
-		val type = ByteBuffer.allocate(4).order(ByteOrder.nativeOrder()).asIntBuffer()
+		val size = MemoryUtil.memAllocInt(1)
+		val type = MemoryUtil.memAllocInt(1)
 
 		for (i in 0 until max) {
 			size.clear()
+			size.put(0, 1)
 			type.clear()
 
 			val name = glGetActiveUniform(program, i, size, type)
 			val location = glGetUniformLocation(max, name)
 			uniforms[name] = VertexAttribute(name, VertexAttributeType.getAttributeByGlType(type.get()), i, location)
 		}
+
+		MemoryUtil.memFree(size)
+		MemoryUtil.memFree(type)
 
 		return uniforms
 	}
