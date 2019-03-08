@@ -10,7 +10,9 @@ class Shader(private val vertex: String, private val fragment: String) {
 	private var vertexHandle: Int = 0
 	private var fragmentHandle: Int = 0
 
-	private var attributes: HashMap<String, VertexAttribute>
+	var attributes: HashMap<String, VertexAttribute>
+		private set
+
 	private var uniforms: HashMap<String, VertexAttribute>
 
 	private var bound = false
@@ -43,7 +45,6 @@ class Shader(private val vertex: String, private val fragment: String) {
 
 		attributes = ShaderHelper.getAttributesLocations(shaderId)
 		uniforms = ShaderHelper.getUniformsLocations(shaderId)
-
 	}
 
 	fun bind() {
