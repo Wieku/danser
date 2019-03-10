@@ -33,3 +33,5 @@ enum class VertexAttributeType(val glId: Int, val size: Int) {
 }
 
 data class VertexAttribute(val attributeName: String, val attributeType: VertexAttributeType, val attributeIndex: Int, var location: Int = 0)
+
+fun Array<VertexAttribute>.vertexSize() = this.sumBy { it.attributeType.size }

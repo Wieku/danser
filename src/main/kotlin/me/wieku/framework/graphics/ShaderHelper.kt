@@ -1,5 +1,6 @@
 package me.wieku.framework.graphics
 
+import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL33.*
 import org.lwjgl.system.MemoryUtil
 
@@ -63,7 +64,7 @@ object ShaderHelper {
 			type.clear()
 
 			val name = glGetActiveAttrib(program, i, size, type)
-			val location = glGetAttribLocation(max, name)
+			val location = glGetAttribLocation(program, name)
 			attributes[name] = VertexAttribute(name, VertexAttributeType.getAttributeByGlType(type.get()), i, location)
 		}
 
