@@ -94,7 +94,7 @@ object ShaderHelper {
             type.clear()
 
             val name = glGetActiveUniform(program, i, size, type)
-            val location = glGetUniformLocation(max, name)
+            val location = glGetUniformLocation(program, name)
             uniforms[name] = VertexAttribute(
                 name,
                 VertexAttributeType.getAttributeByGlType(type.get()),
