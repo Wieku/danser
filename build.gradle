@@ -14,6 +14,7 @@ repositories {
 }
 
 project.ext.lwjglVersion = "3.2.1"
+project.ext.jomlVersion = "1.9.13"
 
 switch (OperatingSystem.current()) {
     case OperatingSystem.LINUX:
@@ -55,6 +56,7 @@ dependencies {
     implementation "org.lwjgl:lwjgl-opengles:$lwjglVersion"
     implementation "org.lwjgl:lwjgl-stb:$lwjglVersion"
     implementation "org.lwjgl:lwjgl-yoga:$lwjglVersion"
+    implementation "org.joml:joml:${jomlVersion}"
     runtimeOnly "org.lwjgl:lwjgl:$lwjglVersion:$lwjglNatives"
     runtimeOnly "org.lwjgl:lwjgl-glfw:$lwjglVersion:$lwjglNatives"
     runtimeOnly "org.lwjgl:lwjgl-nfd:$lwjglVersion:$lwjglNatives"
