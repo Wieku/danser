@@ -2,6 +2,7 @@ package me.wieku.framework.graphics.shaders
 
 import me.wieku.framework.graphics.vertex.VertexAttribute
 import me.wieku.framework.graphics.vertex.VertexAttributeType
+import me.wieku.framework.resource.FileHandle
 import org.lwjgl.opengl.GL33.*
 
 class Shader(private val vertex: String, private val fragment: String) {
@@ -17,6 +18,8 @@ class Shader(private val vertex: String, private val fragment: String) {
     private var uniforms: HashMap<String, VertexAttribute>
 
     private var bound = false
+
+    constructor(vertex: FileHandle, fragment: FileHandle):this(vertex.asString(), fragment.asString())
 
     init {
         val resultV = ShaderHelper.loadShader(ShaderType.Vertex, vertex)

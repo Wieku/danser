@@ -7,16 +7,41 @@ import jouvieje.bass.defines.BASS_DATA.BASS_DATA_FFT1024
 import jouvieje.bass.defines.BASS_FX
 import jouvieje.bass.defines.BASS_POS.BASS_POS_BYTE
 import jouvieje.bass.defines.BASS_STREAM
+import me.wieku.framework.resource.FileHandle
+import me.wieku.framework.resource.FileType
+import org.lwjgl.BufferUtils
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-class Track(filename: String) {
-    private var channelStream =
-        BASS_StreamCreateFile(false, filename, 0, 0, BASS_STREAM.BASS_STREAM_DECODE or BASS_STREAM.BASS_STREAM_PRESCAN)
+class Track(file: FileHandle) {
+    private var channelStream = when (file.fileType) {
+        FileType.Classpath -> {
+            val buffer = file.toBuffer()
+            BASS_StreamCreateFile(
+                true,
+                buffer,
+                0,
+                buffer.limit().toLong(),
+                BASS_STREAM.BASS_STREAM_DECODE or BASS_STREAM.BASS_STREAM_PRESCAN
+            )
+        }
+        FileType.Local, FileType.Absolute -> {
+            BASS_StreamCreateFile(
+                false,
+                file.absolutePath(),
+                0,
+                0,
+                BASS_STREAM.BASS_STREAM_DECODE or BASS_STREAM.BASS_STREAM_PRESCAN
+            )
+        }
+    }
+
     private var fxChannel = BASS_FX_TempoCreate(channelStream.asInt(), BASS_FX.BASS_FX_FREESOURCE)
 
-    private var dataBuffer = ByteBuffer.allocateDirect(512 * 4)
-    private var fftData = FloatArray(512)
+    private var dataBuffer = BufferUtils.createByteBuffer(512*4)
+
+    var fftData = FloatArray(512)
+        private set
 
     var peak: Float = 0.0f
         private set
@@ -29,10 +54,6 @@ class Track(filename: String) {
 
     var rightChannelLevel: Float = 0.0f
         private set
-
-    init {
-        dataBuffer.order(ByteOrder.nativeOrder())
-    }
 
     fun play() {
         setVolume(/*settings.Audio.GeneralVolume * settings.Audio.MusicVolume*/0.5f)
@@ -112,8 +133,8 @@ class Track(filename: String) {
 
     fun update() {
         BASS_ChannelGetData(fxChannel.asInt(), dataBuffer, BASS_DATA_FFT1024)
-        var buff = dataBuffer.asFloatBuffer()
-        buff.get(fftData)
+
+        dataBuffer.asFloatBuffer().get(fftData)
 
         var toPeak = -1.0f
         var beatAv = 0.0f
@@ -134,10 +155,6 @@ class Track(filename: String) {
 
         leftChannelLevel = (level and 65535).toFloat() / 32768
         rightChannelLevel = (level shr 16).toFloat() / 32768
-    }
-
-    fun getFFT(): FloatArray {
-        return fftData
     }
 
     fun getLevelCombined(): Float {
