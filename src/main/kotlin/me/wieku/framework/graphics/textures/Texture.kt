@@ -31,7 +31,7 @@ class Texture {
     constructor(file: FileHandle) {
         val imageBuffer = file.toBuffer()
 
-        MemoryStack.stackPush().let { stack ->
+        MemoryStack.stackPush().use { stack ->
             val w: IntBuffer = stack.mallocInt(1)
             val h: IntBuffer = stack.mallocInt(1)
             val comp: IntBuffer = stack.mallocInt(1)
