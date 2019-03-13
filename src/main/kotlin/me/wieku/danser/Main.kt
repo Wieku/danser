@@ -34,8 +34,11 @@ fun main(args: Array<String>) {
 
     println(glGetError())
 
+    var offt = FloatArray(256)
+    var arr = FloatArray(6 * offt.size * 2)
+
     var vao = VertexArrayObject(
-        6*256,
+        6 * offt.size,
         arrayOf(
             VertexAttribute(
                 "in_position",
@@ -55,67 +58,57 @@ fun main(args: Array<String>) {
         )
     )
 
-    var arr = FloatArray(6*256*2)
-
     var texture = Texture(FileHandle("assets/testimg.jpg", FileType.Classpath))
 
     texture.bind(1)
 
     vao.bind()
     vao.bindToShader(shader)
-    vao.setData(
-        floatArrayOf(
-            -1f, -1f, 1f, 0f, 0f, 1f, 0f, 1f,
-            1f, -1f, 0f, 1f, 0f, 1f, 1f, 1f,
-            -1f, 1f, 0f, 1f, 0f, 1f, 0f, 0f,
-            -1f, 1f, 0f, 1f, 0f, 1f, 0f, 0f,
-            1f, -1f, 0f, 1f, 0f, 1f, 1f, 1f,
-            1f, 1f, 0f, 0f, 1f, 1f, 1f, 0f
-        )
-    )
     vao.unbind()
 
     BassSystem.initSystem()
     val track = Track(FileHandle("assets/audio.mp3", FileType.Classpath))
-    track.play()
+    track.play(0.1f)
 
     Thread {
         while (!glfwWindowShouldClose(handle)) {
             track.update()
+            for ((i, d) in track.fftData.withIndex()) {
+                if (i >= offt.size) break
+                offt[i] = Math.max(d, offt[i] - 0.001f * 16)
+            }
             Thread.sleep(16)
         }
     }.start()
 
     while (!glfwWindowShouldClose(handle)) {
 
-        GL11.glClearColor(0.5f, 0.5f, 0.5f, 1f)
+        GL11.glClearColor(0.1f, 0.1f, 0.1f, 1f)
         glClear(GL_COLOR_BUFFER_BIT)
         shader.bind()
         //shader.setUniform("tex", 1f)
-        shader.setUniform("col", 1f, 1f, 0f, 1f)
+        shader.setUniform("col", 0.2f, 0.2f, 0.5f, 1f)
         vao.bind()
 
-        for ((i, d) in track.fftData.withIndex()){
-            if (i>255) break
-
-            val x0 = (i.toFloat()*2/255 - 1)
-            val x1 = ((i+1).toFloat()*2/255 - 1)
+        for ((i, d) in offt.withIndex()) {
+            val x0 = (i.toFloat() * 2 / offt.size - 1)
+            val x1 = ((i + 1).toFloat() * 2 / offt.size - 1)
             val y0 = -1f
-            val y1 = d*2 - 1
+            val y1 = d * 2 - 1
 
-            arr[i*12] = x0
-            arr[i*12+1] = y0
-            arr[i*12+2] = x1
-            arr[i*12+3] = y0
-            arr[i*12+4] = x0
-            arr[i*12+5] = y1
+            arr[i * 12] = x0
+            arr[i * 12 + 1] = y0
+            arr[i * 12 + 2] = x1
+            arr[i * 12 + 3] = y0
+            arr[i * 12 + 4] = x0
+            arr[i * 12 + 5] = y1
 
-            arr[i*12+6] = x0
-            arr[i*12+7] = y1
-            arr[i*12+8] = x1
-            arr[i*12+9] = y0
-            arr[i*12+10] = x1
-            arr[i*12+11] = y1
+            arr[i * 12 + 6] = x0
+            arr[i * 12 + 7] = y1
+            arr[i * 12 + 8] = x1
+            arr[i * 12 + 9] = y0
+            arr[i * 12 + 10] = x1
+            arr[i * 12 + 11] = y1
 
         }
         vao.setData(arr)

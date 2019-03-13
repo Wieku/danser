@@ -10,8 +10,6 @@ import jouvieje.bass.defines.BASS_STREAM
 import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.FileType
 import org.lwjgl.BufferUtils
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
 
 class Track(file: FileHandle) {
     private var channelStream = when (file.fileType) {
@@ -60,7 +58,7 @@ class Track(file: FileHandle) {
         BASS_ChannelPlay(fxChannel.asInt(), true)
     }
 
-    fun playV(volume: Float) {
+    fun play(volume: Float) {
         setVolume(volume)
         BASS_ChannelPlay(fxChannel.asInt(), false)
     }
