@@ -2,7 +2,6 @@ package me.wieku.framework.audio
 
 import jouvieje.bass.Bass.*
 import jouvieje.bass.defines.BASS_ATTRIB
-import jouvieje.bass.defines.BASS_ATTRIB.BASS_ATTRIB_VOL
 import jouvieje.bass.defines.BASS_DATA.BASS_DATA_FFT1024
 import jouvieje.bass.defines.BASS_FX
 import jouvieje.bass.defines.BASS_POS.BASS_POS_BYTE
@@ -10,6 +9,8 @@ import jouvieje.bass.defines.BASS_STREAM
 import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.FileType
 import org.lwjgl.BufferUtils
+import org.lwjgl.system.MemoryStack
+import java.lang.ref.WeakReference
 
 class Track(file: FileHandle) {
     private var channelStream = when (file.fileType) {
@@ -36,7 +37,10 @@ class Track(file: FileHandle) {
 
     private var fxChannel = BASS_FX_TempoCreate(channelStream.asInt(), BASS_FX.BASS_FX_FREESOURCE)
 
-    private var dataBuffer = BufferUtils.createByteBuffer(512*4)
+    private var dataBuffer = BufferUtils.createByteBuffer(512 * 4)
+
+    internal var volume = 1f
+    internal var isVolumeAbsolute = false
 
     var fftData = FloatArray(512)
         private set
@@ -53,14 +57,15 @@ class Track(file: FileHandle) {
     var rightChannelLevel: Float = 0.0f
         private set
 
-    fun play() {
-        setVolume(/*settings.Audio.GeneralVolume * settings.Audio.MusicVolume*/0.5f)
-        BASS_ChannelPlay(fxChannel.asInt(), true)
+    init {
+        synchronized(BassSystem.tracks) {
+            BassSystem.tracks.add(WeakReference(this))
+        }
     }
 
-    fun play(volume: Float) {
-        setVolume(volume)
-        BASS_ChannelPlay(fxChannel.asInt(), false)
+    fun play(volume: Float = 1f, isAbsolute: Boolean = false) {
+        setVolume(volume, isAbsolute)
+        BASS_ChannelPlay(fxChannel.asInt(), true)
     }
 
     fun pause() {
@@ -73,18 +78,25 @@ class Track(file: FileHandle) {
 
     fun stop() {
         BASS_ChannelStop(fxChannel.asInt())
+        BASS_ChannelStop(channelStream.asInt())
     }
 
-    fun setVolume(vol: Float) {
-        BASS_ChannelSetAttribute(fxChannel.asInt(), BASS_ATTRIB.BASS_ATTRIB_VOL, vol)
-    }
-
-    fun setVolumeRelative(vol: Float) {
+    fun setVolume(vol: Float, isAbsolute: Boolean = false) {
+        volume = vol
+        isVolumeAbsolute = isAbsolute
         BASS_ChannelSetAttribute(
             fxChannel.asInt(),
-            BASS_ATTRIB_VOL, /*settings.Audio.GeneralVolume*settings.Audio.MusicVolume**/
-            vol
+            BASS_ATTRIB.BASS_ATTRIB_VOL,
+            if (isAbsolute) vol else BassSystem.globalVolume * BassSystem.musicVolume * vol
         )
+    }
+
+    fun getVolume(): Float {
+        MemoryStack.stackPush().use { stack ->
+            var buf = stack.mallocFloat(1)
+            BASS_ChannelGetAttribute(fxChannel.asInt(), BASS_ATTRIB.BASS_ATTRIB_VOL, buf)
+            return buf.get() / (if (isVolumeAbsolute) 1f else (BassSystem.globalVolume * BassSystem.musicVolume))
+        }
     }
 
     fun getLength(): Float {
@@ -157,6 +169,10 @@ class Track(file: FileHandle) {
 
     fun getLevelCombined(): Float {
         return (leftChannelLevel + rightChannelLevel) / 2
+    }
+
+    protected fun finalize() {
+        stop()
     }
 
 }

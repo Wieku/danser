@@ -4,10 +4,31 @@ import jouvieje.bass.Bass
 import jouvieje.bass.BassInit
 import org.lwjgl.system.Library
 import org.lwjgl.system.Platform
+import java.lang.ref.WeakReference
 import java.net.URL
 import java.nio.channels.FileChannel
 
 object BassSystem {
+
+    var globalVolume: Float = 1f
+        set(value) {
+            field = Math.min(1f, Math.max(0f, value))
+            updateAll()
+        }
+
+    var musicVolume: Float = 1f
+        set(value) {
+            field = Math.min(1f, Math.max(0f, value))
+            updateAll()
+        }
+
+    var sampleVolume: Float = 1f
+        set(value) {
+            field = Math.min(1f, Math.max(0f, value))
+        }
+
+    internal var tracks: ArrayList<WeakReference<Track>> = ArrayList()
+
     init {
         val field = BassInit::class.java.getDeclaredField("librariesLoaded")
         field.isAccessible = true
@@ -39,6 +60,18 @@ object BassSystem {
 
     fun initSystem() {
         Bass.BASS_Init(-1, 44100, 0, null, null)
+    }
+
+    private fun updateAll() {
+        synchronized(tracks) {
+            println("uuuuwuwuw")
+            println(globalVolume)
+            tracks = tracks.filter { it.get() != null } as ArrayList<WeakReference<Track>>
+            tracks.forEach { ref ->
+                val track = ref.get()!!
+                track.setVolume(track.volume, track.isVolumeAbsolute)
+            }
+        }
     }
 
 }
