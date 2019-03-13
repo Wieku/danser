@@ -15,9 +15,6 @@ import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL11.*
 
-import java.io.File
-import java.nio.file.Paths
-
 fun main(args: Array<String>) {
     println("Version " + Build.Version)
 
@@ -34,7 +31,7 @@ fun main(args: Array<String>) {
 
     println(glGetError())
 
-    var offt = FloatArray(256)
+    var offt = FloatArray(200)
     var arr = FloatArray(6 * offt.size * 2)
 
     var vao = VertexArrayObject(
