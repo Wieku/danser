@@ -1,15 +1,19 @@
 package me.wieku.framework.graphics.vertex
 
 import me.wieku.framework.graphics.shaders.Shader
+import me.wieku.framework.utils.Disposable
 import org.lwjgl.opengl.GL33.*
 import org.lwjgl.system.MemoryUtil
 import java.nio.FloatBuffer
 
-class VertexArrayObject(private var maxVertices: Int, private val attributes: Array<VertexAttribute>) {
+class VertexArrayObject(private var maxVertices: Int, private val attributes: Array<VertexAttribute>) : Disposable {
+    private var vertexSize = attributes.vertexSize()
     private var byteSize = maxVertices * attributes.vertexSize()
 
     private var vaoHandle: Int = 0
     private var vboHandle: Int = 0
+
+    private var currentVertices = 0
 
     init {
         vaoHandle = glGenVertexArrays()
@@ -57,6 +61,40 @@ class VertexArrayObject(private var maxVertices: Int, private val attributes: Ar
     }
 
     fun setData(data: FloatArray) {
+        if (data.isEmpty()) {
+            throw IllegalStateException("Empty array was given")
+        }
+
+        if (data.size > byteSize / 4) {
+            throw IllegalStateException("Input data exceeds buffer size")
+        }
+
+        if (data.size % vertexSize != 0) {
+            throw IllegalStateException("Vertex size does not match")
+        }
+
+
+        currentVertices = 4 * data.size / vertexSize
+        glBufferSubData(GL_ARRAY_BUFFER, 0, data)
+    }
+
+    /**
+     * NOTE: Data have to be flipped before calling this function
+     */
+    fun setData(data: FloatBuffer) {
+        if (data.position() == 0) {
+            throw IllegalStateException("Empty buffer was given")
+        }
+
+        if (data.position() > byteSize / 4) {
+            throw IllegalStateException("Input data exceeds buffer size")
+        }
+
+        if (data.position() % vertexSize != 0) {
+            throw IllegalStateException("Vertex size does not match")
+        }
+
+        currentVertices = 4 * data.position() / vertexSize
         glBufferSubData(GL_ARRAY_BUFFER, 0, data)
     }
 
@@ -84,9 +122,14 @@ class VertexArrayObject(private var maxVertices: Int, private val attributes: Ar
 
     fun draw(from: Int, to: Int) {
         if (to < from || from < 0 || to > maxVertices || from > maxVertices)
-            throw IllegalStateException("Drawing out of memory data")
+            throw IndexOutOfBoundsException("Drawing data out of buffer's memory")
 
         glDrawArrays(GL_TRIANGLES, from, to - from)
+    }
+
+    override fun dispose() {
+        glDeleteBuffers(vboHandle)
+        glDeleteVertexArrays(vaoHandle)
     }
 
 }

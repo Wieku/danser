@@ -23,7 +23,7 @@ fun main(args: Array<String>) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE)
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, 1)
-    var handle = glfwCreateWindow(1024, 400, "testdanser: " + Build.Version, 0, 0)
+    var handle = glfwCreateWindow(500, 600, "testdanser: " + Build.Version, 0, 0)
     glfwMakeContextCurrent(handle)
     GL.createCapabilities()
 
