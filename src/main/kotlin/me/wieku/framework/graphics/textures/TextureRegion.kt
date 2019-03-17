@@ -15,4 +15,11 @@ class TextureRegion(
     fun getHeight(): Float = (V2 - V1) * baseTexture.height
 
     fun getArea(): Float = getWidth() * getHeight()
+
+    fun getTexture() = baseTexture
+    fun getU1() = U1
+    fun getU2() = U2
+    fun getV1() = V1
+    fun getV2() = U2
+    fun getLayer() = layer
 }

@@ -80,19 +80,19 @@ class VertexArrayObject(private var maxVertices: Int, private val attributes: Ar
      * NOTE: Data have to be flipped before calling this function
      */
     fun setData(data: FloatBuffer) {
-        if (data.position() == 0) {
-            throw IllegalStateException("Empty buffer was given")
+        if (data.position() != 0) {
+            throw IllegalStateException("Unflipped buffer was given")
         }
 
-        if (data.position() > byteSize / 4) {
+        if (data.limit() > byteSize / 4) {
             throw IllegalStateException("Input data exceeds buffer size")
         }
 
-        if (data.position() % vertexSize != 0) {
+        if (data.limit() % vertexSize != 0) {
             throw IllegalStateException("Vertex size does not match")
         }
 
-        currentVertices = 4 * data.position() / vertexSize
+        currentVertices = 4 * data.limit() / vertexSize
         glBufferSubData(GL_ARRAY_BUFFER, 0, data)
     }
 

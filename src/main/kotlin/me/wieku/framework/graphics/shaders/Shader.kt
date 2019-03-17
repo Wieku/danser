@@ -4,6 +4,7 @@ import me.wieku.framework.graphics.vertex.VertexAttribute
 import me.wieku.framework.graphics.vertex.VertexAttributeType
 import me.wieku.framework.resource.FileHandle
 import org.lwjgl.opengl.GL33.*
+import java.nio.FloatBuffer
 
 class Shader(private val vertex: String, private val fragment: String) {
     var shaderId: Int = 0
@@ -73,6 +74,29 @@ class Shader(private val vertex: String, private val fragment: String) {
         when (uniforms[name]!!.attributeType) {
             VertexAttributeType.GlInt -> glUniform1i(uniforms[name]!!.location, values[0].toInt())
             VertexAttributeType.GlFloat -> glUniform1f(uniforms[name]!!.location, values[0])
+            VertexAttributeType.Vec2 -> glUniform2fv(uniforms[name]!!.location, values)
+            VertexAttributeType.Vec3 -> glUniform3fv(uniforms[name]!!.location, values)
+            VertexAttributeType.Vec4 -> glUniform4fv(uniforms[name]!!.location, values)
+            VertexAttributeType.Mat2 -> glUniformMatrix2fv(uniforms[name]!!.location, false, values)
+            VertexAttributeType.Mat23 -> glUniformMatrix2x3fv(uniforms[name]!!.location, false, values)
+            VertexAttributeType.Mat24 -> glUniformMatrix2x4fv(uniforms[name]!!.location, false, values)
+            VertexAttributeType.Mat3 -> glUniformMatrix3fv(uniforms[name]!!.location, false, values)
+            VertexAttributeType.Mat32 -> glUniformMatrix3x2fv(uniforms[name]!!.location, false, values)
+            VertexAttributeType.Mat34 -> glUniformMatrix3x4fv(uniforms[name]!!.location, false, values)
+            VertexAttributeType.Mat4 -> glUniformMatrix4fv(uniforms[name]!!.location, false, values)
+            VertexAttributeType.Mat42 -> glUniformMatrix4x2fv(uniforms[name]!!.location, false, values)
+            VertexAttributeType.Mat43 -> glUniformMatrix4x3fv(uniforms[name]!!.location, false, values)
+        }
+    }
+
+    fun setUniform(name: String, values: FloatBuffer) {
+        if (!bound) {
+            throw IllegalStateException("Shader is not bound")
+        }
+
+        when (uniforms[name]!!.attributeType) {
+            VertexAttributeType.GlInt -> glUniform1i(uniforms[name]!!.location, values[0].toInt())
+            VertexAttributeType.GlFloat -> glUniform1fv(uniforms[name]!!.location, values)
             VertexAttributeType.Vec2 -> glUniform2fv(uniforms[name]!!.location, values)
             VertexAttributeType.Vec3 -> glUniform3fv(uniforms[name]!!.location, values)
             VertexAttributeType.Vec4 -> glUniform4fv(uniforms[name]!!.location, values)

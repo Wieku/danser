@@ -74,15 +74,15 @@ class IndexBufferObject(private val maxIndices: Int, private val useInts: Boolea
             throw IllegalStateException("Wrong buffer was given")
         }
 
-        if (data.position() == 0) {
-            throw IllegalStateException("Empty buffer was given")
+        if (data.position() != 0) {
+            throw IllegalStateException("Unflipped buffer was given")
         }
 
-        if (data.position() > maxIndices) {
+        if (data.limit() > maxIndices) {
             throw IllegalStateException("Input data exceeds buffer size")
         }
 
-        currentIndices = data.position()
+        currentIndices = data.limit()
         glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, data)
     }
 
@@ -94,15 +94,15 @@ class IndexBufferObject(private val maxIndices: Int, private val useInts: Boolea
             throw IllegalStateException("Wrong buffer was given")
         }
 
-        if (data.position() == 0) {
-            throw IllegalStateException("Empty buffer was given")
+        if (data.position() != 0) {
+            throw IllegalStateException("Unflipped buffer was given")
         }
 
-        if (data.position() > maxIndices) {
+        if (data.limit() > maxIndices) {
             throw IllegalStateException("Input data exceeds buffer size")
         }
 
-        currentIndices = data.position()
+        currentIndices = data.limit()
         glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, data)
     }
 

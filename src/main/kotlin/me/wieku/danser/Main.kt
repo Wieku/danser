@@ -12,6 +12,7 @@ import me.wieku.framework.graphics.vertex.VertexAttribute
 import me.wieku.framework.graphics.vertex.VertexAttributeType
 import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.FileType
+import org.joml.Vector4f
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11
@@ -29,46 +30,17 @@ fun main(args: Array<String>) {
     glfwMakeContextCurrent(handle)
     GL.createCapabilities()
 
-    var shader = Shader(FileHandle("assets/test.vsh", FileType.Classpath), FileHandle("assets/test.fsh", FileType.Classpath))
-
     println(glGetError())
 
     var offt = FloatArray(200)
-    var arr = FloatArray(4 * offt.size * 2)
-    var iarr = ShortArray(6 * offt.size)
-
-    var vao = VertexArrayObject(
-        4 * offt.size,
-        arrayOf(
-            VertexAttribute(
-                "in_position",
-                VertexAttributeType.Vec2,
-                0
-            )/*,
-            VertexAttribute(
-                "in_color",
-                VertexAttributeType.Vec4,
-                1
-            )*//*,
-            VertexAttribute(
-                "in_tex_coord",
-                VertexAttributeType.Vec2,
-                2
-            )*/
-        )
-    )
-
     var batch = SpriteBatch()
 
-    var ibo = IndexBufferObject(6 * offt.size)
+    val color = Vector4f(0.2f, 0.2f, 0.5f, 1f)
 
-    var texture = Texture(FileHandle("assets/testimg.jpg", FileType.Classpath))
-
+    var texture = Texture(1, 1)
     texture.bind(1)
+    texture.setData(0, 0, 1, 1, byteArrayOf(255.toByte(), 255.toByte(), 255.toByte(), 255.toByte()))
 
-    vao.bind()
-    vao.bindToShader(shader)
-    vao.unbind()
 
     BassSystem.initSystem()
     val track = Track(FileHandle("assets/audio.mp3", FileType.Classpath))
@@ -89,41 +61,15 @@ fun main(args: Array<String>) {
 
         GL11.glClearColor(0.1f, 0.1f, 0.1f, 1f)
         glClear(GL_COLOR_BUFFER_BIT)
-        shader.bind()
-        //shader.setUniform("tex", 1f)
-        shader.setUniform("col", 0.2f, 0.2f, 0.5f, 1f)
-        vao.bind()
-        ibo.bind()
+
+        batch.begin()
+
         for ((i, d) in offt.withIndex()) {
-            val x0 = (i.toFloat() * 2 / offt.size - 1)
-            val x1 = ((i + 1).toFloat() * 2 / offt.size - 1)
-            val y0 = -1f
-            val y1 = d * 2 - 1
-
-            arr[i * 8] = x0
-            arr[i * 8 + 1] = y0
-            arr[i * 8 + 2] = x1
-            arr[i * 8 + 3] = y0
-            arr[i * 8 + 4] = x0
-            arr[i * 8 + 5] = y1
-            arr[i * 8 + 6] = x1
-            arr[i * 8 + 7] = y1
-
-            iarr[i * 6] = (i*4).toShort()
-            iarr[i * 6 + 1] = (i*4+1).toShort()
-            iarr[i * 6 + 2] = (i*4+2).toShort()
-            iarr[i * 6 + 3] = (i*4+2).toShort()
-            iarr[i * 6 + 4] = (i*4+1).toShort()
-            iarr[i * 6 + 5] = (i*4+3).toShort()
-
+            batch.draw(texture, ((i.toFloat()+0.5f) * 2) / offt.size - 1, d-1, 2f/offt.size, d*2, color)
         }
-        vao.setData(arr)
-        ibo.setData(iarr)
-        ibo.draw()
-        ibo.unbind()
-        vao.unbind()
 
-        shader.unbind()
+        batch.end()
+
         glfwPollEvents()
         glfwSwapBuffers(handle)
     }
