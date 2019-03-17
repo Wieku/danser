@@ -4,6 +4,7 @@ import me.wieku.danser.build.Build
 import me.wieku.framework.audio.BassSystem
 import me.wieku.framework.audio.Track
 import me.wieku.framework.graphics.shaders.Shader
+import me.wieku.framework.graphics.sprite.SpriteBatch
 import me.wieku.framework.graphics.textures.Texture
 import me.wieku.framework.graphics.vertex.IndexBufferObject
 import me.wieku.framework.graphics.vertex.VertexArrayObject
@@ -56,6 +57,8 @@ fun main(args: Array<String>) {
             )*/
         )
     )
+
+    var batch = SpriteBatch()
 
     var ibo = IndexBufferObject(6 * offt.size)
 

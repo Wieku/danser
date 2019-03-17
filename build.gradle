@@ -16,6 +16,8 @@ repositories {
 project.ext.lwjglVersion = "3.2.1"
 project.ext.jomlVersion = "1.9.13"
 
+sourceSets.main.resources { srcDirs = ["src/main/kotlin", "src/main/resources"]; include "**/*.*"; exclude "**/*.kt" }
+
 switch (OperatingSystem.current()) {
     case OperatingSystem.LINUX:
         project.ext.lwjglNatives = "natives-linux"
