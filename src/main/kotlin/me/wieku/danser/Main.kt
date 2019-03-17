@@ -5,6 +5,7 @@ import me.wieku.framework.audio.BassSystem
 import me.wieku.framework.audio.Track
 import me.wieku.framework.graphics.shaders.Shader
 import me.wieku.framework.graphics.textures.Texture
+import me.wieku.framework.graphics.vertex.IndexBufferObject
 import me.wieku.framework.graphics.vertex.VertexArrayObject
 import me.wieku.framework.graphics.vertex.VertexAttribute
 import me.wieku.framework.graphics.vertex.VertexAttributeType
@@ -32,10 +33,11 @@ fun main(args: Array<String>) {
     println(glGetError())
 
     var offt = FloatArray(200)
-    var arr = FloatArray(6 * offt.size * 2)
+    var arr = FloatArray(4 * offt.size * 2)
+    var iarr = ShortArray(6 * offt.size)
 
     var vao = VertexArrayObject(
-        6 * offt.size,
+        4 * offt.size,
         arrayOf(
             VertexAttribute(
                 "in_position",
@@ -54,6 +56,8 @@ fun main(args: Array<String>) {
             )*/
         )
     )
+
+    var ibo = IndexBufferObject(6 * offt.size)
 
     var texture = Texture(FileHandle("assets/testimg.jpg", FileType.Classpath))
 
@@ -86,30 +90,34 @@ fun main(args: Array<String>) {
         //shader.setUniform("tex", 1f)
         shader.setUniform("col", 0.2f, 0.2f, 0.5f, 1f)
         vao.bind()
-
+        ibo.bind()
         for ((i, d) in offt.withIndex()) {
             val x0 = (i.toFloat() * 2 / offt.size - 1)
             val x1 = ((i + 1).toFloat() * 2 / offt.size - 1)
             val y0 = -1f
             val y1 = d * 2 - 1
 
-            arr[i * 12] = x0
-            arr[i * 12 + 1] = y0
-            arr[i * 12 + 2] = x1
-            arr[i * 12 + 3] = y0
-            arr[i * 12 + 4] = x0
-            arr[i * 12 + 5] = y1
+            arr[i * 8] = x0
+            arr[i * 8 + 1] = y0
+            arr[i * 8 + 2] = x1
+            arr[i * 8 + 3] = y0
+            arr[i * 8 + 4] = x0
+            arr[i * 8 + 5] = y1
+            arr[i * 8 + 6] = x1
+            arr[i * 8 + 7] = y1
 
-            arr[i * 12 + 6] = x0
-            arr[i * 12 + 7] = y1
-            arr[i * 12 + 8] = x1
-            arr[i * 12 + 9] = y0
-            arr[i * 12 + 10] = x1
-            arr[i * 12 + 11] = y1
+            iarr[i * 6] = (i*4).toShort()
+            iarr[i * 6 + 1] = (i*4+1).toShort()
+            iarr[i * 6 + 2] = (i*4+2).toShort()
+            iarr[i * 6 + 3] = (i*4+2).toShort()
+            iarr[i * 6 + 4] = (i*4+1).toShort()
+            iarr[i * 6 + 5] = (i*4+3).toShort()
 
         }
         vao.setData(arr)
-        vao.draw()
+        ibo.setData(iarr)
+        ibo.draw()
+        ibo.unbind()
         vao.unbind()
 
         shader.unbind()

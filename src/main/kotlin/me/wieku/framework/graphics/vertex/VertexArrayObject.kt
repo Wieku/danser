@@ -24,15 +24,14 @@ class VertexArrayObject(private var maxVertices: Int, private val attributes: Ar
 
         glBindBuffer(GL_ARRAY_BUFFER, vboHandle)
 
-        val buffer = MemoryUtil.memAlloc(byteSize).asFloatBuffer() as FloatBuffer
-        glBufferData(GL_ARRAY_BUFFER, buffer, GL_DYNAMIC_DRAW)
+        val buffer = MemoryUtil.memAlloc(byteSize)
+        glBufferData(GL_ARRAY_BUFFER, buffer.asFloatBuffer(), GL_DYNAMIC_DRAW)
         MemoryUtil.memFree(buffer)
 
         glBindBuffer(GL_ARRAY_BUFFER, 0)
         glBindVertexArray(0)
 
         attributes.sortBy { it.attributeIndex }
-
     }
 
     fun bindToShader(shader: Shader) {
@@ -72,7 +71,6 @@ class VertexArrayObject(private var maxVertices: Int, private val attributes: Ar
         if (data.size % vertexSize != 0) {
             throw IllegalStateException("Vertex size does not match")
         }
-
 
         currentVertices = 4 * data.size / vertexSize
         glBufferSubData(GL_ARRAY_BUFFER, 0, data)
