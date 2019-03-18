@@ -13,7 +13,7 @@ enum class VertexAttributeType(val glId: Int, val size: Int) {
     Mat24(GL_FLOAT_MAT2x4, 2 * 4 * 4),
     Mat3(GL_FLOAT_MAT3, 3 * 3 * 4),
     Mat32(GL_FLOAT_MAT3x2, 3 * 2 * 4),
-    Mat34(GL_FLOAT_MAT3x4, 2 * 4 * 4),
+    Mat34(GL_FLOAT_MAT3x4, 3 * 4 * 4),
     Mat4(GL_FLOAT_MAT4, 4 * 4 * 4),
     Mat42(GL_FLOAT_MAT4x2, 4 * 2 * 4),
     Mat43(GL_FLOAT_MAT4x3, 4 * 3 * 4);
