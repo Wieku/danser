@@ -1,4 +1,4 @@
-package me.wieku.framework.graphics.vertex
+package me.wieku.framework.graphics.buffers
 
 import me.wieku.framework.graphics.shaders.Shader
 import me.wieku.framework.utils.Disposable

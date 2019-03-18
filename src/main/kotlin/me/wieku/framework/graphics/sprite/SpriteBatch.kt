@@ -3,7 +3,7 @@ package me.wieku.framework.graphics.sprite
 import me.wieku.framework.graphics.shaders.Shader
 import me.wieku.framework.graphics.textures.Texture
 import me.wieku.framework.graphics.textures.TextureRegion
-import me.wieku.framework.graphics.vertex.*
+import me.wieku.framework.graphics.buffers.*
 import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.FileType
 import me.wieku.framework.utils.Disposable
@@ -14,7 +14,6 @@ import org.joml.Vector4f
 import org.lwjgl.opengl.GL33.*
 import org.lwjgl.system.MemoryUtil
 import java.nio.FloatBuffer
-import java.nio.ShortBuffer
 
 //TODO: support Int IBOs
 /**
@@ -193,6 +192,8 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
     fun draw(texture: Texture, x: Float, y: Float, scaleX: Float, scaleY: Float, color: Vector4f) {
         draw(texture.region, x, y, scaleX, scaleY, color)
     }
+
+    //TODO: More draw options
 
     fun draw(region: TextureRegion, x: Float, y: Float, scaleX: Float, scaleY: Float, color: Vector4f) {
         if (!drawing) {

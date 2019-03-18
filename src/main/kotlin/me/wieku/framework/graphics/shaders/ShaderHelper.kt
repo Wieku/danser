@@ -1,7 +1,7 @@
 package me.wieku.framework.graphics.shaders
 
-import me.wieku.framework.graphics.vertex.VertexAttribute
-import me.wieku.framework.graphics.vertex.VertexAttributeType
+import me.wieku.framework.graphics.buffers.VertexAttribute
+import me.wieku.framework.graphics.buffers.VertexAttributeType
 import org.lwjgl.opengl.GL33.*
 import org.lwjgl.system.MemoryUtil
 
