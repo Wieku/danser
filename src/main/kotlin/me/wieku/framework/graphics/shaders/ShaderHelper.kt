@@ -5,14 +5,6 @@ import me.wieku.framework.graphics.buffers.VertexAttributeType
 import org.lwjgl.opengl.GL33.*
 import org.lwjgl.system.MemoryUtil
 
-enum class ShaderType(val glId: Int) {
-    Vertex(GL_VERTEX_SHADER),
-    Fragment(GL_FRAGMENT_SHADER),
-    Geometry(GL_GEOMETRY_SHADER)
-}
-
-data class ShaderResult(val glId: Int, val successful: Boolean, val log: String)
-
 object ShaderHelper {
 
     fun loadShader(type: ShaderType, source: String): ShaderResult {
