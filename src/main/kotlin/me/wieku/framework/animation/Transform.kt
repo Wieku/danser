@@ -5,7 +5,7 @@ import org.joml.Vector2f
 import org.joml.Vector3f
 import org.joml.Vector4f
 
-class Tranform {
+class Transform {
 
     var transformType: TransformType
         private set
@@ -37,7 +37,7 @@ class Tranform {
         endValue: Float,
         easing: Easing = Easing.Out
     ) {
-        if (transformType != TransformType.Fade || transformType != TransformType.Rotate || transformType != TransformType.Scale || transformType != TransformType.MoveX || transformType != TransformType.MoveY) {
+        if (!(transformType == TransformType.Fade || transformType == TransformType.Rotate || transformType == TransformType.Scale || transformType == TransformType.MoveX || transformType == TransformType.MoveY || transformType == TransformType.OriginX || transformType == TransformType.OriginY)) {
             throw IllegalStateException("Wrong TransformationType used!")
         }
 
@@ -59,7 +59,7 @@ class Tranform {
         endValueY: Float,
         easing: Easing = Easing.Out
     ) {
-        if (transformType != TransformType.ScaleVector || transformType != TransformType.Move) {
+        if (!(transformType == TransformType.ScaleVector || transformType == TransformType.Move || transformType == TransformType.Origin)) {
             throw IllegalStateException("Wrong TransformationType used!")
         }
 
@@ -81,7 +81,7 @@ class Tranform {
         end: Vector2f,
         easing: Easing = Easing.Out
     ) {
-        if (transformType != TransformType.ScaleVector || transformType != TransformType.Move) {
+        if (!(transformType == TransformType.ScaleVector || transformType == TransformType.Move)) {
             throw IllegalStateException("Wrong TransformationType used!")
         }
 
@@ -103,7 +103,7 @@ class Tranform {
         end: Vector4f,
         easing: Easing = Easing.Out
     ) {
-        if (transformType != TransformType.Color3 || transformType != TransformType.Color4) {
+        if (!(transformType == TransformType.Color3 || transformType == TransformType.Color4)) {
             throw IllegalStateException("Wrong TransformationType used!")
         }
 
@@ -162,6 +162,16 @@ class Tranform {
             startValues[0] + progress * (endValues[0] - startValues[0]),
             startValues[1] + progress * (endValues[1] - startValues[1]),
             startValues[2] + progress * (endValues[2] - startValues[2])
+        )
+    }
+
+    fun getColor3(time: Float, to: Vector4f = Vector4f()): Vector4f {
+        val progress = getProgress(time)
+        return to.set(
+            startValues[0] + progress * (endValues[0] - startValues[0]),
+            startValues[1] + progress * (endValues[1] - startValues[1]),
+            startValues[2] + progress * (endValues[2] - startValues[2]),
+            to.w
         )
     }
 
