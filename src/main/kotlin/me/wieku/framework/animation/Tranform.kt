@@ -140,7 +140,7 @@ class Tranform {
         return easing.func(timeClamp(startTime, endTime, time))
     }
 
-    fun GetSingle(time: Float): Float {
+    fun getSingle(time: Float): Float {
         return startValues[0] + getProgress(time) * (endValues[0] - startValues[0])
     }
 
