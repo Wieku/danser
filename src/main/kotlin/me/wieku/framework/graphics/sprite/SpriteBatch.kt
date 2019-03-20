@@ -4,6 +4,7 @@ import me.wieku.framework.graphics.shaders.Shader
 import me.wieku.framework.graphics.textures.Texture
 import me.wieku.framework.graphics.textures.TextureRegion
 import me.wieku.framework.graphics.buffers.*
+import me.wieku.framework.math.rot
 import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.FileType
 import me.wieku.framework.utils.Disposable
@@ -11,6 +12,7 @@ import org.joml.Matrix4f
 import org.joml.Vector2f
 import org.joml.Vector3f
 import org.joml.Vector4f
+import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL33.*
 import org.lwjgl.system.MemoryUtil
 import java.nio.FloatBuffer
@@ -89,6 +91,7 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
         helperBuffer = MemoryUtil.memAllocFloat(16)
     }
 
+    private var preBlendState: Boolean = false
     private var preSFactor: Int = 0
     private var preDFactor: Int = 0
 
@@ -123,9 +126,13 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
         vao.bind()
         ibo.bind()
 
+
+        preBlendState = GL11.glIsEnabled(GL_BLEND)
         preSFactor = glGetInteger(GL_BLEND_SRC_ALPHA)
         preDFactor = glGetInteger(GL_BLEND_SRC_ALPHA)
 
+        if(!preBlendState)
+            glEnable(GL_BLEND)
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
 
         if (currentTexture != null) {
@@ -166,6 +173,8 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
 
         shader.unbind()
 
+        if(!preBlendState)
+            glDisable(GL_BLEND)
         glBlendFunc(preSFactor, preDFactor)
     }
 
@@ -220,6 +229,38 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
         tmp.set(-1f, 1f).mul(scaleX, scaleY).mul(region.getWidth() / 2, region.getHeight() / 2).add(x, y)
         tmp1.set(region.getU1(), region.getV2(), region.getLayer().toFloat())
         addVertex(tmp, tmp1, color)
+    }
+
+    fun draw(sprite: Sprite) {
+        if (!drawing) {
+            throw IllegalStateException("Batching not started")
+        }
+
+        val region = sprite.texture!!
+
+        bind(region.getTexture())
+        if (vertexCount / 4 >= maxSprites) {
+            flush()
+        }
+
+        val fX = if(sprite.flipX) -1f else 1f
+        val fY = if(sprite.flipY) -1f else 1f
+
+        tmp.set(0f, 0f).sub(sprite.origin).rot(sprite.rotation).mul(sprite.scale).mul(sprite.width*fX, sprite.height*fY).add(sprite.position)
+        tmp1.set(region.getU1(), region.getV1(), region.getLayer().toFloat())
+        addVertex(tmp, tmp1, sprite.color, sprite.additive)
+
+        tmp.set(1f, 0f).sub(sprite.origin).rot(sprite.rotation).mul(sprite.scale).mul(sprite.width*fX, sprite.height*fY).add(sprite.position)
+        tmp1.set(region.getU2(), region.getV1(), region.getLayer().toFloat())
+        addVertex(tmp, tmp1, sprite.color, sprite.additive)
+
+        tmp.set(1f, 1f).sub(sprite.origin).rot(sprite.rotation).mul(sprite.scale).mul(sprite.width*fX, sprite.height*fY).add(sprite.position)
+        tmp1.set(region.getU2(), region.getV2(), region.getLayer().toFloat())
+        addVertex(tmp, tmp1, sprite.color, sprite.additive)
+
+        tmp.set(0f, 1f).sub(sprite.origin).rot(sprite.rotation).mul(sprite.scale).mul(sprite.width*fX, sprite.height*fY).add(sprite.position)
+        tmp1.set(region.getU1(), region.getV2(), region.getLayer().toFloat())
+        addVertex(tmp, tmp1, sprite.color, sprite.additive)
     }
 
     override fun dispose() {
