@@ -13,7 +13,7 @@ enum class TextureFilter(val glId: Int) {
     MipMapLinearLinear(GL_LINEAR_MIPMAP_LINEAR)
 }
 
-internal class TextureStore(var layers: Int, var width: Int, var height: Int, var mipmaps: Int = 1) {
+internal class TextureStore(var layers: Int, var width: Int, var height: Int, var mipmaps: Int = 1, val format: TextureFormat = TextureFormat.RGBA) {
     var id: Int = -1
     var binding: Int = -1
 
@@ -24,7 +24,7 @@ internal class TextureStore(var layers: Int, var width: Int, var height: Int, va
         }
 
         bind(0)
-        glTexStorage3D(GL_TEXTURE_2D_ARRAY, mipmaps, GL_RGBA8, width, height, layers)
+        glTexStorage3D(GL_TEXTURE_2D_ARRAY, mipmaps, format.internalFormat, width, height, layers)
         glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BASE_LEVEL, 0)
         glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAX_LEVEL, mipmaps - 1)
         glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)

@@ -39,9 +39,7 @@ fun main(args: Array<String>) {
 
     val color = Vector4f(0.2f, 0.2f, 0.5f, 0.6f)
 
-    var texture = Texture(1, 1)
-    texture.bind(1)
-    texture.setData(0, 0, 1, 1, byteArrayOf(255.toByte(), 255.toByte(), 255.toByte(), 255.toByte()))
+    var texture = Texture(1, 1, data = intArrayOf(0xffffffff.toInt()))
 
     val sprite = Sprite(Texture(FileHandle("assets/testimg.jpg", FileType.Classpath)).region, 1f, 1f, Vector2f(0.25f, 0.25f))
     sprite.position.set(-1f, -1f)

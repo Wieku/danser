@@ -51,3 +51,6 @@ gradle-app.setting
 ## OS Specific
 .DS_Store
 Thumbs.db
+
+## renderdoc libraries
+renderdoc*
