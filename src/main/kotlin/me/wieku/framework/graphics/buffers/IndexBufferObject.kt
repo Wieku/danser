@@ -34,15 +34,15 @@ class IndexBufferObject(private val maxIndices: Int, private val useInts: Boolea
 
     fun setData(data: IntArray) {
         if (!useInts) {
-            throw IllegalStateException("Wrong array was given")
+            throw IllegalArgumentException("Wrong array was given")
         }
 
         if (data.isEmpty()) {
-            throw IllegalStateException("Empty array was given")
+            throw IllegalArgumentException("Empty array was given")
         }
 
         if (data.size > maxIndices) {
-            throw IllegalStateException("Input data exceeds buffer size")
+            throw IllegalArgumentException("Input data exceeds buffer size")
         }
 
         currentIndices = data.size
@@ -51,15 +51,15 @@ class IndexBufferObject(private val maxIndices: Int, private val useInts: Boolea
 
     fun setData(data: ShortArray) {
         if (useInts) {
-            throw IllegalStateException("Wrong array was given")
+            throw IllegalArgumentException("Wrong array was given")
         }
 
         if (data.isEmpty()) {
-            throw IllegalStateException("Empty array was given")
+            throw IllegalArgumentException("Empty array was given")
         }
 
         if (data.size > maxIndices) {
-            throw IllegalStateException("Input data exceeds buffer size")
+            throw IllegalArgumentException("Input data exceeds buffer size")
         }
 
         currentIndices = data.size
@@ -71,15 +71,15 @@ class IndexBufferObject(private val maxIndices: Int, private val useInts: Boolea
      */
     fun setData(data: IntBuffer) {
         if (!useInts) {
-            throw IllegalStateException("Wrong buffer was given")
+            throw IllegalArgumentException("Wrong buffer was given")
         }
 
         if (data.position() != 0) {
-            throw IllegalStateException("Unflipped buffer was given")
+            throw IllegalArgumentException("Unflipped buffer was given")
         }
 
         if (data.limit() > maxIndices) {
-            throw IllegalStateException("Input data exceeds buffer size")
+            throw IllegalArgumentException("Input data exceeds buffer size")
         }
 
         currentIndices = data.limit()
@@ -91,15 +91,15 @@ class IndexBufferObject(private val maxIndices: Int, private val useInts: Boolea
      */
     fun setData(data: ShortBuffer) {
         if (useInts) {
-            throw IllegalStateException("Wrong buffer was given")
+            throw IllegalArgumentException("Wrong buffer was given")
         }
 
         if (data.position() != 0) {
-            throw IllegalStateException("Unflipped buffer was given")
+            throw IllegalArgumentException("Unflipped buffer was given")
         }
 
         if (data.limit() > maxIndices) {
-            throw IllegalStateException("Input data exceeds buffer size")
+            throw IllegalArgumentException("Input data exceeds buffer size")
         }
 
         currentIndices = data.limit()

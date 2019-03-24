@@ -61,15 +61,15 @@ class VertexArrayObject(private var maxVertices: Int, private val attributes: Ar
 
     fun setData(data: FloatArray) {
         if (data.isEmpty()) {
-            throw IllegalStateException("Empty array was given")
+            throw IllegalArgumentException("Empty array was given")
         }
 
         if (data.size > byteSize / 4) {
-            throw IllegalStateException("Input data exceeds buffer size")
+            throw IllegalArgumentException("Input data exceeds buffer size")
         }
 
         if (data.size % vertexSize != 0) {
-            throw IllegalStateException("Vertex size does not match")
+            throw IllegalArgumentException("Vertex size does not match")
         }
 
         currentVertices = 4 * data.size / vertexSize
@@ -81,15 +81,15 @@ class VertexArrayObject(private var maxVertices: Int, private val attributes: Ar
      */
     fun setData(data: FloatBuffer) {
         if (data.position() != 0) {
-            throw IllegalStateException("Unflipped buffer was given")
+            throw IllegalArgumentException("Unflipped buffer was given")
         }
 
         if (data.limit() > byteSize / 4) {
-            throw IllegalStateException("Input data exceeds buffer size")
+            throw IllegalArgumentException("Input data exceeds buffer size")
         }
 
         if (data.limit() % vertexSize != 0) {
-            throw IllegalStateException("Vertex size does not match")
+            throw IllegalArgumentException("Vertex size does not match")
         }
 
         currentVertices = 4 * data.limit() / vertexSize

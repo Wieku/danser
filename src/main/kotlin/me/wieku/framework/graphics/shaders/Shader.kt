@@ -20,17 +20,17 @@ class Shader(private val vertex: String, private val fragment: String) {
 
     private var bound = false
 
-    constructor(vertex: FileHandle, fragment: FileHandle):this(vertex.asString(), fragment.asString())
+    constructor(vertex: FileHandle, fragment: FileHandle) : this(vertex.asString(), fragment.asString())
 
     init {
         val resultV = ShaderHelper.loadShader(ShaderType.Vertex, vertex)
         if (!resultV.successful) {
-            throw IllegalStateException("Failed to compile vertex shader:\n" + resultV.log)
+            throw RuntimeException("Failed to compile vertex shader:\n" + resultV.log)
         }
 
         val resultH = ShaderHelper.loadShader(ShaderType.Fragment, fragment)
         if (!resultH.successful) {
-            throw IllegalStateException("Failed to compile fragment shader:\n" + resultH.log)
+            throw RuntimeException("Failed to compile fragment shader:\n" + resultH.log)
         }
 
         vertexHandle = resultV.glId
@@ -39,13 +39,13 @@ class Shader(private val vertex: String, private val fragment: String) {
         shaderId = ShaderHelper.createProgram()
 
         if (shaderId == 0) {
-            throw IllegalStateException("Failed to create shaderId")
+            throw RuntimeException("Failed to create shaderId")
         }
 
         val linkResult = ShaderHelper.linkShader(shaderId, vertexHandle, fragmentHandle)
 
         if (!linkResult.successful) {
-            throw IllegalStateException("Failed to link shaders:\n" + linkResult.log)
+            throw RuntimeException("Failed to link shaders:\n" + linkResult.log)
         }
 
         attributes = ShaderHelper.getAttributesLocations(shaderId)
@@ -53,11 +53,19 @@ class Shader(private val vertex: String, private val fragment: String) {
     }
 
     fun bind() {
+        if (bound) {
+            throw IllegalStateException("Shader is already bound")
+        }
+
         glUseProgram(shaderId)
         bound = true
     }
 
     fun unbind() {
+        if (!bound) {
+            throw IllegalStateException("Shader is already not bound")
+        }
+
         glUseProgram(0)
         bound = false
     }
