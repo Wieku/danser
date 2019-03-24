@@ -2,57 +2,91 @@ package me.wieku.framework.graphics.buffers
 
 import me.wieku.framework.graphics.textures.Texture
 import me.wieku.framework.utils.Disposable
+import org.joml.Vector4f
+import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL33.*
 import java.util.*
 
-class Framebuffer(private var width: Int, private var height: Int, private var hasDepth: Boolean = false) : Disposable {
+class Framebuffer(private var width: Int, private var height: Int, defaultColor: Boolean = true) : Disposable {
 
     private var stack = ArrayDeque<Int>()
-
-    var texture = Texture(width, height)
-        private set
 
     var id: Int
         private set
 
-    private var depthID: Int = 0
+    private var colorAttachmentsUsed = 0
+    private var renderBuffers = ArrayList<Int>()
+    private var textureTargets = HashMap<String, Texture>()
 
     init {
-        texture = Texture(width, height)
-
         id = glGenFramebuffers()
 
         bind()
-        texture.bind(0)
-        glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texture.getID(), 0, 0)
 
-        if (hasDepth) {
-            depthID = glGenRenderbuffers()
-            glBindRenderbuffer(GL_RENDERBUFFER, depthID)
-            glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height)
-            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthID)
-            glBindRenderbuffer(GL_RENDERBUFFER, 0)
+        if (defaultColor) {
+            addTextureTarget("color", FramebufferTarget.RGBA)
         }
 
         unbind()
 
     }
 
-    fun bind() {
+    fun addRenderbuffer(target: FramebufferTarget) {
+        var rbID = glGenRenderbuffers()
+        glBindRenderbuffer(GL_RENDERBUFFER, rbID)
+        glRenderbufferStorage(GL_RENDERBUFFER, target.textureFormat.format, width, height)
+
+        var targetId = target.attachment
+
+        if (targetId == GL_COLOR_ATTACHMENT0) {
+            targetId += colorAttachmentsUsed++
+        }
+
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, targetId, GL_RENDERBUFFER, rbID)
+        glBindRenderbuffer(GL_RENDERBUFFER, 0)
+
+        renderBuffers.add(rbID)
+    }
+
+    fun addTextureTarget(name: String, target: FramebufferTarget) {
+        if (textureTargets.containsKey(name)) {
+            throw IllegalStateException("Texture attachment with that name already exists")
+        }
+
+        var texture = Texture(width, height, format = target.textureFormat)
+
+        var targetId = target.attachment
+
+        if (targetId == GL_COLOR_ATTACHMENT0) {
+            targetId += colorAttachmentsUsed++
+        }
+
+        glFramebufferTextureLayer(GL_FRAMEBUFFER, targetId, texture.getID(), 0, 0)
+        textureTargets[name] = texture
+    }
+
+    fun getTexture(name: String = "color"): Texture? {
+        return textureTargets[name]
+    }
+
+    fun bind(clear: Boolean = true, clearColor: Vector4f = Vector4f(0f, 0f, 0f, 1f)) {
         stack.push(glGetInteger(GL_FRAMEBUFFER_BINDING))
         glBindFramebuffer(GL_FRAMEBUFFER, id)
+        if (clear) {
+            GL11.glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w)
+            glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
+        }
     }
 
     fun unbind() {
-        var binding = stack.pop()
+        val binding = stack.pop()
         glBindFramebuffer(GL_FRAMEBUFFER, binding ?: 0)
     }
 
     override fun dispose() {
+        renderBuffers.forEach { glDeleteRenderbuffers(it) }
+        textureTargets.values.forEach { it.dispose() }
         glDeleteFramebuffers(id)
-        if (hasDepth) {
-            glDeleteRenderbuffers(depthID)
-        }
     }
 
 }
