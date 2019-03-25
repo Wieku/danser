@@ -20,13 +20,8 @@ class VertexBufferObject(private val floats: Int, drawMode: DrawMode = DrawMode.
     }
 
     fun bind() {
-        if (disposed) {
-            throw IllegalStateException("Can't bind disposed VBO")
-        }
-
-        if (isBound) {
-            throw IllegalStateException("VBO is already bound")
-        }
+        if (disposed) throw IllegalStateException("Can't bind disposed VBO")
+        if (isBound) throw IllegalStateException("VBO is already bound")
 
         stack.push(glGetInteger(GL_ARRAY_BUFFER_BINDING))
         glBindBuffer(GL_ARRAY_BUFFER, vboHandle)
@@ -34,13 +29,7 @@ class VertexBufferObject(private val floats: Int, drawMode: DrawMode = DrawMode.
     }
 
     fun unbind() {
-        if (disposed) {
-            throw IllegalStateException("Can't unbind disposed VBO")
-        }
-
-        if (!isBound) {
-            throw IllegalStateException("VBO is already not bound")
-        }
+        if (disposed || !isBound) return
 
         val binding = stack.pop()
         GL15.glBindBuffer(GL_ARRAY_BUFFER, binding?:0)
@@ -60,17 +49,9 @@ class VertexBufferObject(private val floats: Int, drawMode: DrawMode = DrawMode.
      * @param data [FloatArray] containing data
      */
     fun setData(data: FloatArray) {
-        if (!isBound) {
-            throw IllegalStateException("VBO is not bound")
-        }
-
-        if (data.isEmpty()) {
-            throw IllegalArgumentException("Empty array was given")
-        }
-
-        if (data.size > floats) {
-            throw IllegalArgumentException("Input data exceeds buffer size")
-        }
+        if (!isBound) throw IllegalStateException("VBO is not bound")
+        if (data.isEmpty()) throw IllegalArgumentException("Empty array was given")
+        if (data.size > floats) throw IllegalArgumentException("Input data exceeds buffer size")
 
         glBufferSubData(GL_ARRAY_BUFFER, 0, data)
     }
@@ -82,17 +63,9 @@ class VertexBufferObject(private val floats: Int, drawMode: DrawMode = DrawMode.
      * @param data [java.nio.FloatBuffer] containing data. It has to be flipped before calling this method
      */
     fun setData(data: FloatBuffer) {
-        if (!isBound) {
-            throw IllegalStateException("VBO is not bound")
-        }
-
-        if (data.position() != 0) {
-            throw IllegalArgumentException("Unflipped buffer was given")
-        }
-
-        if (data.limit() > floats) {
-            throw IllegalArgumentException("Input data exceeds buffer size")
-        }
+        if (!isBound) throw IllegalStateException("VBO is not bound")
+        if (data.position() != 0) throw IllegalArgumentException("Unflipped buffer was given")
+        if (data.limit() > floats) throw IllegalArgumentException("Input data exceeds buffer size")
 
         glBufferSubData(GL_ARRAY_BUFFER, 0, data)
     }
