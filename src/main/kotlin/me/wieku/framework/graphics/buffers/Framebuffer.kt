@@ -9,8 +9,6 @@ import java.util.*
 
 class Framebuffer(private var width: Int, private var height: Int, defaultColor: Boolean = true) : Disposable {
 
-    private var stack = ArrayDeque<Int>()
-
     var id: Int
         private set
 
@@ -87,6 +85,13 @@ class Framebuffer(private var width: Int, private var height: Int, defaultColor:
         renderBuffers.forEach { glDeleteRenderbuffers(it) }
         textureTargets.values.forEach { it.dispose() }
         glDeleteFramebuffers(id)
+    }
+
+    /**
+     * Companion to store framebuffer stack (usefull to restore the context of the previous one)
+     */
+    private companion object {
+        private var stack = ArrayDeque<Int>()
     }
 
 }
