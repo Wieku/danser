@@ -54,7 +54,7 @@ class Shader(private val vertex: String, private val fragment: String) {
 
     fun bind() {
         if (isBound) {
-            throw IllegalStateException("Shader is already isBound")
+            throw IllegalStateException("Shader is already bound")
         }
 
         glUseProgram(shaderId)
@@ -63,7 +63,7 @@ class Shader(private val vertex: String, private val fragment: String) {
 
     fun unbind() {
         if (!isBound) {
-            throw IllegalStateException("Shader is already not isBound")
+            throw IllegalStateException("Shader is already not bound")
         }
 
         glUseProgram(0)
@@ -76,7 +76,7 @@ class Shader(private val vertex: String, private val fragment: String) {
 
     fun setUniform(name: String, vararg values: Float) {
         if (!isBound) {
-            throw IllegalStateException("Shader is not isBound")
+            throw IllegalStateException("Shader is not bound")
         }
 
         when (uniforms[name]!!.attributeType) {
@@ -99,7 +99,7 @@ class Shader(private val vertex: String, private val fragment: String) {
 
     fun setUniform(name: String, values: FloatBuffer) {
         if (!isBound) {
-            throw IllegalStateException("Shader is not isBound")
+            throw IllegalStateException("Shader is not bound")
         }
 
         when (uniforms[name]!!.attributeType) {
