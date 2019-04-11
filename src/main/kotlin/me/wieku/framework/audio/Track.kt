@@ -2,7 +2,6 @@ package me.wieku.framework.audio
 
 import jouvieje.bass.Bass.*
 import jouvieje.bass.defines.BASS_ATTRIB
-import jouvieje.bass.defines.BASS_DATA.BASS_DATA_FFT1024
 import jouvieje.bass.defines.BASS_FX
 import jouvieje.bass.defines.BASS_POS.BASS_POS_BYTE
 import jouvieje.bass.defines.BASS_STREAM
@@ -12,7 +11,7 @@ import org.lwjgl.BufferUtils
 import org.lwjgl.system.MemoryStack
 import java.lang.ref.WeakReference
 
-class Track(file: FileHandle) {
+class Track(file: FileHandle, val fftMode: FFTMode = FFTMode.FFT512) {
     private var channelStream = when (file.fileType) {
         FileType.Classpath -> {
             val buffer = file.toBuffer()
@@ -37,12 +36,12 @@ class Track(file: FileHandle) {
 
     private var fxChannel = BASS_FX_TempoCreate(channelStream.asInt(), BASS_FX.BASS_FX_FREESOURCE)
 
-    private var dataBuffer = BufferUtils.createByteBuffer(512 * 4)
+    private var dataBuffer = BufferUtils.createByteBuffer(fftMode.bins * 4)
 
     internal var volume = 1f
     internal var isVolumeAbsolute = false
 
-    var fftData = FloatArray(512)
+    var fftData = FloatArray(fftMode.bins)
         private set
 
     var peak: Float = 0.0f
@@ -137,34 +136,33 @@ class Track(file: FileHandle) {
         )
     }
 
-    /*fun getState(): Int {
+    fun getState(): Int {
         return BASS_ChannelIsActive(fxChannel.asInt())
-    }*/
+    }
 
     fun update() {
-        BASS_ChannelGetData(fxChannel.asInt(), dataBuffer, BASS_DATA_FFT1024)
+        BASS_ChannelGetData(fxChannel.asInt(), dataBuffer, fftMode.bassInt)
 
         dataBuffer.asFloatBuffer().get(fftData)
 
-        var toPeak = -1.0f
-        var beatAv = 0.0f
+        var allPeak = 0f
+        var beatPeak = 0f
 
         for ((i, v) in fftData.withIndex()) {
-            if (toPeak < v) {
-                toPeak = v
-            }
+            allPeak = Math.max(allPeak, v)
+
             if (i in 1..4) {
-                beatAv = Math.max(beatAv, v)
+                beatPeak = Math.max(beatPeak, v)
             }
         }
 
-        beat = beatAv
-        peak = toPeak
+        beat = beatPeak
+        peak = allPeak
 
         val level = BASS_ChannelGetLevel(fxChannel.asInt())
 
-        leftChannelLevel = (level and 65535).toFloat() / 32768
-        rightChannelLevel = (level shr 16).toFloat() / 32768
+        leftChannelLevel = (level and 0xffff).toFloat() / 0x8000
+        rightChannelLevel = (level shr 16).toFloat() / 0x8000
     }
 
     fun getLevelCombined(): Float {
