@@ -64,8 +64,6 @@ object BassSystem {
 
     private fun updateAll() {
         synchronized(tracks) {
-            println("uuuuwuwuw")
-            println(globalVolume)
             tracks = tracks.filter { it.get() != null } as ArrayList<WeakReference<Track>>
             tracks.forEach { ref ->
                 val track = ref.get()!!
