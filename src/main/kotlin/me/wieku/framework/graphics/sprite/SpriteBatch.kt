@@ -1,9 +1,9 @@
 package me.wieku.framework.graphics.sprite
 
+import me.wieku.framework.graphics.buffers.*
 import me.wieku.framework.graphics.shaders.Shader
 import me.wieku.framework.graphics.textures.Texture
 import me.wieku.framework.graphics.textures.TextureRegion
-import me.wieku.framework.graphics.buffers.*
 import me.wieku.framework.math.rot
 import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.FileType
@@ -131,7 +131,7 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
         preSFactor = glGetInteger(GL_BLEND_SRC_ALPHA)
         preDFactor = glGetInteger(GL_BLEND_SRC_ALPHA)
 
-        if(!preBlendState)
+        if (!preBlendState)
             glEnable(GL_BLEND)
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
 
@@ -148,7 +148,7 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
         vertexBuffer.flip()
         vao.setData(vertexBuffer)
 
-        ibo.draw(0, vertexCount / 4 * 6)
+        ibo.draw(to = vertexCount / 4 * 6)
 
         vertexBuffer.clear()
         vertexCount = 0
@@ -173,7 +173,7 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
 
         shader.unbind()
 
-        if(!preBlendState)
+        if (!preBlendState)
             glDisable(GL_BLEND)
         glBlendFunc(preSFactor, preDFactor)
     }
@@ -243,22 +243,26 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
             flush()
         }
 
-        val fX = if(sprite.flipX) -1f else 1f
-        val fY = if(sprite.flipY) -1f else 1f
+        val fX = if (sprite.flipX) -1f else 1f
+        val fY = if (sprite.flipY) -1f else 1f
 
-        tmp.set(0f, 0f).sub(sprite.origin).rot(sprite.rotation).mul(sprite.scale).mul(sprite.width*fX, sprite.height*fY).add(sprite.position)
+        tmp.set(0f, 0f).sub(sprite.origin).rot(sprite.rotation).mul(sprite.scale)
+            .mul(sprite.width * fX, sprite.height * fY).add(sprite.position)
         tmp1.set(region.getU1(), region.getV1(), region.getLayer().toFloat())
         addVertex(tmp, tmp1, sprite.color, sprite.additive)
 
-        tmp.set(1f, 0f).sub(sprite.origin).rot(sprite.rotation).mul(sprite.scale).mul(sprite.width*fX, sprite.height*fY).add(sprite.position)
+        tmp.set(1f, 0f).sub(sprite.origin).rot(sprite.rotation).mul(sprite.scale)
+            .mul(sprite.width * fX, sprite.height * fY).add(sprite.position)
         tmp1.set(region.getU2(), region.getV1(), region.getLayer().toFloat())
         addVertex(tmp, tmp1, sprite.color, sprite.additive)
 
-        tmp.set(1f, 1f).sub(sprite.origin).rot(sprite.rotation).mul(sprite.scale).mul(sprite.width*fX, sprite.height*fY).add(sprite.position)
+        tmp.set(1f, 1f).sub(sprite.origin).rot(sprite.rotation).mul(sprite.scale)
+            .mul(sprite.width * fX, sprite.height * fY).add(sprite.position)
         tmp1.set(region.getU2(), region.getV2(), region.getLayer().toFloat())
         addVertex(tmp, tmp1, sprite.color, sprite.additive)
 
-        tmp.set(0f, 1f).sub(sprite.origin).rot(sprite.rotation).mul(sprite.scale).mul(sprite.width*fX, sprite.height*fY).add(sprite.position)
+        tmp.set(0f, 1f).sub(sprite.origin).rot(sprite.rotation).mul(sprite.scale)
+            .mul(sprite.width * fX, sprite.height * fY).add(sprite.position)
         tmp1.set(region.getU1(), region.getV2(), region.getLayer().toFloat())
         addVertex(tmp, tmp1, sprite.color, sprite.additive)
     }
