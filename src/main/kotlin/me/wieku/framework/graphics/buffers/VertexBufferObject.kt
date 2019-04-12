@@ -3,11 +3,10 @@ package me.wieku.framework.graphics.buffers
 import me.wieku.framework.utils.Disposable
 import org.lwjgl.opengl.GL15
 import org.lwjgl.opengl.GL33.*
-import java.lang.IllegalStateException
 import java.nio.FloatBuffer
 import java.util.*
 
-class VertexBufferObject(private val floats: Int, drawMode: DrawMode = DrawMode.DynamicDraw): Disposable {
+class VertexBufferObject(private val floats: Int, drawMode: DrawMode = DrawMode.DynamicDraw) : Disposable {
 
     private var vboHandle = glGenBuffers()
     private var isBound = false
@@ -15,13 +14,13 @@ class VertexBufferObject(private val floats: Int, drawMode: DrawMode = DrawMode.
 
     init {
         bind()
-        glBufferData(GL_ARRAY_BUFFER, floats.toLong()*4, drawMode.glEnumID)
+        glBufferData(GL_ARRAY_BUFFER, floats.toLong() * 4, drawMode.glEnumID)
         unbind()
     }
 
     fun bind() {
-        if (disposed) throw IllegalStateException("Can't bind disposed VBO")
-        if (isBound) throw IllegalStateException("VBO is already bound")
+        check(!disposed) { "Can't bind disposed VBO" }
+        check(!isBound) { "VBO is already bound" }
 
         stack.push(glGetInteger(GL_ARRAY_BUFFER_BINDING))
         glBindBuffer(GL_ARRAY_BUFFER, vboHandle)
@@ -32,7 +31,7 @@ class VertexBufferObject(private val floats: Int, drawMode: DrawMode = DrawMode.
         if (disposed || !isBound) return
 
         val binding = stack.pop()
-        GL15.glBindBuffer(GL_ARRAY_BUFFER, binding?:0)
+        GL15.glBindBuffer(GL_ARRAY_BUFFER, binding ?: 0)
         isBound = false
     }
 
@@ -49,9 +48,9 @@ class VertexBufferObject(private val floats: Int, drawMode: DrawMode = DrawMode.
      * @param data [FloatArray] containing data
      */
     fun setData(data: FloatArray) {
-        if (!isBound) throw IllegalStateException("VBO is not bound")
-        if (data.isEmpty()) throw IllegalArgumentException("Empty array was given")
-        if (data.size > floats) throw IllegalArgumentException("Input data exceeds buffer size")
+        check(isBound) { "VBO is not bound" }
+        require(data.isNotEmpty()) { "Empty array was given" }
+        require(data.size <= floats) { "Input data exceeds buffer size" }
 
         glBufferSubData(GL_ARRAY_BUFFER, 0, data)
     }
@@ -63,9 +62,9 @@ class VertexBufferObject(private val floats: Int, drawMode: DrawMode = DrawMode.
      * @param data [java.nio.FloatBuffer] containing data. It has to be flipped before calling this method
      */
     fun setData(data: FloatBuffer) {
-        if (!isBound) throw IllegalStateException("VBO is not bound")
-        if (data.position() != 0) throw IllegalArgumentException("Unflipped buffer was given")
-        if (data.limit() > floats) throw IllegalArgumentException("Input data exceeds buffer size")
+        check(isBound) { "VBO is not bound" }
+        require(data.position() == 0) { "Unflipped buffer was given" }
+        require(data.limit() <= floats) { "Input data exceeds buffer size" }
 
         glBufferSubData(GL_ARRAY_BUFFER, 0, data)
     }
