@@ -7,7 +7,12 @@ import java.nio.IntBuffer
 import java.nio.ShortBuffer
 import java.util.*
 
-class IndexBufferObject(private val maxIndices: Int, private val useInts: Boolean = false, drawMode: DrawMode = DrawMode.DynamicDraw) : Disposable {
+class IndexBufferObject(
+    private val maxIndices: Int,
+    private val useInts: Boolean = false,
+    drawMode: DrawMode = DrawMode.DynamicDraw
+) : Disposable {
+
     private var indexSize = if (useInts) 4 else 2
     private var byteSize = maxIndices * indexSize
 
@@ -24,8 +29,8 @@ class IndexBufferObject(private val maxIndices: Int, private val useInts: Boolea
     }
 
     fun bind() {
-        if (disposed) throw IllegalStateException("Can't bind disposed IBO")
-        if (isBound) throw IllegalStateException("IBO is already bound")
+        check(!disposed) { "Can't bind disposed IBO" }
+        check(!isBound) { "IBO is already bound" }
 
         stack.push(glGetInteger(GL_ELEMENT_ARRAY_BUFFER_BINDING))
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iboHandle)
@@ -40,8 +45,9 @@ class IndexBufferObject(private val maxIndices: Int, private val useInts: Boolea
         isBound = false
     }
 
-    fun drawInstanced(fromInstance: Int = 0, toInstance: Int = 1, from: Int = 0, to: Int = currentIndices) {
-        if (!isBound) throw IllegalStateException("IBO is not bound")
+    fun draw(from: Int = 0, to: Int = currentIndices, fromInstance: Int = 0, toInstance: Int = 1) {
+        check(isBound) { "IBO is not bound" }
+        check(from in 0..to && to <= maxIndices) { "Drawing data out of buffer's memory" }
 
         ARBBaseInstance.glDrawElementsInstancedBaseInstance(
             GL_TRIANGLES,
@@ -51,15 +57,6 @@ class IndexBufferObject(private val maxIndices: Int, private val useInts: Boolea
             toInstance - fromInstance,
             fromInstance
         )
-    }
-
-    fun draw(from: Int = 0, to: Int = currentIndices) {
-        if (!isBound) throw IllegalStateException("IBO is not bound")
-
-        if (to < from || from < 0 || to > maxIndices || from > maxIndices)
-            throw IndexOutOfBoundsException("Drawing data out of buffer's memory")
-
-        glDrawElements(GL_TRIANGLES, to - from, if (useInts) GL_UNSIGNED_INT else GL_UNSIGNED_SHORT, from.toLong())
     }
 
     override fun dispose() {
@@ -76,10 +73,10 @@ class IndexBufferObject(private val maxIndices: Int, private val useInts: Boolea
      * @throws [java.lang.IllegalArgumentException] if IBO was instantiated with [useInts] as false
      */
     fun setData(data: IntArray) {
-        if (!isBound) throw IllegalStateException("IBO is not bound")
-        if (!useInts) throw IllegalArgumentException("Wrong array was given")
-        if (data.isEmpty()) throw IllegalArgumentException("Empty array was given")
-        if (data.size > maxIndices) throw IllegalArgumentException("Input data exceeds buffer size")
+        check(isBound) { "IBO is not bound" }
+        require(useInts) { "Wrong array was given" }
+        require(!data.isEmpty()) { "Empty array was given" }
+        require(data.size <= maxIndices) { "Input data exceeds buffer size" }
 
         currentIndices = data.size
         glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, data)
@@ -93,10 +90,10 @@ class IndexBufferObject(private val maxIndices: Int, private val useInts: Boolea
      * @throws [java.lang.IllegalArgumentException] if IBO was instantiated with [useInts] as true
      */
     fun setData(data: ShortArray) {
-        if (!isBound) throw IllegalStateException("IBO is not bound")
-        if (useInts) throw IllegalArgumentException("Wrong array was given")
-        if (data.isEmpty()) throw IllegalArgumentException("Empty array was given")
-        if (data.size > maxIndices) throw IllegalArgumentException("Input data exceeds buffer size")
+        check(isBound) { "IBO is not bound" }
+        require(!useInts) { "Wrong array was given" }
+        require(!data.isEmpty()) { "Empty array was given" }
+        require(data.size <= maxIndices) { "Input data exceeds buffer size" }
 
         currentIndices = data.size
         glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, data)
@@ -110,10 +107,10 @@ class IndexBufferObject(private val maxIndices: Int, private val useInts: Boolea
      * @throws [java.lang.IllegalArgumentException] if IBO was instantiated with [useInts] as false
      */
     fun setData(data: IntBuffer) {
-        if (!isBound) throw IllegalStateException("IBO is not bound")
-        if (!useInts) throw IllegalArgumentException("Wrong buffer was given")
-        if (data.position() != 0) throw IllegalArgumentException("Unflipped buffer was given")
-        if (data.limit() > maxIndices) throw IllegalArgumentException("Input data exceeds buffer size")
+        check(isBound) { "IBO is not bound" }
+        require(useInts) { "Wrong buffer was given" }
+        require(data.position() == 0) { "Unflipped buffer was given" }
+        require(data.limit() <= maxIndices) { "Input data exceeds buffer size" }
 
         currentIndices = data.limit()
         glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, data)
@@ -127,10 +124,10 @@ class IndexBufferObject(private val maxIndices: Int, private val useInts: Boolea
      * @throws [java.lang.IllegalArgumentException] if IBO was instantiated with [useInts] as true
      */
     fun setData(data: ShortBuffer) {
-        if (!isBound) throw IllegalStateException("IBO is not bound")
-        if (useInts) throw IllegalArgumentException("Wrong buffer was given")
-        if (data.position() != 0) throw IllegalArgumentException("Unflipped buffer was given")
-        if (data.limit() > maxIndices) throw IllegalArgumentException("Input data exceeds buffer size")
+        check(isBound) { "IBO is not bound" }
+        require(!useInts) { "Wrong buffer was given" }
+        require(data.position() == 0) { "Unflipped buffer was given" }
+        require(data.limit() <= maxIndices) { "Input data exceeds buffer size" }
 
         currentIndices = data.limit()
         glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, data)
