@@ -2,132 +2,162 @@ package me.wieku.framework.graphics.buffers
 
 import me.wieku.framework.graphics.shaders.Shader
 import me.wieku.framework.utils.Disposable
+import org.lwjgl.opengl.ARBBaseInstance
 import org.lwjgl.opengl.GL33.*
-import org.lwjgl.system.MemoryUtil
 import java.nio.FloatBuffer
+import java.util.*
 
-class VertexArrayObject(private var maxVertices: Int, private val attributes: Array<VertexAttribute>) : Disposable {
-    private var vertexSize = attributes.vertexSize()
-    private var byteSize = maxVertices * attributes.vertexSize()
+class VertexArrayObject : Disposable {
+    private var vaoHandle: Int = glGenVertexArrays()
 
-    private var vaoHandle: Int = 0
-    private var vboHandle: Int = 0
+    private var isBound = false
+    private var disposed = false
+
+    private val vboMap = HashMap<String, VBOHolder>()
 
     private var currentVertices = 0
+    private var currentInstances = 1
 
     init {
-        vaoHandle = glGenVertexArrays()
-
-        glBindVertexArray(vaoHandle)
-
-        vboHandle = glGenBuffers()
-
-        glBindBuffer(GL_ARRAY_BUFFER, vboHandle)
-
-        val buffer = MemoryUtil.memAlloc(byteSize)
-        glBufferData(GL_ARRAY_BUFFER, buffer.asFloatBuffer(), GL_DYNAMIC_DRAW)
-        MemoryUtil.memFree(buffer)
-
-        glBindBuffer(GL_ARRAY_BUFFER, 0)
-        glBindVertexArray(0)
-
-        attributes.sortBy { it.attributeIndex }
+        bind()
+        unbind()
     }
 
     fun bindToShader(shader: Shader) {
+        check(isBound) { "VBO is not bound" }
 
-        var offset = 0
+        vboMap.values.forEach { vboHolder ->
 
-        attributes.forEach {
-            if (it.attributeType.size > 16)
-                throw IllegalStateException("Cannot use ${it.attributeType.name} as an attribute")
+            vboHolder.vbo.bind()
 
-            val location = shader.attributes[it.attributeName]!!.location
+            var offset = 0
 
-            glVertexAttribPointer(
-                location,
-                it.attributeType.size / 4,
-                if (it.attributeType == VertexAttributeType.GlInt) GL_INT else GL_FLOAT,
-                false,
-                attributes.vertexSize(),
-                offset.toLong()
-            )
-            glEnableVertexAttribArray(location)
+            vboHolder.attributes.forEach {
+                require(it.attributeType.size <= 16) {
+                    "Cannot use ${it.attributeType.name} as an attribute"
+                }
 
-            offset += it.attributeType.size
+                val location = shader.attributes[it.attributeName]!!.location
+
+                glVertexAttribPointer(
+                    location,
+                    it.attributeType.size / 4,
+                    if (it.attributeType == VertexAttributeType.GlInt) GL_INT else GL_FLOAT,
+                    false,
+                    vboHolder.attributes.vertexSize(),
+                    offset.toLong()
+                )
+                glVertexAttribDivisor(location, vboHolder.divisor)
+                glEnableVertexAttribArray(location)
+
+                offset += it.attributeType.size
+            }
+
+            vboHolder.vbo.unbind()
         }
 
     }
 
-    fun setData(data: FloatArray) {
-        if (data.isEmpty()) {
-            throw IllegalArgumentException("Empty array was given")
+    fun addVBO(name: String, maxVertices: Int, divisor: Int, attributes: Array<VertexAttribute>) {
+        check(!vboMap.containsKey(name)) { "VBO with that name already exists" }
+
+        attributes.sortBy { it.attributeIndex }
+        val holder = VBOHolder(
+            VertexBufferObject(maxVertices * attributes.vertexSize() / 4),
+            maxVertices,
+            divisor,
+            attributes.vertexSize() / 4,
+            attributes
+        )
+
+        vboMap[name] = holder
+    }
+
+    fun setData(vboName: String, data: FloatArray) {
+        require(vboMap.containsKey(vboName)) { "VBO with that name does not exist" }
+        val vboHolder = vboMap[vboName]!!
+
+        require(data.isNotEmpty()) { "Empty array was given" }
+        require(data.size <= vboHolder.maxVertices * vboHolder.vertexSize) { "Input data exceeds buffer size" }
+        require(data.size % vboHolder.vertexSize == 0) { "Vertex size does not match" }
+
+        when (vboHolder.divisor) {
+            0 -> currentVertices = data.size / vboHolder.vertexSize
+            else -> currentInstances = data.size / vboHolder.vertexSize * vboHolder.divisor
         }
 
-        if (data.size > byteSize / 4) {
-            throw IllegalArgumentException("Input data exceeds buffer size")
-        }
-
-        if (data.size % vertexSize != 0) {
-            throw IllegalArgumentException("Vertex size does not match")
-        }
-
-        currentVertices = 4 * data.size / vertexSize
-        glBufferSubData(GL_ARRAY_BUFFER, 0, data)
+        vboHolder.vbo.bind()
+        vboHolder.vbo.setData(data)
+        vboHolder.vbo.unbind()
     }
 
     /**
      * NOTE: Data have to be flipped before calling this function
      */
-    fun setData(data: FloatBuffer) {
-        if (data.position() != 0) {
-            throw IllegalArgumentException("Unflipped buffer was given")
+    fun setData(vboName: String, data: FloatBuffer) {
+        require(vboMap.containsKey(vboName)) { "VBO with that name does not exist" }
+        val vboHolder = vboMap[vboName]!!
+
+        require(data.position() == 0) { "Unflipped buffer was given" }
+        require(data.limit() <= vboHolder.maxVertices * vboHolder.vertexSize) { "Input data exceeds buffer size" }
+        require(data.limit() % vboHolder.vertexSize == 0) { "Vertex size does not match" }
+
+        when (vboHolder.divisor) {
+            0 -> currentVertices = data.limit() / vboHolder.vertexSize
+            else -> currentInstances = data.limit() / vboHolder.vertexSize * vboHolder.divisor
         }
 
-        if (data.limit() > byteSize / 4) {
-            throw IllegalArgumentException("Input data exceeds buffer size")
-        }
-
-        if (data.limit() % vertexSize != 0) {
-            throw IllegalArgumentException("Vertex size does not match")
-        }
-
-        currentVertices = 4 * data.limit() / vertexSize
-        glBufferSubData(GL_ARRAY_BUFFER, 0, data)
+        vboHolder.vbo.bind()
+        vboHolder.vbo.setData(data)
+        vboHolder.vbo.unbind()
     }
 
     fun bind() {
-        glBindVertexArray(vaoHandle)
-        glBindBuffer(GL_ARRAY_BUFFER, vboHandle)
-    }
+        check(!disposed) { "Can't bind disposed VAO" }
+        check(!isBound) { "VBO is already bound" }
 
-    fun bindRender() {
+        stack.push(glGetInteger(GL_VERTEX_ARRAY_BINDING))
         glBindVertexArray(vaoHandle)
+        isBound = true
     }
 
     fun unbind() {
-        glBindVertexArray(0)
-        glBindBuffer(GL_ARRAY_BUFFER, 0)
+        if (disposed || !isBound) return
+
+        val binding = stack.pop()
+        glBindVertexArray(binding ?: 0)
+        isBound = false
     }
 
-    fun unbindRender() {
-        glBindVertexArray(0)
-    }
+    fun draw(from: Int = 0, to: Int = currentVertices, fromInstance: Int = 0, toInstance: Int = currentInstances) {
+        check(from in 0..to/* && to <= maxVertices*/) { "Drawing data out of buffer's memory" }
 
-    fun draw() {
-        glDrawArrays(GL_TRIANGLES, 0, maxVertices)
-    }
-
-    fun draw(from: Int, to: Int) {
-        if (to < from || from < 0 || to > maxVertices || from > maxVertices)
-            throw IndexOutOfBoundsException("Drawing data out of buffer's memory")
-
-        glDrawArrays(GL_TRIANGLES, from, to - from)
+        ARBBaseInstance.glDrawArraysInstancedBaseInstance(
+            GL_TRIANGLES,
+            from,
+            to - from,
+            toInstance - fromInstance,
+            fromInstance
+        )
     }
 
     override fun dispose() {
-        glDeleteBuffers(vboHandle)
+        if (disposed) return
+        vboMap.forEach { it.value.vbo.dispose() }
         glDeleteVertexArrays(vaoHandle)
+        disposed = true
+    }
+
+    @Suppress("ProtectedInFinal", "Unused")
+    protected fun finalize() {
+        dispose()
+    }
+
+    /**
+     * Companion to store vao stack (useful to restore the context of the previous one)
+     */
+    private companion object {
+        private var stack = ArrayDeque<Int>()
     }
 
 }

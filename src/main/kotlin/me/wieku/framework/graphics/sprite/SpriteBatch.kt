@@ -59,7 +59,8 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
 
         vertexSize = attributes.vertexSize() / 4
 
-        vao = VertexArrayObject(maxSprites * 4, attributes)
+        vao = VertexArrayObject()
+        vao.addVBO("default", maxSprites * 4, 0, attributes)
 
         vao.bind()
         vao.bindToShader(shader)
@@ -146,7 +147,7 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
         }
 
         vertexBuffer.flip()
-        vao.setData(vertexBuffer)
+        vao.setData("default", vertexBuffer)
 
         ibo.draw(to = vertexCount / 4 * 6)
 
