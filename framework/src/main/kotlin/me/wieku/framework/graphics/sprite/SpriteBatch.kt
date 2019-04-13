@@ -46,7 +46,7 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
     private var currentTexture: Texture? = null
 
     init {
-        var location = SpriteBatch::class.java.getPackage().name.replace(".", "/") + "/res/sprite"
+        var location = "frameworkAssets/sprite"
         shader =
                 Shader(FileHandle("$location.vsh", FileType.Classpath), FileHandle("$location.fsh", FileType.Classpath))
 

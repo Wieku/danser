@@ -1,33 +1,24 @@
 import org.gradle.internal.os.OperatingSystem
 
-plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.3.11'
-    id 'de.fuerstenau.buildconfig' version '1.1.8'
-    id 'application'
+buildscript {
+    project.ext.kotlinVersion = '1.3.30'
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+    }
 }
 
-group 'me.wieku'
-version = new Date().format("yy.MMdd")
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.3.30'
+    id 'de.fuerstenau.buildconfig' version '1.1.8'
+}
 
 repositories {
     mavenCentral()
-}
-
-project.ext.lwjglVersion = "3.2.1"
-project.ext.jomlVersion = "1.9.13"
-
-sourceSets.main.resources { srcDirs = ["src/main/kotlin", "src/main/resources"]; include "**/*.*"; exclude "**/*.kt" }
-
-switch (OperatingSystem.current()) {
-    case OperatingSystem.LINUX:
-        project.ext.lwjglNatives = "natives-linux"
-        break
-    case OperatingSystem.MAC_OS:
-        project.ext.lwjglNatives = "natives-macos"
-        break
-    case OperatingSystem.WINDOWS:
-        project.ext.lwjglNatives = "natives-windows"
-        break
 }
 
 def getGitRef() {
@@ -43,50 +34,47 @@ def getGitRef() {
     }
 }
 
-if (System.getenv("BUILD_NUMBER") != null)
-    version += ".${System.getenv("BUILD_NUMBER")}"
-else
-    version += "-" + getGitRef()
+allprojects {
+    apply plugin: 'idea'
+    apply plugin: 'java'
+    group 'me.wieku'
 
-dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    compile fileTree(dir: 'libs', include: '*.jar')
-    implementation "org.lwjgl:lwjgl:$lwjglVersion"
-    implementation "org.lwjgl:lwjgl-glfw:$lwjglVersion"
-    implementation "org.lwjgl:lwjgl-nfd:$lwjglVersion"
-    implementation "org.lwjgl:lwjgl-opengl:$lwjglVersion"
-    implementation "org.lwjgl:lwjgl-opengles:$lwjglVersion"
-    implementation "org.lwjgl:lwjgl-stb:$lwjglVersion"
-    implementation "org.lwjgl:lwjgl-yoga:$lwjglVersion"
-    implementation "org.joml:joml:${jomlVersion}"
-    runtimeOnly "org.lwjgl:lwjgl:$lwjglVersion:$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-glfw:$lwjglVersion:$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-nfd:$lwjglVersion:$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-opengl:$lwjglVersion:$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-opengles:$lwjglVersion:$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-stb:$lwjglVersion:$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-yoga:$lwjglVersion:$lwjglNatives"
+    version = new Date().format("yy.MMdd")
+
+    if (System.getenv("BUILD_NUMBER") != null)
+        version += ".${System.getenv("BUILD_NUMBER")}"
+    else
+        version += "-" + getGitRef()
+
+    ext {
+        lwjglVersion = "3.2.1"
+        jomlVersion = "1.9.13"
+        switch (OperatingSystem.current()) {
+            case OperatingSystem.LINUX:
+                lwjglNatives = "natives-linux"
+                break
+            case OperatingSystem.MAC_OS:
+                lwjglNatives = "natives-macos"
+                break
+            case OperatingSystem.WINDOWS:
+                lwjglNatives = "natives-windows"
+                break
+        }
+
+    }
+    
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    }
 }
-
-mainClassName = 'me.wieku.danser.MainKt'
 
 compileKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
 compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
-}
-
-buildConfig {
-    appName = project.name
-    version = project.version
-
-    clsName = "BuildConf"
-    packageName = "me.wieku.danser.build"
-
-    charset = "UTF-8"
-}
-
-run {
-   // systemProperty "java.library.path", "libs/natives/bass/win64/"
 }

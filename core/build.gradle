@@ -1,0 +1,25 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm'
+    id 'de.fuerstenau.buildconfig'
+}
+
+sourceCompatibility = 1.8
+
+sourceSets.main.kotlin.srcDirs = ["src/main/kotlin"]
+sourceSets.main.resources.srcDirs = ["src/main/resources"]
+
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+dependencies {
+    implementation project(":framework")
+}
+
+buildConfig {
+    appName = project.name
+    version = project.version
+
+    clsName = "BuildConf"
+    packageName = "me.wieku.danser.build"
+
+    charset = "UTF-8"
+}
