@@ -12,6 +12,7 @@ sourceSets.main.resources.srcDirs = ["src/main/resources"]
 
 dependencies {
     implementation project(":framework")
+    implementation 'org.jetbrains.exposed:exposed:0.13.6'
 }
 
 buildConfig {
