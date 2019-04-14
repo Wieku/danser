@@ -5,8 +5,8 @@ import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.IntIdTable
 
-class BeatmapStatistics(id: EntityID<Int>): IntEntity(id) {
-    companion object: IntEntityClass<BeatmapStatistics>(BeatmapStatisticss)
+class BeatmapStatistics(id: EntityID<Int>) : IntEntity(id) {
+    companion object : IntEntityClass<BeatmapStatistics>(BeatmapStatisticss)
 
     var lastModified by BeatmapStatisticss.lastModified
     var timeAdded by BeatmapStatisticss.timeAdded
@@ -16,7 +16,7 @@ class BeatmapStatistics(id: EntityID<Int>): IntEntity(id) {
     var isFavorite by BeatmapStatisticss.favorite
 }
 
-object BeatmapStatisticss: IntIdTable() {
+object BeatmapStatisticss : IntIdTable() {
     val lastModified = integer("lastModified").default(-1)
     val timeAdded = integer("timeAdded").default(-1)
     val playCount = integer("playCount").default(0)

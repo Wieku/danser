@@ -5,8 +5,8 @@ import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.IntIdTable
 
-class BeatmapInfo(id: EntityID<Int>): IntEntity(id) {
-    companion object: IntEntityClass<BeatmapInfo>(BeatmapInfos)
+class BeatmapInfo(id: EntityID<Int>) : IntEntity(id) {
+    companion object : IntEntityClass<BeatmapInfo>(BeatmapInfos)
 
     val version by BeatmapInfos.version
     val onlineId by BeatmapInfos.onlineId
@@ -20,7 +20,7 @@ class BeatmapInfo(id: EntityID<Int>): IntEntity(id) {
     val md5 by BeatmapInfos.md5
 }
 
-object BeatmapInfos: IntIdTable() {
+object BeatmapInfos : IntIdTable() {
     val version = text("version")
     val onlineId = integer("onlineId").nullable()
     val audioLeadIn = integer("audioLeadIn")

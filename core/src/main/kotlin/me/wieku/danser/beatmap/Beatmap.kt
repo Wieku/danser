@@ -16,15 +16,15 @@ class Beatmap(id: EntityID<Int>) : IntEntity(id) {
     private var metadata by BeatmapMetadata optionalReferencedOn Beatmaps.beatmapMetadata
 
     var beatmapMetadata: BeatmapMetadata = metadata ?: beatmapSet.metadata
-    set(value) {
-        if (value == beatmapSet.metadata) {
-            metadata?.delete()
-            field = beatmapSet.metadata
-        } else {
-            metadata = value
-            field = value
+        set(value) {
+            if (value == beatmapSet.metadata) {
+                metadata?.delete()
+                field = beatmapSet.metadata
+            } else {
+                metadata = value
+                field = value
+            }
         }
-    }
 }
 
 object Beatmaps : IntIdTable() {

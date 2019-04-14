@@ -5,8 +5,8 @@ import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.IntIdTable
 
-class BeatmapDifficulty(id: EntityID<Int>): IntEntity(id) {
-    companion object: IntEntityClass<BeatmapDifficulty>(BeatmapDifficulties)
+class BeatmapDifficulty(id: EntityID<Int>) : IntEntity(id) {
+    companion object : IntEntityClass<BeatmapDifficulty>(BeatmapDifficulties)
 
     var hpDrain by BeatmapDifficulties.hpDrain
     var cs by BeatmapDifficulties.cs
@@ -14,10 +14,9 @@ class BeatmapDifficulty(id: EntityID<Int>): IntEntity(id) {
     var ar by BeatmapDifficulties.ar
     var sliderMultiplier by BeatmapDifficulties.sliderMultiplier
     var sliderTickRate by BeatmapDifficulties.sliderTickRate
-
 }
 
-object BeatmapDifficulties: IntIdTable() {
+object BeatmapDifficulties : IntIdTable() {
     val hpDrain = float("hpDrain").default(5f)
     val cs = float("cs").default(5f)
     val od = float("od").default(5f)
