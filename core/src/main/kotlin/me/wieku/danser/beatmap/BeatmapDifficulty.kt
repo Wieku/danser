@@ -22,5 +22,5 @@ object BeatmapDifficulties : IntIdTable() {
     val od = float("od").default(5f)
     val ar = float("ar").default(5f)
     val sliderMultiplier = float("sliderMultiplier").default(1f)
-    val sliderTickRate = integer("sliderTickRate").default(0)
+    val sliderTickRate = float("sliderTickRate").default(1f)
 }

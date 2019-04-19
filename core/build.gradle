@@ -12,7 +12,8 @@ sourceSets.main.resources.srcDirs = ["src/main/resources"]
 
 dependencies {
     implementation project(":framework")
-    implementation 'org.jetbrains.exposed:exposed:0.13.6'
+    api 'org.jetbrains.exposed:exposed:0.13.6'
+    api "org.xerial:sqlite-jdbc:3.21.0.1"
 }
 
 buildConfig {

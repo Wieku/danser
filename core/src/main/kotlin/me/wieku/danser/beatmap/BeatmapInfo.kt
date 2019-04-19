@@ -8,27 +8,29 @@ import org.jetbrains.exposed.dao.IntIdTable
 class BeatmapInfo(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<BeatmapInfo>(BeatmapInfos)
 
-    val version by BeatmapInfos.version
-    val onlineId by BeatmapInfos.onlineId
-    val audioLeadIn by BeatmapInfos.audioLeadIn
-    val countdown by BeatmapInfos.countdown
-    val sampleSet by BeatmapInfos.sampleSet
-    val stackLeniency by BeatmapInfos.stackLeniency
-    val mode by BeatmapInfos.mode
-    val letterboxInBreaks by BeatmapInfos.letterboxInBreaks
-    val widescreenStoryboard by BeatmapInfos.widescreenStoryboard
-    val md5 by BeatmapInfos.md5
+    var fileVersion by BeatmapInfos.fileVersion
+    var version by BeatmapInfos.version
+    var onlineId by BeatmapInfos.onlineId
+    var audioLeadIn by BeatmapInfos.audioLeadIn
+    var countdown by BeatmapInfos.countdown
+    var sampleSet by BeatmapInfos.sampleSet
+    var stackLeniency by BeatmapInfos.stackLeniency
+    var mode by BeatmapInfos.mode
+    var letterboxInBreaks by BeatmapInfos.letterboxInBreaks
+    var widescreenStoryboard by BeatmapInfos.widescreenStoryboard
+    var md5 by BeatmapInfos.md5
 }
 
 object BeatmapInfos : IntIdTable() {
+    val fileVersion = integer("fileVersion")
     val version = text("version")
     val onlineId = integer("onlineId").nullable()
     val audioLeadIn = integer("audioLeadIn")
-    val countdown = integer("countdown")
+    val countdown = bool("countdown")
     val sampleSet = text("sampleSet")
     val stackLeniency = float("stackLeniency").default(0.7f)
     val mode = integer("mode")
-    val letterboxInBreaks = integer("letterboxInBreaks")
-    val widescreenStoryboard = integer("widescreenStoryboard").default(0)
+    val letterboxInBreaks = bool("letterboxInBreaks")
+    val widescreenStoryboard = bool("widescreenStoryboard").default(false)
     val md5 = text("md5")
 }

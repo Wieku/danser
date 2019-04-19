@@ -9,16 +9,16 @@ import java.util.*
 class BeatmapMetadata(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<BeatmapMetadata>(BeatmapMetadatas)
 
-    val title by BeatmapMetadatas.title
-    val titleUnicode by BeatmapMetadatas.titleUnicode
-    val artist by BeatmapMetadatas.artist
-    val artistUnicode by BeatmapMetadatas.artistUnicode
-    val creator by BeatmapMetadatas.creator
-    val source by BeatmapMetadatas.ssource
-    val tags by BeatmapMetadatas.tags
-    val audioFile by BeatmapMetadatas.audio
-    val previewTime by BeatmapMetadatas.preview
-    val backgroundFile by BeatmapMetadatas.background
+    var title by BeatmapMetadatas.title
+    var titleUnicode by BeatmapMetadatas.titleUnicode
+    var artist by BeatmapMetadatas.artist
+    var artistUnicode by BeatmapMetadatas.artistUnicode
+    var creator by BeatmapMetadatas.creator
+    var source by BeatmapMetadatas.ssource
+    var tags by BeatmapMetadatas.tags
+    var audioFile by BeatmapMetadatas.audio
+    var previewTime by BeatmapMetadatas.preview
+    var backgroundFile by BeatmapMetadatas.background
 
     override fun equals(other: Any?): Boolean {
         if (other !is BeatmapMetadata) {
@@ -42,11 +42,11 @@ class BeatmapMetadata(id: EntityID<Int>) : IntEntity(id) {
 }
 
 object BeatmapMetadatas : IntIdTable() {
-    val title = text("title")
+    val title = text("title").default("Unknown title")
     val titleUnicode = text("titleUnicode").nullable()
-    val artist = text("artist")
+    val artist = text("artist").default("Unknown artist")
     val artistUnicode = text("artistUnicode").nullable()
-    val creator = text("creator")
+    val creator = text("creator").default("Unknown creator")
     val ssource = text("source").nullable()
     val tags = text("tags").nullable()
     val audio = text("audio")
