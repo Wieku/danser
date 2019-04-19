@@ -1,26 +1,56 @@
 package me.wieku.danser.beatmap
 
-import me.wieku.danser.database.eager
-import org.jetbrains.exposed.dao.EntityID
-import org.jetbrains.exposed.dao.IntEntity
-import org.jetbrains.exposed.dao.IntEntityClass
-import org.jetbrains.exposed.dao.IntIdTable
+import java.lang.IllegalStateException
+import javax.persistence.*
 
-class Beatmap(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<Beatmap>(Beatmaps)
+@Entity(name = "Beatmap")
+@Table(indexes = [Index(name = "idx", columnList = "id,beatmapFile")])
+open class Beatmap(
+    var beatmapFile: String = ""
+) {
 
-    var beatmapSet by BeatmapSet referencedOn Beatmaps.beatmapSet//.eager(this)
-    var beatmapInfo by BeatmapInfo referencedOn Beatmaps.beatmapInfo
-    var beatmapStatistics by BeatmapStatistics referencedOn Beatmaps.beatmapStatistics
-    var beatmapDifficulty by BeatmapDifficulty referencedOn Beatmaps.beatmapDifficulty
+    @Id
+    @GeneratedValue
+    @Column(unique = true)
+    protected var id: Int? = null
 
-    var beatmapMetadata by BeatmapMetadata referencedOn Beatmaps.beatmapMetadata
-}
+    @ManyToOne(fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
+    @JoinColumn(name = "beatmapSet")
+    var beatmapSet: BeatmapSet = BeatmapSet()
 
-object Beatmaps : IntIdTable() {
-    val beatmapSet = reference("beatmapSetId", BeatmapSets)
-    val beatmapInfo = reference("beatmapInfoId", BeatmapInfos)
-    val beatmapMetadata = reference("beatmapMetadataId", BeatmapMetadatas)
-    val beatmapStatistics = reference("beatmapStatisticsId", BeatmapStatisticss)
-    val beatmapDifficulty = reference("beatmapDifficultyId", BeatmapDifficulties)
+    @ManyToMany(mappedBy = "beatmaps", cascade = [CascadeType.ALL])
+    val collections: List<BeatmapCollection> = ArrayList()
+
+    @OneToOne(cascade = [CascadeType.ALL])
+    var beatmapInfo: BeatmapInfo = BeatmapInfo()
+
+    @OneToOne(cascade = [CascadeType.ALL])
+    var beatmapStatistics: BeatmapStatistics = BeatmapStatistics()
+
+    @OneToOne(cascade = [CascadeType.ALL])
+    var beatmapDifficulty: BeatmapDifficulty = BeatmapDifficulty()
+
+    @OneToOne(cascade = [CascadeType.ALL])
+    var metadata: BeatmapMetadata? = BeatmapMetadata()
+
+    var beatmapMetadata: BeatmapMetadata
+        get() = metadata ?: beatmapSet.metadata?:throw NullPointerException("Beatmap and BeatmapSet metadata are null")
+        set(value) {
+            if (value == beatmapSet.metadata) {
+                metadata = null
+            }
+        }
+
+    private fun validateMetadatas() {
+        if (metadata == beatmapSet.metadata) {
+            metadata = null
+        }
+    }
+
+    @PrePersist
+    @PreUpdate
+    protected fun validatePreInsertUpdate() {
+        validateMetadatas()
+    }
+
 }

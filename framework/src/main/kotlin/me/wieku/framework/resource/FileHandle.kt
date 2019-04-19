@@ -25,7 +25,7 @@ class FileHandle(path: String, val fileType: FileType) {
         fileURL = when (fileType) {
             FileType.Absolute -> {
                 if (!file.isAbsolute) {
-                    throw IllegalStateException("Opening local file as absolute")
+                    throw IllegalStateException("Opening local file as absolute: ${file.absolutePath}")
                 }
 
                 filePath = Paths.get(path)

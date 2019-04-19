@@ -1,22 +1,47 @@
 package me.wieku.danser.beatmap
 
-import me.wieku.danser.database.eager
-import org.jetbrains.exposed.dao.EntityID
-import org.jetbrains.exposed.dao.IntEntity
-import org.jetbrains.exposed.dao.IntEntityClass
-import org.jetbrains.exposed.dao.IntIdTable
+import javax.persistence.*
 
-class BeatmapSet(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<BeatmapSet>(BeatmapSets)
+@Entity(name = "BeatmapSet")
+@Table(indexes = [Index(name = "idx1", columnList = "id,directory")])
+open class BeatmapSet(
+    //@Column(unique = true)
+    var directory: String = "",
+    var onlineId: Int? = null
+) {
 
-    var directory by BeatmapSets.setDir
-    var onlineId by BeatmapSets.onlineId
-    var metadata by BeatmapMetadata referencedOn BeatmapSets.metadataId
-    val beatmaps by Beatmap.referrersOn(Beatmaps.beatmapSet).eager(this)
-}
+    @Id
+    @GeneratedValue
+    @Column(unique = true)
+    protected var id: Int? = null
 
-object BeatmapSets : IntIdTable() {
-    val setDir = text("dir").default("")
-    val onlineId = integer("onlineId").nullable()
-    val metadataId = reference("metadataId", BeatmapMetadatas)
+    @OneToOne(cascade = [CascadeType.ALL])
+    var metadata: BeatmapMetadata? = null
+
+    @OneToMany(mappedBy = "beatmapSet", cascade = [CascadeType.ALL])
+    val beatmaps: List<Beatmap> = ArrayList()
+
+    @PrePersist
+    protected fun cleanBeatmaps() {
+        beatmaps.forEach {
+            if (directory.isEmpty()) {
+                directory = it.beatmapSet.directory
+            }
+
+            if (onlineId == null) {
+                onlineId = it.beatmapSet.onlineId
+            }
+
+            if (metadata == null) {
+                metadata = it.metadata
+            }
+
+            if(metadata == it.metadata) {
+                it.metadata = null
+            }
+
+            it.beatmapSet = this
+        }
+    }
+
 }

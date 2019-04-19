@@ -1,24 +1,27 @@
 package me.wieku.danser.beatmap
 
-import org.jetbrains.exposed.dao.EntityID
-import org.jetbrains.exposed.dao.IntEntity
-import org.jetbrains.exposed.dao.IntEntityClass
-import org.jetbrains.exposed.dao.IntIdTable
 import java.util.*
+import javax.persistence.Entity
+import javax.persistence.GeneratedValue
+import javax.persistence.Id
 
-class BeatmapMetadata(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<BeatmapMetadata>(BeatmapMetadatas)
+@Entity(name = "BeatmapMetadata")
+open class BeatmapMetadata {
 
-    var title by BeatmapMetadatas.title
-    var titleUnicode by BeatmapMetadatas.titleUnicode
-    var artist by BeatmapMetadatas.artist
-    var artistUnicode by BeatmapMetadatas.artistUnicode
-    var creator by BeatmapMetadatas.creator
-    var source by BeatmapMetadatas.ssource
-    var tags by BeatmapMetadatas.tags
-    var audioFile by BeatmapMetadatas.audio
-    var previewTime by BeatmapMetadatas.preview
-    var backgroundFile by BeatmapMetadatas.background
+    @Id
+    @GeneratedValue
+    protected var id: Int? = null
+
+    var title = "Unknown title"
+    var titleUnicode: String? = null
+    var artist = "Unknown artist"
+    var artistUnicode: String? = null
+    var creator = "Unknown creator"
+    var source: String? = null
+    var tags: String? = null
+    var audioFile: String = ".mp3"
+    var previewTime = 0
+    var backgroundFile: String? = null
 
     override fun equals(other: Any?): Boolean {
         if (other !is BeatmapMetadata) {
@@ -39,17 +42,4 @@ class BeatmapMetadata(id: EntityID<Int>) : IntEntity(id) {
             this.backgroundFile
         )
     }
-}
-
-object BeatmapMetadatas : IntIdTable() {
-    val title = text("title").default("Unknown title")
-    val titleUnicode = text("titleUnicode").nullable()
-    val artist = text("artist").default("Unknown artist")
-    val artistUnicode = text("artistUnicode").nullable()
-    val creator = text("creator").default("Unknown creator")
-    val ssource = text("source").nullable()
-    val tags = text("tags").nullable()
-    val audio = text("audio")
-    val preview = integer("preview")
-    val background = text("background").nullable()
 }

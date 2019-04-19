@@ -12,7 +12,7 @@ class BeatmapParser {
     var timeOffset = 0
 
     fun parse(file: FileHandle, beatmap: Beatmap) {
-        var scanner = Scanner(file.fileURL.openStream())
+        var scanner = Scanner(file.fileURL.openStream(), "UTF-8")
 
         val fileVersion = scanner.nextLine().substringAfter("osu file format v").toInt()
 
@@ -23,8 +23,9 @@ class BeatmapParser {
 
         println("Parsing file version $fileVersion")
 
+        beatmap.beatmapFile = file.filePath!!.fileName.toString()
         beatmap.beatmapInfo.fileVersion = fileVersion
-        beatmap.beatmapSet.directory = file.filePath!!.parent.toString()
+        beatmap.beatmapSet.directory = file.filePath!!.parent.fileName.toString()
 
         this.beatmap = beatmap
 
@@ -47,6 +48,7 @@ class BeatmapParser {
                 Section.General -> parseGeneral(splittedLine)
                 Section.Metadata -> parseMetadata(splittedLine)
                 Section.Difficulty -> parseDifficulty(splittedLine)
+                Section.Events -> parseEvent(splittedLine)
             }
 
         }
@@ -59,7 +61,7 @@ class BeatmapParser {
             "AudioLeadIn" -> beatmap?.beatmapInfo?.audioLeadIn = getOffset(line[1].toInt())
             "PreviewTime" -> beatmap?.beatmapMetadata?.previewTime = getOffset(line[1].toInt())
             "Countdown" -> beatmap?.beatmapInfo?.countdown = line[1].toInt() == 1
-            "SampleSet" -> beatmap?.beatmapInfo?.sampleSet = line[1].toString()
+            "SampleSet" -> beatmap?.beatmapInfo?.sampleSet = line[1]
             "StackLeniency" -> beatmap?.beatmapInfo?.stackLeniency = line[1].toFloat()
             "Mode" -> beatmap?.beatmapInfo?.mode = line[1].toInt()
             "LetterboxInBreaks" -> beatmap?.beatmapInfo?.letterboxInBreaks = line[1].toInt() == 1
@@ -90,6 +92,14 @@ class BeatmapParser {
             "ApproachRate" -> beatmap?.beatmapDifficulty?.ar = line[1].toFloat()
             "SliderMultiplier" -> beatmap?.beatmapDifficulty?.sliderMultiplier = line[1].toFloat()
             "SliderTickRate" -> beatmap?.beatmapDifficulty?.sliderTickRate = line[1].toFloat()
+        }
+    }
+
+    private fun parseEvent(line: List<String>) {
+        val event = Events[line[0]]
+        when (event) {
+            Events.Background -> beatmap?.beatmapMetadata?.backgroundFile = line[1]
+            Events.Break -> beatmap?.beatmapInfo!!.breaksText += "${line[1]}:${line[2]},"
         }
     }
 

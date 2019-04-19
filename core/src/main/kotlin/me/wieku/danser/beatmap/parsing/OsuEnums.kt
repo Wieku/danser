@@ -32,3 +32,39 @@ enum class Section(override val osuEnumId: Int, val separator: String): OsuEnum 
 
     companion object: OsuEnum.Companion<Section>(Unknown)
 }
+
+enum class Events(override val osuEnumId: Int): OsuEnum {
+    Background(0),
+    Video(1),
+    Break(2),
+    Colour(3),
+    Sprite(4),
+    Sample(5),
+    Animation(6);
+
+    companion object: OsuEnum.Companion<Events>(Background)
+}
+
+enum class Origins(override val osuEnumId: Int): OsuEnum {
+    TopLeft(0),
+    Centre(0),
+    CentreLeft(0),
+    TopRight(0),
+    BottomCentre(0),
+    TopCentre(0),
+    Custom(0),
+    CentreRight(0),
+    BottomLeft(0),
+    BottomRight(0);
+
+    companion object: OsuEnum.Companion<Origins>(Centre)
+}
+
+enum class StoryLayer(override val osuEnumId: Int): OsuEnum {
+    Background(0),
+    Fail(1),
+    Pass(2),
+    Foreground(3);
+
+    companion object: OsuEnum.Companion<StoryLayer>(Background)
+}

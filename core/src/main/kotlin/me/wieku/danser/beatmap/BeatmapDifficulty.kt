@@ -1,26 +1,23 @@
 package me.wieku.danser.beatmap
 
-import org.jetbrains.exposed.dao.EntityID
-import org.jetbrains.exposed.dao.IntEntity
-import org.jetbrains.exposed.dao.IntEntityClass
-import org.jetbrains.exposed.dao.IntIdTable
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.GeneratedValue
+import javax.persistence.Id
 
-class BeatmapDifficulty(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<BeatmapDifficulty>(BeatmapDifficulties)
+@Entity(name = "BeatmapDifficulty")
+open class BeatmapDifficulty(
+    var hpDrain: Float = 5f,
+    var cs: Float = 5f,
+    var od: Float = 5f,
+    var ar: Float = 5f,
+    var sliderMultiplier: Float = 1f,
+    var sliderTickRate: Float = 1f
+) {
 
-    var hpDrain by BeatmapDifficulties.hpDrain
-    var cs by BeatmapDifficulties.cs
-    var od by BeatmapDifficulties.od
-    var ar by BeatmapDifficulties.ar
-    var sliderMultiplier by BeatmapDifficulties.sliderMultiplier
-    var sliderTickRate by BeatmapDifficulties.sliderTickRate
-}
+    @Id
+    @GeneratedValue
+    @Column(unique = true)
+    protected var id: Int? = null
 
-object BeatmapDifficulties : IntIdTable() {
-    val hpDrain = float("hpDrain").default(5f)
-    val cs = float("cs").default(5f)
-    val od = float("od").default(5f)
-    val ar = float("ar").default(5f)
-    val sliderMultiplier = float("sliderMultiplier").default(1f)
-    val sliderTickRate = float("sliderTickRate").default(1f)
 }

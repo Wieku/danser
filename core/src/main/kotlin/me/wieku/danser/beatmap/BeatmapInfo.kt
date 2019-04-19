@@ -1,36 +1,42 @@
 package me.wieku.danser.beatmap
 
-import org.jetbrains.exposed.dao.EntityID
-import org.jetbrains.exposed.dao.IntEntity
-import org.jetbrains.exposed.dao.IntEntityClass
-import org.jetbrains.exposed.dao.IntIdTable
+import org.hibernate.annotations.Type
+import javax.persistence.*
 
-class BeatmapInfo(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<BeatmapInfo>(BeatmapInfos)
+@Entity(name = "BeatmapInfo")
+open class BeatmapInfo(
+    var fileVersion: Int = 0,
+    var version: String = "",
+    var onlineId: Int? = null,
+    var audioLeadIn: Int = 0,
+    var countdown: Boolean = false,
+    var sampleSet: String = "Normal",
+    var stackLeniency: Float = 0.7f,
+    var mode: Int = 0,
+    var letterboxInBreaks: Boolean = false,
+    var widescreenStoryboard: Boolean = false,
+    var md5: String = "",
+    @Column(name = "breaks")
+    @Type(type = "text")
+    var breaksText: String = ""
+) {
 
-    var fileVersion by BeatmapInfos.fileVersion
-    var version by BeatmapInfos.version
-    var onlineId by BeatmapInfos.onlineId
-    var audioLeadIn by BeatmapInfos.audioLeadIn
-    var countdown by BeatmapInfos.countdown
-    var sampleSet by BeatmapInfos.sampleSet
-    var stackLeniency by BeatmapInfos.stackLeniency
-    var mode by BeatmapInfos.mode
-    var letterboxInBreaks by BeatmapInfos.letterboxInBreaks
-    var widescreenStoryboard by BeatmapInfos.widescreenStoryboard
-    var md5 by BeatmapInfos.md5
-}
+    @Id
+    @GeneratedValue
+    protected var id: Int? = null
 
-object BeatmapInfos : IntIdTable() {
-    val fileVersion = integer("fileVersion")
-    val version = text("version")
-    val onlineId = integer("onlineId").nullable()
-    val audioLeadIn = integer("audioLeadIn")
-    val countdown = bool("countdown")
-    val sampleSet = text("sampleSet")
-    val stackLeniency = float("stackLeniency").default(0.7f)
-    val mode = integer("mode")
-    val letterboxInBreaks = bool("letterboxInBreaks")
-    val widescreenStoryboard = bool("widescreenStoryboard").default(false)
-    val md5 = text("md5")
+    @Transient
+    val breaks = ArrayList<Break>()
+
+    @PostLoad
+    protected fun parseBreaks() {
+        breaks.clear()
+        breaksText.split(",").forEach {
+            if (it.isNotEmpty()) {
+                val subSplit = it.split(":")
+                breaks.add(Break(subSplit[0].toInt(), subSplit[1].toInt()))
+            }
+        }
+    }
+
 }

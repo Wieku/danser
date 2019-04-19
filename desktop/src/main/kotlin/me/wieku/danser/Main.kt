@@ -15,13 +15,13 @@ import me.wieku.framework.math.Easing
 import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.FileType
 import me.wieku.framework.utils.FpsLimiter
-import org.jetbrains.exposed.dao.load
+/*import org.jetbrains.exposed.dao.load
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.StdOutSqlLogger
 import org.jetbrains.exposed.sql.addLogger
 import org.jetbrains.exposed.sql.transactions.TransactionManager
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.transactions.transaction*/
 import org.joml.Vector2f
 import org.joml.Vector4f
 import org.lwjgl.glfw.GLFW.*
@@ -30,8 +30,14 @@ import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL11.*
 import java.io.File
 import java.sql.Connection
+import javax.persistence.EntityManagerFactory
+import javax.persistence.Persistence
 import javax.sql.DataSource
 import kotlin.math.absoluteValue
+import kotlin.system.exitProcess
+
+var emf = Persistence.createEntityManagerFactory("default")
+
 
 fun main(args: Array<String>) {
     println("Version " + Build.Version)
@@ -41,7 +47,7 @@ fun main(args: Array<String>) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE)
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, 1)
-    var handle = glfwCreateWindow(800, 800, "testdanser: " + Build.Version, 0, 0)
+    var handle = glfwCreateWindow(600, 600, "testdanser: " + Build.Version, 0, 0)
     glfwMakeContextCurrent(handle)
     glfwSwapInterval(0)
     GL.createCapabilities()
@@ -67,61 +73,41 @@ fun main(args: Array<String>) {
     BassSystem.initSystem()
 
     val file = FileHandle(
-        "C:\\Users\\Wieku\\AppData\\Local\\osu!\\Songs\\949703 REOL - Kamisama ni Natta Hi\\REOL - Kamisama ni Natta Hi (I love apples) [God].osu",
+        System.getenv("localappdata")+"\\osu!\\Songs\\949703 REOL - Kamisama ni Natta Hi\\REOL - Kamisama ni Natta Hi (I love apples) [God].osu",
         FileType.Absolute
     )
 
-    Database.connect("jdbc:sqlite:danser.db", "org.sqlite.JDBC")
-    TransactionManager.manager.defaultIsolationLevel = Connection.TRANSACTION_SERIALIZABLE
+    //Database.connect("jdbc:sqlite:danser.db", "org.sqlite.JDBC")
+    //TransactionManager.manager.defaultIsolationLevel = Connection.TRANSACTION_SERIALIZABLE
 
     //data.insert(beatmap)
-    var beatmap = transaction {
-    addLogger(StdOutSqlLogger)
 
-    SchemaUtils.create(Beatmaps)
-    SchemaUtils.create(BeatmapStatisticss)
-    SchemaUtils.create(BeatmapSets)
-    SchemaUtils.create(BeatmapInfos)
-    SchemaUtils.create(BeatmapMetadatas)
-    SchemaUtils.create(BeatmapDifficulties)
-    SchemaUtils.create(Collections)
-    SchemaUtils.create(CollectionBeatmaps)
+   /* var beatmap = Beatmap()
+    BeatmapParser().parse(file, beatmap)*/
 
-    var beatmap = Beatmap.new { }
-    beatmap!!.beatmapSet = BeatmapSet.new {  }
-    beatmap!!.beatmapInfo = BeatmapInfo.new {  }
-    beatmap!!.beatmapStatistics = BeatmapStatistics.new {  }
-    beatmap!!.beatmapDifficulty = BeatmapDifficulty.new {  }
-    beatmap!!.beatmapMetadata = BeatmapMetadata.new {  }
+    var em = emf.createEntityManager()
+    var transaction = em.transaction
 
-        BeatmapParser().parse(file, beatmap)
+    transaction.begin()
 
-    //beatmap = beatmap!!.load(Beatmap::beatmapInfo, Beatmap::beatmapSet, Beatmap::beatmapStatistics, Beatmap::beatmapMetadata, Beatmap::beatmapDifficulty)
-    //BeatmapSets.inse
-        println("Yolo")
-        beatmap
+    val beatmapSet = BeatmapSet()
+    File(System.getenv("localappdata")+"\\osu!\\Songs\\949703 REOL - Kamisama ni Natta Hi").listFiles().filter { it -> it.name.endsWith(".osu") }.forEach{
+        var beatmap = Beatmap()
+        BeatmapParser().parse(FileHandle(it.absolutePath, FileType.Absolute), beatmap)
+        (beatmapSet.beatmaps as ArrayList<Beatmap>).add(beatmap)
     }
+    em.persist(beatmapSet)
 
-    var dir = ""
-    var afile = ""
-    /*transaction {
-        addLogger(StdOutSqlLogger)
-        dir = beatmap!!.beatmapSet.directory
-        afile = beatmap!!.beatmapMetadata.audioFile
-    }*/
-    /*transaction {
-        addLogger(StdOutSqlLogger)
-        beatmap = Beatmap.find { Beatmaps.beatmapMetadata.table eq "Kamisama ni Natta Hi" }.first()
-        dir = beatmap!!.beatmapSet.directory
-        afile = beatmap!!.beatmapMetadata.audioFile
-    }*/
+    transaction.commit()
+    em.close()
 
-    println(dir)
-    println(afile)
+    var beatmaps = emf.createEntityManager().createQuery("SELECT a FROM ${Beatmap::class.java.simpleName} a").resultList as List<Beatmap>
+
+
 
     val track = Track(
         FileHandle(
-            beatmap.beatmapSet.directory + File.separator + beatmap.beatmapMetadata.audioFile,
+            System.getenv("localappdata")+"/osu!/Songs/"+beatmaps[0].beatmapSet.directory + File.separator + beatmaps[0].beatmapMetadata.audioFile,
             FileType.Absolute
         )
     )//Track(FileHandle("assets/audio.mp3", FileType.Classpath))
@@ -130,7 +116,7 @@ fun main(args: Array<String>) {
     var power = 0f
     var time = 0f
 
-    val fbf = Framebuffer(800, 800)
+    val fbf = Framebuffer(600, 600)
     var fsprite = Sprite(fbf.getTexture()!!.region, 2f, 2f)
 
     Thread {
@@ -202,5 +188,5 @@ fun main(args: Array<String>) {
     }
 
     glfwDestroyWindow(handle)
-
+    exitProcess(0)
 }
