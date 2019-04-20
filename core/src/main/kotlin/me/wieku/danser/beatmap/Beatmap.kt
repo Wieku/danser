@@ -10,7 +10,7 @@ open class Beatmap(
 ) {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(unique = true)
     protected var id: Int? = null
 

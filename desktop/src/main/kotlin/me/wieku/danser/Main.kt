@@ -36,8 +36,6 @@ import javax.sql.DataSource
 import kotlin.math.absoluteValue
 import kotlin.system.exitProcess
 
-var emf = Persistence.createEntityManagerFactory("default")
-
 
 fun main(args: Array<String>) {
     println("Version " + Build.Version)
@@ -72,42 +70,15 @@ fun main(args: Array<String>) {
     sprite.addTransform(Transform(TransformType.Move, 20000f, 25000f, -1f, -1f, 0f, 0f, Easing.OutElastic))
     BassSystem.initSystem()
 
-    val file = FileHandle(
-        System.getenv("localappdata")+"\\osu!\\Songs\\949703 REOL - Kamisama ni Natta Hi\\REOL - Kamisama ni Natta Hi (I love apples) [God].osu",
-        FileType.Absolute
-    )
+    BeatmapManager.loadBeatmaps(System.getenv("localappdata")+"\\osu!\\Songs")
 
-    //Database.connect("jdbc:sqlite:danser.db", "org.sqlite.JDBC")
-    //TransactionManager.manager.defaultIsolationLevel = Connection.TRANSACTION_SERIALIZABLE
-
-    //data.insert(beatmap)
-
-   /* var beatmap = Beatmap()
-    BeatmapParser().parse(file, beatmap)*/
-
-    var em = emf.createEntityManager()
-    var transaction = em.transaction
-
-    transaction.begin()
-
-    val beatmapSet = BeatmapSet()
-    File(System.getenv("localappdata")+"\\osu!\\Songs\\949703 REOL - Kamisama ni Natta Hi").listFiles().filter { it -> it.name.endsWith(".osu") }.forEach{
-        var beatmap = Beatmap()
-        BeatmapParser().parse(FileHandle(it.absolutePath, FileType.Absolute), beatmap)
-        (beatmapSet.beatmaps as ArrayList<Beatmap>).add(beatmap)
-    }
-    em.persist(beatmapSet)
-
-    transaction.commit()
-    em.close()
-
-    var beatmaps = emf.createEntityManager().createQuery("SELECT a FROM ${Beatmap::class.java.simpleName} a").resultList as List<Beatmap>
+    var beatmap = BeatmapManager.beatmapSets.filter{it.metadata!!.title == "Chikatto Chika Chika (TV Size)"}[0].beatmaps[0]
 
 
 
     val track = Track(
         FileHandle(
-            System.getenv("localappdata")+"/osu!/Songs/"+beatmaps[0].beatmapSet.directory + File.separator + beatmaps[0].beatmapMetadata.audioFile,
+            System.getenv("localappdata")+"/osu!/Songs/"+beatmap.beatmapSet.directory + File.separator + beatmap.beatmapMetadata.audioFile,
             FileType.Absolute
         )
     )//Track(FileHandle("assets/audio.mp3", FileType.Classpath))

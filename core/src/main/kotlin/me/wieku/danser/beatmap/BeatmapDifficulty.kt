@@ -1,9 +1,6 @@
 package me.wieku.danser.beatmap
 
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.Id
+import javax.persistence.*
 
 @Entity(name = "BeatmapDifficulty")
 open class BeatmapDifficulty(
@@ -16,7 +13,7 @@ open class BeatmapDifficulty(
 ) {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(unique = true)
     protected var id: Int? = null
 

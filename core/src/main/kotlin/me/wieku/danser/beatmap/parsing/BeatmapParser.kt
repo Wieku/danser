@@ -2,6 +2,8 @@ package me.wieku.danser.beatmap.parsing
 
 import me.wieku.danser.beatmap.Beatmap
 import me.wieku.framework.resource.FileHandle
+import me.wieku.framework.resource.md5
+import me.wieku.framework.resource.sha1
 import java.util.*
 
 class BeatmapParser {
@@ -24,7 +26,16 @@ class BeatmapParser {
         println("Parsing file version $fileVersion")
 
         beatmap.beatmapFile = file.filePath!!.fileName.toString()
+        beatmap.beatmapInfo.md5 = file.file.md5()
+        beatmap.beatmapInfo.sha1 = file.file.sha1()
+        beatmap.beatmapStatistics.lastModified = file.file.lastModified()
+
+        if (beatmap.beatmapStatistics.timeAdded == 0L) {
+            beatmap.beatmapStatistics.timeAdded = System.currentTimeMillis()
+        }
+
         beatmap.beatmapInfo.fileVersion = fileVersion
+        beatmap.beatmapInfo.breaksText = ""
         beatmap.beatmapSet.directory = file.filePath!!.parent.fileName.toString()
 
         this.beatmap = beatmap
@@ -42,7 +53,7 @@ class BeatmapParser {
                 continue
             }
 
-            var splittedLine = line.split(section.separator).map { it.trim() }
+            val splittedLine = line.split(section.separator).map { it.trim() }
 
             when(section) {
                 Section.General -> parseGeneral(splittedLine)

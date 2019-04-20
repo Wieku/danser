@@ -16,13 +16,14 @@ open class BeatmapInfo(
     var letterboxInBreaks: Boolean = false,
     var widescreenStoryboard: Boolean = false,
     var md5: String = "",
+    var sha1: String = "",
     @Column(name = "breaks")
     @Type(type = "text")
     var breaksText: String = ""
 ) {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected var id: Int? = null
 
     @Transient

@@ -1,6 +1,7 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm'
     id 'de.fuerstenau.buildconfig'
+    id "org.jetbrains.kotlin.plugin.allopen" version "1.3.30"
 }
 
 sourceCompatibility = 1.8
@@ -31,4 +32,8 @@ buildConfig {
     packageName = "me.wieku.danser.build"
 
     charset = "UTF-8"
+}
+
+allOpen {
+    annotations ("javax.persistence.Entity")
 }

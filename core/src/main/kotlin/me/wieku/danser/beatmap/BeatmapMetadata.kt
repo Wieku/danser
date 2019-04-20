@@ -3,13 +3,14 @@ package me.wieku.danser.beatmap
 import java.util.*
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
 import javax.persistence.Id
 
 @Entity(name = "BeatmapMetadata")
 open class BeatmapMetadata {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected var id: Int? = null
 
     var title = "Unknown title"
