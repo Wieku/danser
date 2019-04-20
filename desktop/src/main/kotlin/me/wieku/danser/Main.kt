@@ -15,13 +15,6 @@ import me.wieku.framework.math.Easing
 import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.FileType
 import me.wieku.framework.utils.FpsLimiter
-/*import org.jetbrains.exposed.dao.load
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.StdOutSqlLogger
-import org.jetbrains.exposed.sql.addLogger
-import org.jetbrains.exposed.sql.transactions.TransactionManager
-import org.jetbrains.exposed.sql.transactions.transaction*/
 import org.joml.Vector2f
 import org.joml.Vector4f
 import org.lwjgl.glfw.GLFW.*
@@ -29,10 +22,6 @@ import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL11.*
 import java.io.File
-import java.sql.Connection
-import javax.persistence.EntityManagerFactory
-import javax.persistence.Persistence
-import javax.sql.DataSource
 import kotlin.math.absoluteValue
 import kotlin.system.exitProcess
 

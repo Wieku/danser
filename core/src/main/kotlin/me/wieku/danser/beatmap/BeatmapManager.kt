@@ -1,6 +1,7 @@
 package me.wieku.danser.beatmap
 
 import me.wieku.danser.beatmap.parsing.BeatmapParser
+import me.wieku.danser.database.transactional
 import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.FileType
 import java.io.File
@@ -17,15 +18,12 @@ object BeatmapManager {
     private var beatmapSetCache: HashMap<String, BeatmapSet>
 
     init {
-        Runtime.getRuntime().addShutdownHook(Thread{
+        Runtime.getRuntime().addShutdownHook(Thread {
             entityManager.close()
             entityManagerFactory.close()
         })
 
-        val transaction = entityManager.transaction
-        transaction.begin()
         beatmapSets.addAll(entityManager.createQuery("SELECT a FROM ${BeatmapSet::class.java.simpleName} a").resultList as ArrayList<BeatmapSet>)
-        transaction.commit()
         beatmapSetCache = beatmapSets.map { it.directory to it }.toMap().toMutableMap() as HashMap<String, BeatmapSet>
     }
 
@@ -35,15 +33,11 @@ object BeatmapManager {
             unpackBundle(it)
         }
 
-        val transaction = entityManager.transaction
-        transaction.begin()
-
-        File(location).listFiles { it -> it.isDirectory }.forEach {
-            loadBeatmapBundle(it.toPath())
+        entityManager.transactional {
+            File(location).listFiles { file -> file.isDirectory }.forEach { file ->
+                loadBeatmapBundle(file.toPath())
+            }
         }
-
-        transaction.commit()
-
 
     }
 
@@ -103,7 +97,7 @@ object BeatmapManager {
         ZipFile(file).use { zip ->
             println("Unpacking " + file.name)
             zip.entries().asSequence().forEach { entry ->
-                zip.getInputStream(entry).use {inStream ->
+                zip.getInputStream(entry).use { inStream ->
                     File(directory + File.separator + entry.name).outputStream().use { outStream ->
                         inStream.copyTo(outStream)
                     }
