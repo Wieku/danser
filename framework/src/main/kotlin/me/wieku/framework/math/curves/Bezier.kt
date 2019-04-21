@@ -3,15 +3,15 @@ package me.wieku.framework.math.curves
 import org.joml.Vector2f
 import kotlin.math.ceil
 
-class Bezier(vararg points: Vector2f): Curve2d {
+class Bezier(vararg points: Vector2f) : Curve2d {
 
-    private val points = Array(points.size) { i -> Vector2f(points[i])}
+    private val points = Array(points.size) { i -> Vector2f(points[i]) }
     private var approxLength = 0f
 
     init {
         var pointLength = 0.0f
         for (i in 1 until points.size) {
-            pointLength += points[i].distance(points[i-1])
+            pointLength += points[i].distance(points[i - 1])
         }
 
         pointLength = ceil(pointLength)
@@ -22,7 +22,7 @@ class Bezier(vararg points: Vector2f): Curve2d {
         val p2 = Vector2f()
 
         for (i in 1..roundedLength) {
-            approxLength += npointAt(i / pointLength, p1).distance(npointAt((i-1) / pointLength, p2))
+            approxLength += npointAt(i / pointLength, p1).distance(npointAt((i - 1) / pointLength, p2))
         }
     }
 
@@ -31,7 +31,7 @@ class Bezier(vararg points: Vector2f): Curve2d {
     }
 
     override fun getEndAngle(): Float {
-        return points.last().angle(npointAt((approxLength-1.0f) / approxLength, temp))
+        return points.last().angle(npointAt((approxLength - 1.0f) / approxLength, temp))
     }
 
     override fun pointAt(t: Float): Vector2f = pointAt(t, Vector2f())
@@ -49,7 +49,7 @@ class Bezier(vararg points: Vector2f): Curve2d {
                 return dest
             }
             dest.set(pt)
-            c += 1.0f / (approxLength*2-1)
+            c += 1.0f / (approxLength * 2 - 1)
         }
 
         return dest
@@ -60,7 +60,7 @@ class Bezier(vararg points: Vector2f): Curve2d {
         val n = points.size - 1
         for (i in 0..n) {
             val b = bernstein(i, n, t)
-            vec.add(points[i].x*b, points[i].y*b)
+            vec.add(points[i].x * b, points[i].y * b)
         }
         return vec
     }
@@ -75,7 +75,7 @@ class Bezier(vararg points: Vector2f): Curve2d {
             return 1
         }
 
-        val k1 = Math.min(k, n-k)
+        val k1 = Math.min(k, n - k)
         var c = 1
         for (i in 0 until k1) {
             c = c * (n - i) / (i + 1)
@@ -85,7 +85,10 @@ class Bezier(vararg points: Vector2f): Curve2d {
     }
 
     private fun bernstein(i: Int, n: Int, t: Float): Float {
-        return (binomialCoefficient(n, i).toFloat() * Math.pow(t.toDouble(), i.toDouble()) * Math.pow(1.0-t, (n-i).toDouble())).toFloat()
+        return (binomialCoefficient(n, i).toFloat() * Math.pow(t.toDouble(), i.toDouble()) * Math.pow(
+            1.0 - t,
+            (n - i).toDouble()
+        )).toFloat()
     }
 
 }
