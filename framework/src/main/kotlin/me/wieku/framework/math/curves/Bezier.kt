@@ -3,10 +3,9 @@ package me.wieku.framework.math.curves
 import org.joml.Vector2f
 import kotlin.math.ceil
 
-class Bezier(vararg points: Vector2f) : Curve2d {
+class Bezier(vararg points: Vector2f) : NCCurve() {
 
     private val points = Array(points.size) { i -> Vector2f(points[i]) }
-    private var approxLength = 0f
 
     init {
         var pointLength = 0.0f
@@ -16,46 +15,12 @@ class Bezier(vararg points: Vector2f) : Curve2d {
 
         pointLength = ceil(pointLength)
 
-        val roundedLength = pointLength.toInt()
-
-        val p1 = Vector2f()
-        val p2 = Vector2f()
-
-        for (i in 1..roundedLength) {
-            approxLength += npointAt(i / pointLength, p1).distance(npointAt((i - 1) / pointLength, p2))
+        for (i in 1..pointLength.toInt()) {
+            approxLength += ncPointAt(i / pointLength, temp1).distance(ncPointAt((i - 1) / pointLength, temp2))
         }
     }
 
-    override fun getStartAngle(): Float {
-        return points.first().angle(npointAt(1.0f / approxLength, temp))
-    }
-
-    override fun getEndAngle(): Float {
-        return points.last().angle(npointAt((approxLength - 1.0f) / approxLength, temp))
-    }
-
-    override fun pointAt(t: Float): Vector2f = pointAt(t, Vector2f())
-
-    private var temp = Vector2f()
-    override fun pointAt(t: Float, dest: Vector2f): Vector2f {
-        val desiredWidth = (approxLength * t) * (approxLength * t)
-        var width = 0.0f
-        dest.set(points[0])
-        var c = 0.0f
-        while (width < desiredWidth) {
-            val pt = npointAt(c, temp)
-            width += pt.distanceSquared(dest)
-            if (width > desiredWidth) {
-                return dest
-            }
-            dest.set(pt)
-            c += 1.0f / (approxLength * 2 - 1)
-        }
-
-        return dest
-    }
-
-    private fun npointAt(t: Float, vec: Vector2f): Vector2f {
+    override fun ncPointAt(t: Float, vec: Vector2f): Vector2f {
         vec.set(0f)
         val n = points.size - 1
         for (i in 0..n) {
@@ -64,8 +29,6 @@ class Bezier(vararg points: Vector2f) : Curve2d {
         }
         return vec
     }
-
-    override fun getLength() = approxLength
 
     private fun binomialCoefficient(n: Int, k: Int): Int {
         if (k < 0 || k > n) {
