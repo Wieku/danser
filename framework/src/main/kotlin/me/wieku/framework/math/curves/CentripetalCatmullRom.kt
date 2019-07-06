@@ -3,7 +3,7 @@ package me.wieku.framework.math.curves
 import org.joml.Vector2f
 import kotlin.math.ceil
 
-class CentripetalCatmullRom(vararg points: Vector2f) : NCCurve() {
+class CentripetalCatmullRom(points: Array<Vector2f>) : NCCurve() {
     private val points: Array<Vector2f>
 
     init {
