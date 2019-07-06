@@ -1,7 +1,6 @@
 package me.wieku.framework.resource
 
 import org.lwjgl.BufferUtils
-import sun.plugin.dom.exception.InvalidStateException
 import java.io.File
 import java.lang.IllegalStateException
 import java.net.URL
@@ -45,7 +44,7 @@ class FileHandle(path: String, val fileType: FileType) {
 
     fun absolutePath(): String {
         if(fileType == FileType.Classpath) {
-            throw InvalidStateException("Getting absolute path on classpath file")
+            throw IllegalStateException("Getting absolute path on classpath file")
         }
 
         return filePath!!.toAbsolutePath().toString()
