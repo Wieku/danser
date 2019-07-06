@@ -1,5 +1,7 @@
 package me.wieku.danser.beatmap.parsing
 
+import org.joml.Vector2f
+
 interface OsuEnum {
     val osuEnumId: Int
 
@@ -45,17 +47,17 @@ enum class Events(override val osuEnumId: Int): OsuEnum {
     companion object: OsuEnum.Companion<Events>(Background)
 }
 
-enum class Origins(override val osuEnumId: Int): OsuEnum {
-    TopLeft(0),
-    Centre(1),
-    CentreLeft(2),
-    TopRight(3),
-    BottomCentre(4),
-    TopCentre(5),
-    Custom(6),
-    CentreRight(7),
-    BottomLeft(8),
-    BottomRight(9);
+enum class Origins(override val osuEnumId: Int, val offset: Vector2f): OsuEnum {
+    TopLeft(0, Vector2f(-1f, -1f)),
+    Centre(1, Vector2f(0f, 0f)),
+    CentreLeft(2, Vector2f(-1f, 0f)),
+    TopRight(3, Vector2f(1f, -1f)),
+    BottomCentre(4, Vector2f(0f, 1f)),
+    TopCentre(5, Vector2f(0f, -1f)),
+    Custom(6, Vector2f(0f, 0f)),
+    CentreRight(7, Vector2f(1f, 0f)),
+    BottomLeft(8, Vector2f(-1f, 1f)),
+    BottomRight(9, Vector2f(1f, 1f));
 
     companion object: OsuEnum.Companion<Origins>(Centre)
 }
