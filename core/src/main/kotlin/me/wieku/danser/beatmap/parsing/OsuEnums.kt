@@ -47,15 +47,15 @@ enum class Events(override val osuEnumId: Int): OsuEnum {
 
 enum class Origins(override val osuEnumId: Int): OsuEnum {
     TopLeft(0),
-    Centre(0),
-    CentreLeft(0),
-    TopRight(0),
-    BottomCentre(0),
-    TopCentre(0),
-    Custom(0),
-    CentreRight(0),
-    BottomLeft(0),
-    BottomRight(0);
+    Centre(1),
+    CentreLeft(2),
+    TopRight(3),
+    BottomCentre(4),
+    TopCentre(5),
+    Custom(6),
+    CentreRight(7),
+    BottomLeft(8),
+    BottomRight(9);
 
     companion object: OsuEnum.Companion<Origins>(Centre)
 }
