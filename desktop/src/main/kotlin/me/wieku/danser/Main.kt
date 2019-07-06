@@ -49,7 +49,7 @@ fun main(args: Array<String>) {
     var texture = Texture(1, 1, data = intArrayOf(0xffffffff.toInt()))
 
     val sprite =
-        Sprite(Texture(FileHandle("assets/testimg.jpg", FileType.Classpath)).region, 1f, 1f, Vector2f(0.25f, 0.25f))
+        Sprite(Texture(FileHandle("assets/coinbig.png", FileType.Classpath)).region, 1f, 1f, Vector2f(0.25f, 0.25f))
     sprite.position.set(-1f, -1f)
     sprite.addTransform(Transform(TransformType.Origin, 0f, 25000f, 0.25f, 0.25f, 0.5f, 0.5f, Easing.OutElastic))
     sprite.addTransform(Transform(TransformType.MoveX, 0f, 5000f, -1f, 1f, Easing.InOutCirc))
@@ -61,7 +61,7 @@ fun main(args: Array<String>) {
 
     BeatmapManager.loadBeatmaps(System.getenv("localappdata")+"\\osu!\\Songs")
 
-    var beatmap = BeatmapManager.beatmapSets.filter{it.metadata!!.title == "Chikatto Chika Chika (TV Size)"}[0].beatmaps[0]
+    var beatmap = BeatmapManager.beatmapSets.filter{it.metadata!!.title.contains("redfoo", true)}[0].beatmaps[0]
 
 
 
