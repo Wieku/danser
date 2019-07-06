@@ -23,6 +23,7 @@ open class BeatmapMetadata {
     var audioFile: String = ".mp3"
     var previewTime = 0
     var backgroundFile: String? = null
+    var videoFile: String? = null
 
     override fun equals(other: Any?): Boolean {
         if (other !is BeatmapMetadata) {
@@ -41,6 +42,9 @@ open class BeatmapMetadata {
         ) && other.audioFile == this.audioFile && other.previewTime == this.previewTime && Objects.equals(
             other.backgroundFile,
             this.backgroundFile
+        ) && Objects.equals(
+            other.videoFile,
+            this.videoFile
         )
     }
 }

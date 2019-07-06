@@ -29,7 +29,7 @@ fun EntityManager.transactional(function: (entityManager: EntityManager) -> Unit
         function(this)
         transaction.commit()
     } catch (e: Exception) {
-        println(e)
+        e.printStackTrace()
         transaction.rollback()
     }
 

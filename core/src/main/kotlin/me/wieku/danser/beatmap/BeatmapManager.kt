@@ -4,6 +4,7 @@ import me.wieku.danser.beatmap.parsing.BeatmapParser
 import me.wieku.danser.database.transactional
 import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.FileType
+import me.wieku.framework.resource.sha1
 import java.io.File
 import java.nio.file.Path
 import java.util.zip.ZipFile
@@ -38,13 +39,12 @@ object BeatmapManager {
                 loadBeatmapBundle(file.toPath())
             }
         }
-
     }
 
     private fun loadBeatmapBundle(path: Path) {
         var beatmapSet: BeatmapSet? = beatmapSetCache[path.fileName.toString()]
 
-        var candidates = path.toFile().listFiles { _, name ->
+        val candidates = path.toFile().listFiles { _, name ->
             name.endsWith(".osu")
         }
 
@@ -56,14 +56,21 @@ object BeatmapManager {
             beatmapSet = BeatmapSet()
 
             candidates.forEach {
-                var beatmap = Beatmap()
+                val beatmap = Beatmap()
                 parser.parse(FileHandle(it.absolutePath, FileType.Absolute), beatmap)
-                (beatmapSet.beatmaps as ArrayList<Beatmap>).add(beatmap)
+                if (beatmap.parsedProperly) {
+                    (beatmapSet.beatmaps as ArrayList<Beatmap>).add(beatmap)
+                    println("Imported successfully: ${it.name}")
+                } else {
+                    println("Failed to import ${it.name}")
+                }
             }
 
-            entityManager.persist(beatmapSet)
-            beatmapSets.add(beatmapSet)
-            beatmapSetCache[beatmapSet.directory] = beatmapSet
+            if (beatmapSet.beatmaps.isNotEmpty()) {
+                entityManager.persist(beatmapSet)
+                beatmapSets.add(beatmapSet)
+                beatmapSetCache[beatmapSet.directory] = beatmapSet
+            }
 
         } else {
             val versionsMap = beatmapSet.beatmaps.map { it.beatmapFile to it }.toMap()
@@ -72,7 +79,7 @@ object BeatmapManager {
                 var beatmap = versionsMap[it.name]
                 val wasNull = beatmap == null
 
-                if (beatmap != null && beatmap.beatmapStatistics.lastModified == it.lastModified()) {
+                if (beatmap != null && beatmap.beatmapStatistics.lastModified == it.lastModified() && beatmap.beatmapInfo.sha1 == it.sha1()) {
                     return
                 }
 
@@ -82,10 +89,15 @@ object BeatmapManager {
 
                 parser.parse(FileHandle(it.absolutePath, FileType.Absolute), beatmap)
 
-                if (wasNull) {
-                    (beatmapSet.beatmaps as ArrayList<Beatmap>).add(beatmap)
+                if (beatmap.parsedProperly) {
+                    if (wasNull) {
+                        (beatmapSet.beatmaps as ArrayList<Beatmap>).add(beatmap)
+                    }
+                } else {
+                    if (!wasNull) {
+                        (beatmapSet.beatmaps as ArrayList<Beatmap>).remove(beatmap)
+                    }
                 }
-
             }
 
         }

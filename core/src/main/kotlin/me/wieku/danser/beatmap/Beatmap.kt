@@ -2,12 +2,16 @@ package me.wieku.danser.beatmap
 
 import java.lang.IllegalStateException
 import javax.persistence.*
+import kotlin.jvm.Transient
 
 @Entity(name = "Beatmap")
 @Table(indexes = [Index(name = "idx", columnList = "id,beatmapFile")])
 open class Beatmap(
     var beatmapFile: String = ""
 ) {
+
+    @Transient
+    var parsedProperly = true
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

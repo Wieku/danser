@@ -16,14 +16,17 @@ class BeatmapParser {
     fun parse(file: FileHandle, beatmap: Beatmap) {
         var scanner = Scanner(file.fileURL.openStream(), "UTF-8")
 
+        if (!scanner.hasNext()) {
+            beatmap.parsedProperly = false
+            return
+        }
+
         val fileVersion = scanner.nextLine().substringAfter("osu file format v").toInt()
 
         //Some strange osu things (see https://github.com/ppy/osu/blob/master/osu.Game/Beatmaps/Formats/LegacyBeatmapDecoder.cs#L42)
         if (fileVersion < 5) {
             timeOffset = 24
         }
-
-        println("Parsing file version $fileVersion")
 
         beatmap.beatmapFile = file.filePath!!.fileName.toString()
         beatmap.beatmapInfo.md5 = file.file.md5()
@@ -41,12 +44,14 @@ class BeatmapParser {
         this.beatmap = beatmap
 
         var section = Section.Unknown
-        while (scanner.hasNext()) {
-            val line = scanner.nextLine().trim()
+        while (scanner.hasNextLine()) {
+            var line = scanner.nextLine()
 
-            if (line.isEmpty() || line.isBlank() || line.startsWith("//") || line.startsWith(" ") || line.startsWith("_")) {
+            if (line.isBlank() || line.startsWith("//") || line.startsWith(" ") || line.startsWith("_")) {
                 continue
             }
+
+            line = line.trim()
 
             if (line.startsWith("[") && line.endsWith("]")) {
                 section = Section[line.substring(1, line.length-1)]
@@ -110,6 +115,7 @@ class BeatmapParser {
         val event = Events[line[0]]
         when (event) {
             Events.Background -> beatmap?.beatmapMetadata?.backgroundFile = line[1]
+            Events.Video -> beatmap?.beatmapMetadata?.videoFile = line[1]
             Events.Break -> beatmap?.beatmapInfo!!.breaksText += "${line[1]}:${line[2]},"
         }
     }
