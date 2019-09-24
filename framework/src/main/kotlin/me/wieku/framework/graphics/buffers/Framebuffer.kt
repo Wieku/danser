@@ -18,9 +18,7 @@ class Framebuffer(private var width: Int, private var height: Int, defaultColor:
 
     init {
         id = glGenFramebuffers()
-
-        bind()
-
+        bind(clear = false)
         if (defaultColor) {
             addTextureTarget("color", FramebufferTarget.RGBA)
         }

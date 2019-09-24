@@ -59,7 +59,7 @@ object BeatmapManager {
                 val beatmap = Beatmap()
                 parser.parse(FileHandle(it.absolutePath, FileType.Absolute), beatmap)
                 if (beatmap.parsedProperly) {
-                    (beatmapSet.beatmaps as ArrayList<Beatmap>).add(beatmap)
+                    beatmapSet.beatmaps.add(beatmap)
                     println("Imported successfully: ${it.name}")
                 } else {
                     println("Failed to import ${it.name}")
@@ -91,11 +91,11 @@ object BeatmapManager {
 
                 if (beatmap.parsedProperly) {
                     if (wasNull) {
-                        (beatmapSet.beatmaps as ArrayList<Beatmap>).add(beatmap)
+                        beatmapSet.beatmaps.add(beatmap)
                     }
                 } else {
                     if (!wasNull) {
-                        (beatmapSet.beatmaps as ArrayList<Beatmap>).remove(beatmap)
+                        beatmapSet.beatmaps.remove(beatmap)
                     }
                 }
             }

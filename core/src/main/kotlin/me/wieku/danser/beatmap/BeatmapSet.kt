@@ -15,11 +15,11 @@ open class BeatmapSet(
     @Column(unique = true)
     protected var id: Int? = null
 
-    @OneToOne(cascade = [CascadeType.ALL])
+    @OneToOne(cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
     var metadata: BeatmapMetadata? = null
 
-    @OneToMany(mappedBy = "beatmapSet", cascade = [CascadeType.ALL])
-    val beatmaps: List<Beatmap> = ArrayList()
+    @OneToMany(mappedBy = "beatmapSet", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+    val beatmaps: MutableList<Beatmap> = ArrayList()
 
     @PrePersist
     protected fun cleanBeatmaps() {

@@ -1,4 +1,4 @@
-package me.wieku.framework.graphics.sprite
+package me.wieku.framework.graphics.drawables.sprite
 
 import me.wieku.framework.animation.Transform
 import me.wieku.framework.animation.TransformType
