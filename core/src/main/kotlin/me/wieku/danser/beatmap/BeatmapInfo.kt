@@ -32,7 +32,7 @@ open class BeatmapInfo(
     @PreUpdate
     @PrePersist
     protected fun preUpdatePersist() {
-        breaksText = breaks.joinToString { "${it.breakStart}:${it.breakEnd}," }
+        breaksText = breaks.joinToString(separator = ",") { "${it.breakStart}:${it.breakEnd}" }
     }
 
     @PostLoad
