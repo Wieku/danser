@@ -54,16 +54,16 @@ class BeatmapParser {
                 continue
             }
 
-            line = line.trim()
-
             if (line.startsWith("[") && line.endsWith("]")) {
-                section = Section[line.substring(1, line.length-1)]
+                section = Section[line.substring(1, line.length - 1)]
                 continue
             }
 
+            line = line.replaceStartWithTabs().trim()
+
             val splittedLine = line.split(section.separator).map { it.trim() }
 
-            when(section) {
+            when (section) {
                 Section.General -> parseGeneral(splittedLine)
                 Section.Metadata -> parseMetadata(splittedLine)
                 Section.Difficulty -> parseDifficulty(splittedLine)
@@ -83,7 +83,7 @@ class BeatmapParser {
             "Countdown" -> beatmap?.beatmapInfo?.countdown = line[1].toInt() == 1
             "SampleSet" -> {
                 beatmap?.beatmapInfo?.sampleSet = line[1]
-                beatmap?.timing?.baseSampleData = SampleData(SampleSet[line[1]], SampleSet.Normal, 1, 1f)
+                beatmap?.timing?.baseSampleData = SampleData(SampleSet[line[1]], SampleSet.Inherited, 1, 1f)
             }
             "StackLeniency" -> beatmap?.beatmapInfo?.stackLeniency = line[1].toFloat()
             "Mode" -> beatmap?.beatmapInfo?.mode = line[1].toInt()
@@ -128,24 +128,34 @@ class BeatmapParser {
     }
 
     private fun parseTimingPoint(line: List<String>) {
-        val time = line[0].toLong()
+        val time = line[0].toFloat().toLong()
         val bpm = line[1].toFloat()
 
         if (line.size > 3) {
-            val sampleVolume = if (line.size > 5) line[5].toFloat()/100 else 1.0f
+            val sampleVolume = if (line.size > 5) line[5].toFloat() / 100 else 1.0f
             val kiai = if (line.size > 7) line[7].toInt() == 1 else false
 
-            beatmap!!.timing.addTimingPoint(time, bpm, SampleData(SampleSet[line[3]], SampleSet.Normal, line[4].toInt(), sampleVolume), kiai)
+            beatmap!!.timing.addTimingPoint(
+                time,
+                bpm,
+                SampleData(SampleSet[line[3]], SampleSet.Inherited, line[4].toInt(), sampleVolume),
+                kiai
+            )
         } else {
             beatmap!!.timing.addTimingPoint(time, bpm, null, false)
         }
     }
 
     private fun getOffset(time: Int): Int {
-        return time+timeOffset
+        return time + timeOffset
     }
 
     private fun getOffset(time: Float): Float {
-        return time+timeOffset.toFloat()
+        return time + timeOffset.toFloat()
+    }
+
+    private fun String.replaceStartWithTabs(): String {
+        val index = indexOfFirst { !it.isWhitespace() }.let { if (it == -1) length else it }
+        return "_".repeat(index) + substring(index)
     }
 }
