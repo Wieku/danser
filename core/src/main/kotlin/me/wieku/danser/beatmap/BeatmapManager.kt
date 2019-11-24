@@ -25,18 +25,23 @@ object BeatmapManager {
             entityManagerFactory.close()
         })
 
-        beatmapSets.addAll(entityManager.createQuery("SELECT a FROM ${BeatmapSet::class.java.simpleName} a").resultList as ArrayList<BeatmapSet>)
+        beatmapSets.addAll(
+            entityManager.createQuery(
+                "SELECT a FROM ${BeatmapSet::class.java.simpleName} a",
+                BeatmapSet::class.java
+            ).resultList as ArrayList<BeatmapSet>
+        )
         beatmapSetCache = beatmapSets.map { it.directory to it }.toMap().toMutableMap() as HashMap<String, BeatmapSet>
     }
 
     fun loadBeatmaps(location: String) {
 
-        File(location).listFiles { it -> it.extension == "osz" }.forEach {
+        File(location).listFiles { it -> it.extension == "osz" }?.forEach {
             unpackBundle(it)
         }
 
         entityManager.transactional {
-            File(location).listFiles { file -> file.isDirectory }.forEach { file ->
+            File(location).listFiles { file -> file.isDirectory }?.forEach { file ->
                 loadBeatmapBundle(file.toPath())
             }
         }
