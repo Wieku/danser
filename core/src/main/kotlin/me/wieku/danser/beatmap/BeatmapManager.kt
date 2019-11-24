@@ -5,6 +5,7 @@ import me.wieku.danser.database.transactional
 import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.FileType
 import me.wieku.framework.resource.sha1
+import me.wieku.framework.resource.unpack
 import java.io.File
 import java.lang.Exception
 import java.nio.file.Path
@@ -37,7 +38,7 @@ object BeatmapManager {
     fun loadBeatmaps(location: String) {
 
         File(location).listFiles { it -> it.extension == "osz" }?.forEach {
-            unpackBundle(it)
+            it.unpack()
         }
 
         entityManager.transactional {
@@ -132,22 +133,6 @@ object BeatmapManager {
                 entityManager.remove(beatmapSet)
             }
         }
-    }
-
-    private fun unpackBundle(file: File) {
-        val directory = file.absolutePath.substringBefore(".osz")
-        File(directory).mkdirs()
-        ZipFile(file).use { zip ->
-            println("Unpacking " + file.name)
-            zip.entries().asSequence().forEach { entry ->
-                zip.getInputStream(entry).use { inStream ->
-                    File(directory + File.separator + entry.name).outputStream().use { outStream ->
-                        inStream.copyTo(outStream)
-                    }
-                }
-            }
-        }
-        file.delete()
     }
 
 }
