@@ -1,3 +1,3 @@
 package me.wieku.danser.beatmap
 
-data class Break(val breakStart: Int, val breakEnd: Int)
+data class Break(val breakStart: Long, val breakEnd: Long)

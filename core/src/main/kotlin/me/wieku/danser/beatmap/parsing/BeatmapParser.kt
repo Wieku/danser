@@ -1,6 +1,7 @@
 package me.wieku.danser.beatmap.parsing
 
 import me.wieku.danser.beatmap.Beatmap
+import me.wieku.danser.beatmap.Break
 import me.wieku.danser.beatmap.timing.SampleData
 import me.wieku.danser.beatmap.timing.SampleSet
 import me.wieku.framework.resource.FileHandle
@@ -122,7 +123,7 @@ class BeatmapParser {
         when (event) {
             Events.Background -> beatmap?.beatmapMetadata?.backgroundFile = line[1]
             Events.Video -> beatmap?.beatmapMetadata?.videoFile = line[1]
-            Events.Break -> beatmap?.beatmapInfo!!.breaksText += "${line[1]}:${line[2]},"
+            Events.Break -> beatmap?.beatmapInfo!!.breaks += Break(line[1].toLong(), line[2].toLong())
         }
     }
 

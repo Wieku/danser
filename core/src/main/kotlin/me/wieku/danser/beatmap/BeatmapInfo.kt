@@ -29,13 +29,19 @@ open class BeatmapInfo(
     @Transient
     val breaks = ArrayList<Break>()
 
+    @PreUpdate
+    @PrePersist
+    protected fun preUpdatePersist() {
+        breaksText = breaks.joinToString { "${it.breakStart}:${it.breakEnd}," }
+    }
+
     @PostLoad
     protected fun parseBreaks() {
         breaks.clear()
         breaksText.split(",").forEach {
             if (it.isNotEmpty()) {
                 val subSplit = it.split(":")
-                breaks.add(Break(subSplit[0].toInt(), subSplit[1].toInt()))
+                breaks.add(Break(subSplit[0].toLong(), subSplit[1].toLong()))
             }
         }
     }
