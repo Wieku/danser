@@ -1,6 +1,8 @@
 package me.wieku.danser.beatmap
 
-import java.lang.IllegalStateException
+import me.wieku.danser.beatmap.timing.BeatmapTiming
+import me.wieku.danser.beatmap.timing.SampleData
+import me.wieku.danser.beatmap.timing.SampleSet
 import javax.persistence.*
 import kotlin.jvm.Transient
 
@@ -56,5 +58,13 @@ open class Beatmap(
     protected fun validatePreInsertUpdate() {
         validateMetadatas()
     }
+
+    @PostLoad
+    protected fun postLoad() {
+        timing.baseSampleData = SampleData(SampleSet[beatmapInfo.sampleSet], SampleSet.Normal, 1, 1f)
+    }
+
+    @Transient
+    val timing = BeatmapTiming()
 
 }

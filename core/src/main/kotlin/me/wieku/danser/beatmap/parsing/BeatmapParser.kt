@@ -1,6 +1,8 @@
 package me.wieku.danser.beatmap.parsing
 
 import me.wieku.danser.beatmap.Beatmap
+import me.wieku.danser.beatmap.timing.SampleData
+import me.wieku.danser.beatmap.timing.SampleSet
 import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.md5
 import me.wieku.framework.resource.sha1
@@ -65,6 +67,7 @@ class BeatmapParser {
                 Section.Metadata -> parseMetadata(splittedLine)
                 Section.Difficulty -> parseDifficulty(splittedLine)
                 Section.Events -> parseEvent(splittedLine)
+                Section.TimingPoints -> parseTimingPoint(splittedLine)
             }
 
         }
@@ -77,7 +80,10 @@ class BeatmapParser {
             "AudioLeadIn" -> beatmap?.beatmapInfo?.audioLeadIn = getOffset(line[1].toInt())
             "PreviewTime" -> beatmap?.beatmapMetadata?.previewTime = getOffset(line[1].toInt())
             "Countdown" -> beatmap?.beatmapInfo?.countdown = line[1].toInt() == 1
-            "SampleSet" -> beatmap?.beatmapInfo?.sampleSet = line[1]
+            "SampleSet" -> {
+                beatmap?.beatmapInfo?.sampleSet = line[1]
+                beatmap?.timing?.baseSampleData = SampleData(SampleSet[line[1]], SampleSet.Normal, 1, 1f)
+            }
             "StackLeniency" -> beatmap?.beatmapInfo?.stackLeniency = line[1].toFloat()
             "Mode" -> beatmap?.beatmapInfo?.mode = line[1].toInt()
             "LetterboxInBreaks" -> beatmap?.beatmapInfo?.letterboxInBreaks = line[1].toInt() == 1
@@ -117,6 +123,20 @@ class BeatmapParser {
             Events.Background -> beatmap?.beatmapMetadata?.backgroundFile = line[1]
             Events.Video -> beatmap?.beatmapMetadata?.videoFile = line[1]
             Events.Break -> beatmap?.beatmapInfo!!.breaksText += "${line[1]}:${line[2]},"
+        }
+    }
+
+    private fun parseTimingPoint(line: List<String>) {
+        val time = line[0].toLong()
+        val bpm = line[1].toFloat()
+
+        if (line.size > 3) {
+            val sampleVolume = if (line.size > 5) line[5].toFloat()/100 else 1.0f
+            val kiai = if (line.size > 7) line[7].toInt() == 1 else false
+
+            beatmap!!.timing.addTimingPoint(time, bpm, SampleData(SampleSet[line[3]], SampleSet.Normal, line[4].toInt(), sampleVolume), kiai)
+        } else {
+            beatmap!!.timing.addTimingPoint(time, bpm, null, false)
         }
     }
 
