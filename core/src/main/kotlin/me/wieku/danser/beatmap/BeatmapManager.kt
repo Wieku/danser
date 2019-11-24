@@ -6,6 +6,7 @@ import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.FileType
 import me.wieku.framework.resource.sha1
 import java.io.File
+import java.lang.Exception
 import java.nio.file.Path
 import java.util.zip.ZipFile
 import javax.persistence.Persistence
@@ -57,7 +58,14 @@ object BeatmapManager {
 
             candidates.forEach {
                 val beatmap = Beatmap()
-                parser.parse(FileHandle(it.absolutePath, FileType.Absolute), beatmap)
+                println("Importing: ${it.name}")
+
+                try {
+                    parser.parse(FileHandle(it.absolutePath, FileType.Absolute), beatmap)
+                } catch (exception: Exception) {
+                    beatmap.parsedProperly = false
+                }
+
                 if (beatmap.parsedProperly) {
                     beatmapSet.beatmaps.add(beatmap)
                     println("Imported successfully: ${it.name}")
@@ -83,23 +91,41 @@ object BeatmapManager {
                     return
                 }
 
+                println("Found new beatmap version: ${it.name}")
+
                 if (beatmap == null) {
                     beatmap = Beatmap()
                 }
 
-                parser.parse(FileHandle(it.absolutePath, FileType.Absolute), beatmap)
+                try {
+                    parser.parse(FileHandle(it.absolutePath, FileType.Absolute), beatmap)
+                } catch (exception: Exception) {
+                    beatmap.parsedProperly = false
+                }
 
                 if (beatmap.parsedProperly) {
+                    println("Imported successfully: ${it.name}")
                     if (wasNull) {
                         beatmapSet.beatmaps.add(beatmap)
                     }
                 } else {
                     if (!wasNull) {
+                        println("This beatmap is corrupted, removing from database... ${it.name}")
                         beatmapSet.beatmaps.remove(beatmap)
+
+                    } else {
+                        println("Failed to import ${it.name}")
                     }
                 }
             }
 
+            if (beatmapSet.beatmaps.isEmpty()) {
+                println("${beatmapSet.metadata?.artist} - ${beatmapSet.metadata?.title} (${beatmapSet.metadata?.creator}) contains no beatmaps, removing...")
+
+                beatmapSets.remove(beatmapSet)
+                beatmapSetCache.remove(beatmapSet.directory)
+                entityManager.remove(beatmapSet)
+            }
         }
     }
 
