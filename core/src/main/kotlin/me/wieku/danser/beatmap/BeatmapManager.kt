@@ -69,6 +69,7 @@ object BeatmapManager {
                 try {
                     parser.parse(FileHandle(it.absolutePath, FileType.Absolute), beatmap)
                 } catch (exception: Exception) {
+                    exception.printStackTrace()
                     beatmap.parsedProperly = false
                 }
 
@@ -106,6 +107,7 @@ object BeatmapManager {
                 try {
                     parser.parse(FileHandle(it.absolutePath, FileType.Absolute), beatmap)
                 } catch (exception: Exception) {
+                    exception.printStackTrace()
                     beatmap.parsedProperly = false
                 }
 
