@@ -36,8 +36,9 @@ class DanserCoin(val beatmapBindable: Bindable<Beatmap>, private val batch: Spri
                 FileHandle(
                     "assets/coinbig.png",
                     FileType.Classpath
-                )
-            ).region, 1f, 1f, Vector2f(0.5f, 0.5f)
+                ),
+                4
+            ).region, 1.5f, 1.5f, Vector2f(0.5f, 0.5f)
         )
         println("postopen")
     }
@@ -61,7 +62,7 @@ class DanserCoin(val beatmapBindable: Bindable<Beatmap>, private val batch: Spri
 
         val timingPoint = beatmapBindable.value!!.timing.getPointAt(bTime)
 
-        val bProg = ((bTime-timingPoint.time)/timingPoint.realBpm)
+        val bProg = ((bTime-timingPoint.time)/timingPoint.baseBpm)
 
         beatProgress = bProg - floor(bProg)
 
