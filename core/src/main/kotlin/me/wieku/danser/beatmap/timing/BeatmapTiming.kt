@@ -1,5 +1,6 @@
 package me.wieku.danser.beatmap.timing
 
+import me.wieku.danser.audio.SampleSet
 import me.wieku.danser.utils.binarySearchApproximate
 
 class BeatmapTiming {

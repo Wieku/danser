@@ -3,7 +3,7 @@ package me.wieku.danser.beatmap.parsing
 import me.wieku.danser.beatmap.Beatmap
 import me.wieku.danser.beatmap.Break
 import me.wieku.danser.beatmap.timing.SampleData
-import me.wieku.danser.beatmap.timing.SampleSet
+import me.wieku.danser.audio.SampleSet
 import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.md5
 import me.wieku.framework.resource.sha1
