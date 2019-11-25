@@ -16,7 +16,7 @@ class BeatmapParser {
     var beatmap: Beatmap? = null
     var timeOffset = 0
 
-    fun parse(file: FileHandle, beatmap: Beatmap) {
+    fun parse(file: FileHandle, beatmap: Beatmap, parsePointsOnly: Boolean = false) { //TODO: make section list to parse
         var scanner = Scanner(file.fileURL.openStream(), "UTF-8")
 
         if (!scanner.hasNext()) {
@@ -63,13 +63,20 @@ class BeatmapParser {
 
             val splittedLine = line.split(section.separator).map { it.trim() }
 
-            when (section) {
-                Section.General -> parseGeneral(splittedLine)
-                Section.Metadata -> parseMetadata(splittedLine)
-                Section.Difficulty -> parseDifficulty(splittedLine)
-                Section.Events -> parseEvent(splittedLine)
-                Section.TimingPoints -> parseTimingPoint(splittedLine)
+            if (!parsePointsOnly) {
+                when (section) {
+                    Section.General -> parseGeneral(splittedLine)
+                    Section.Metadata -> parseMetadata(splittedLine)
+                    Section.Difficulty -> parseDifficulty(splittedLine)
+                    Section.Events -> parseEvent(splittedLine)
+                    Section.TimingPoints -> parseTimingPoint(splittedLine)
+                }
+            } else {
+                when (section) {
+                    Section.TimingPoints -> parseTimingPoint(splittedLine)
+                }
             }
+
 
         }
 

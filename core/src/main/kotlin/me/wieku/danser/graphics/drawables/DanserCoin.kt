@@ -1,6 +1,8 @@
 package me.wieku.danser.graphics.drawables
 
+import me.wieku.danser.beatmap.Beatmap
 import me.wieku.framework.audio.Track
+import me.wieku.framework.di.bindable.Bindable
 import me.wieku.framework.graphics.drawables.Drawable
 import me.wieku.framework.graphics.drawables.sprite.Sprite
 import me.wieku.framework.graphics.drawables.sprite.SpriteBatch
@@ -9,8 +11,9 @@ import me.wieku.framework.math.Easings
 import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.FileType
 import org.joml.Vector2f
+import kotlin.math.floor
 
-class DanserCoin(val track: Track, private val batch: SpriteBatch): Drawable {
+class DanserCoin(val beatmapBindable: Bindable<Beatmap>, private val batch: SpriteBatch): Drawable {
 
     private var lastTime = 0L
     private var deltaSum = 0f
@@ -20,6 +23,8 @@ class DanserCoin(val track: Track, private val batch: SpriteBatch): Drawable {
 
     private var progress = 0f
     private var lastProgress = 0f
+
+    private var beatProgress = 0f
 
     //private val batch = SpriteBatch()
     private val coinSprite: Sprite
@@ -45,15 +50,23 @@ class DanserCoin(val track: Track, private val batch: SpriteBatch): Drawable {
 
         if(deltaSum >= 1000f/60) {
 
-            volume = track.getLevelCombined()
+            volume = beatmapBindable.value!!.getTrack().getLevelCombined()
 
             volumeAverage = volumeAverage * 0.9f + volume * 0.1f
 
             deltaSum -= 1000f/60
         }
 
+        val bTime = (beatmapBindable.value!!.getTrack().getPosition()*1000).toLong()
+
+        val timingPoint = beatmapBindable.value!!.timing.getPointAt(bTime)
+
+        val bProg = ((bTime-timingPoint.time)/timingPoint.realBpm)
+
+        beatProgress = bProg - floor(bProg)
+
         val vprog = 1 - ((volume - volumeAverage) / 0.5f)
-        val pV = Math.min(1.0f, Math.max(0.0f, 1.0f-(vprog*0.5f+/*beatProgress*/0f*0.5f)))
+        val pV = Math.min(1.0f, Math.max(0.0f, 1.0f-(vprog*0.5f+beatProgress*0.5f)))
 
         val ratio = Math.pow(0.5, delta/16.6666666666667).toFloat()
 

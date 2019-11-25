@@ -1,14 +1,19 @@
 package me.wieku.danser.beatmap
 
+import me.wieku.danser.beatmap.parsing.BeatmapParser
 import me.wieku.danser.beatmap.timing.BeatmapTiming
 import me.wieku.danser.beatmap.timing.SampleData
 import me.wieku.danser.beatmap.timing.SampleSet
+import me.wieku.framework.audio.Track
+import me.wieku.framework.resource.FileHandle
+import me.wieku.framework.resource.FileType
+import java.io.File
 import javax.persistence.*
 import kotlin.jvm.Transient
 
 @Entity(name = "Beatmap")
 @Table(indexes = [Index(name = "idx", columnList = "id,beatmapFile")])
-open class Beatmap(
+class Beatmap(
     var beatmapFile: String = ""
 ) {
 
@@ -66,5 +71,22 @@ open class Beatmap(
 
     @Transient
     val timing = BeatmapTiming()
+
+    @Transient
+    private lateinit var track: Track
+
+    fun getTrack() : Track {
+        return track
+    }
+
+    fun loadTrack() {
+        track = Track(
+            FileHandle(
+                System.getenv("localappdata") + "/osu!/Songs/" + beatmapSet.directory + File.separator + beatmapMetadata.audioFile,
+                FileType.Absolute
+            )
+        )
+        BeatmapParser().parse(FileHandle(System.getenv("localappdata") + "/osu!/Songs/" + beatmapSet.directory + File.separator + beatmapFile, FileType.Absolute), this, true)
+    }
 
 }

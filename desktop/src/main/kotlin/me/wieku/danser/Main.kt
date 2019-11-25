@@ -5,6 +5,7 @@ import me.wieku.danser.build.Build
 import me.wieku.danser.graphics.drawables.DanserCoin
 import me.wieku.framework.audio.BassSystem
 import me.wieku.framework.audio.Track
+import me.wieku.framework.di.bindable.Bindable
 import me.wieku.framework.graphics.buffers.Framebuffer
 import me.wieku.framework.graphics.drawables.sprite.Sprite
 import me.wieku.framework.graphics.drawables.sprite.SpriteBatch
@@ -41,36 +42,17 @@ fun main(args: Array<String>) {
 
     var texture = Texture(1, 1, data = intArrayOf(0xffffffff.toInt()))
 
-    /*val sprite =
-        Sprite(
-            Texture(
-                FileHandle(
-                    "assets/coinbig.png",
-                    FileType.Classpath
-                )
-            ).region, 1f, 1f, Vector2f(0.25f, 0.25f)
-        )
-    sprite.position.set(-1f, -1f)
-    sprite.addTransform(Transform(TransformType.Origin, 0f, 25000f, 0.25f, 0.25f, 0.5f, 0.5f, Easing.OutElastic))
-    sprite.addTransform(Transform(TransformType.MoveX, 0f, 5000f, -1f, 1f, Easing.InOutCirc))
-    sprite.addTransform(Transform(TransformType.MoveY, 5000f, 10000f, -1f, 1f, Easing.InOutCirc))
-    sprite.addTransform(Transform(TransformType.MoveX, 10000f, 15000f, 1f, -1f, Easing.InOutCirc))
-    sprite.addTransform(Transform(TransformType.MoveY, 15000f, 20000f, 1f, -1f, Easing.InOutCirc))
-    sprite.addTransform(Transform(TransformType.Move, 20000f, 25000f, -1f, -1f, 0f, 0f, Easing.OutElastic))*/
     BassSystem.initSystem()
 
     BeatmapManager.loadBeatmaps(System.getenv("localappdata") + "\\osu!\\Songs")
 
     var beatmap = BeatmapManager.beatmapSets.filter { it.metadata!!.title.contains("redfoo", true) }[0].beatmaps[0]
 
-    val track = Track(
-        FileHandle(
-            System.getenv("localappdata") + "/osu!/Songs/" + beatmap.beatmapSet.directory + File.separator + beatmap.beatmapMetadata.audioFile,
-            FileType.Absolute
-        )
-    )//Track(FileHandle("assets/audio.mp3", FileType.Classpath))
-    track.play(0.1f)
-    val coin = DanserCoin(track, batch)
+    beatmap.loadTrack()
+
+    beatmap.getTrack().play(0.1f)
+    val bindable = Bindable(beatmap)
+    val coin = DanserCoin(bindable, batch)
 
     var power = 0f
     var time = 0f
@@ -80,19 +62,17 @@ fun main(args: Array<String>) {
 
     Thread {
         while (!glfwWindowShouldClose(handle)) {
-            track.update()
+            beatmap.getTrack().update()
             for (i in 0 until offt.size) {
-                offt[i] = Math.max(track.fftData[i], offt[i] - 0.001f * 16)
+                offt[i] = Math.max(beatmap.getTrack().fftData[i], offt[i] - 0.001f * 16)
             }
 
-            power = Math.max(track.beat, power - 0.001f * 16)
+            power = Math.max(beatmap.getTrack().beat, power - 0.001f * 16)
 
             fsprite.rotation -= 0.0005f * 16
 
-            // fsprite.scale.set((Math.sin(Math.PI / 4) / Math.sin(Math.PI / 4 + sprite.rotation.absoluteValue.rem(Math.PI.toFloat() / 2))).toFloat())
 
             if (fsprite.rotation <= -2 * Math.PI) {
-                //sprite.rotation += 2 * Math.PI.toFloat()
                 fsprite.rotation += 2 * Math.PI.toFloat()
             }
 
