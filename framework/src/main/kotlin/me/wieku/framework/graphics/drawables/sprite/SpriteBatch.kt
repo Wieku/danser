@@ -247,23 +247,23 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
         val fX = if (sprite.flipX) -1f else 1f
         val fY = if (sprite.flipY) -1f else 1f
 
-        tmp.set(0f, 0f).sub(sprite.origin).rot(sprite.rotation).mul(sprite.scale)
-            .mul(sprite.width * fX, sprite.height * fY).add(sprite.position)
+        tmp.set(0f, 0f).sub(sprite.origin).mul(sprite.scale)
+            .mul(sprite.width * fX, sprite.height * fY).rot(sprite.rotation).add(sprite.position)
         tmp1.set(region.getU1(), region.getV1(), region.getLayer().toFloat())
         addVertex(tmp, tmp1, sprite.color, sprite.additive)
 
-        tmp.set(1f, 0f).sub(sprite.origin).rot(sprite.rotation).mul(sprite.scale)
-            .mul(sprite.width * fX, sprite.height * fY).add(sprite.position)
+        tmp.set(1f, 0f).sub(sprite.origin).mul(sprite.scale)
+            .mul(sprite.width * fX, sprite.height * fY).rot(sprite.rotation).add(sprite.position)
         tmp1.set(region.getU2(), region.getV1(), region.getLayer().toFloat())
         addVertex(tmp, tmp1, sprite.color, sprite.additive)
 
-        tmp.set(1f, 1f).sub(sprite.origin).rot(sprite.rotation).mul(sprite.scale)
-            .mul(sprite.width * fX, sprite.height * fY).add(sprite.position)
+        tmp.set(1f, 1f).sub(sprite.origin).mul(sprite.scale)
+            .mul(sprite.width * fX, sprite.height * fY).rot(sprite.rotation).add(sprite.position)
         tmp1.set(region.getU2(), region.getV2(), region.getLayer().toFloat())
         addVertex(tmp, tmp1, sprite.color, sprite.additive)
 
-        tmp.set(0f, 1f).sub(sprite.origin).rot(sprite.rotation).mul(sprite.scale)
-            .mul(sprite.width * fX, sprite.height * fY).add(sprite.position)
+        tmp.set(0f, 1f).sub(sprite.origin).mul(sprite.scale)
+            .mul(sprite.width * fX, sprite.height * fY).rot(sprite.rotation).add(sprite.position)
         tmp1.set(region.getU1(), region.getV2(), region.getLayer().toFloat())
         addVertex(tmp, tmp1, sprite.color, sprite.additive)
     }
