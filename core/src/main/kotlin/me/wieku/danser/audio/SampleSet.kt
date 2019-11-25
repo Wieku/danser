@@ -1,6 +1,6 @@
 package me.wieku.danser.audio
 
-import me.wieku.danser.beatmap.parsing.OsuEnum
+import me.wieku.danser.utils.OsuEnum
 
 enum class SampleSet(override val osuEnumId: Int): OsuEnum {
     Inherited(0),

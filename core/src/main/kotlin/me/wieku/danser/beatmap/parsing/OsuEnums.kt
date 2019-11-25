@@ -1,24 +1,7 @@
 package me.wieku.danser.beatmap.parsing
 
+import me.wieku.danser.utils.OsuEnum
 import org.joml.Vector2f
-
-interface OsuEnum {
-    val osuEnumId: Int
-
-    open class Companion<T>(private val defaultReturn: T) where T:Enum<T>, T:OsuEnum {
-        private val inverseLookupS = HashMap<String, T>()
-
-        init {
-            defaultReturn::class.java.enumConstants.forEach {
-                inverseLookupS[it.name] = it
-                inverseLookupS[it.osuEnumId.toString()] = it
-            }
-        }
-
-        operator fun get(value: String) = inverseLookupS[value]?:defaultReturn
-        operator fun get(osuId: Int) = get(osuId.toString())
-    }
-}
 
 enum class Section(override val osuEnumId: Int, val separator: String): OsuEnum {
     Unknown(0, ":"),
