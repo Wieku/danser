@@ -1,6 +1,6 @@
 package me.wieku.danser.utils
 
-public fun <T> List<T>.binarySearchApproximate(fromIndex: Int = 0, toIndex: Int = size, comparison: (T) -> Int): Int {
+fun <T> List<T>.binarySearchApproximate(fromIndex: Int = 0, toIndex: Int = size, comparison: (T) -> Int): Int {
     rangeCheck(size, fromIndex, toIndex)
 
     var low = fromIndex
@@ -24,7 +24,12 @@ public fun <T> List<T>.binarySearchApproximate(fromIndex: Int = 0, toIndex: Int 
                 }
                 high = mid - 1
             }
-            else -> return mid
+            else -> {
+                if (mid + 1 >= size || comparison(get(mid + 1)) > 1) {
+                    return mid
+                }
+                low = mid + 1
+            }
         } // key found
     }
     return -(low + 1)  // key not found
