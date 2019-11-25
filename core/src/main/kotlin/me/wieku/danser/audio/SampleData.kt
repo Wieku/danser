@@ -1,4 +1,4 @@
-package me.wieku.danser.beatmap.timing
+package me.wieku.danser.audio
 
 import me.wieku.danser.audio.SampleSet
 

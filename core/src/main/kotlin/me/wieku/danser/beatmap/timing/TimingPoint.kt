@@ -1,5 +1,6 @@
 package me.wieku.danser.beatmap.timing
 
+import me.wieku.danser.audio.SampleData
 import java.lang.Float.max
 
 class TimingPoint(

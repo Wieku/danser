@@ -1,5 +1,6 @@
 package me.wieku.danser.beatmap.timing
 
+import me.wieku.danser.audio.SampleData
 import me.wieku.danser.audio.SampleSet
 import me.wieku.danser.utils.binarySearchApproximate
 
@@ -8,7 +9,8 @@ class BeatmapTiming {
     private var baseBpm: Float = 0f
     private var points = ArrayList<TimingPoint>()
 
-    var baseSampleData: SampleData = SampleData(SampleSet.Normal, SampleSet.Inherited, 1, 1f)
+    var baseSampleData: SampleData =
+        SampleData(SampleSet.Normal, SampleSet.Inherited, 1, 1f)
         set(value) {
             sampleData = value
             field = value

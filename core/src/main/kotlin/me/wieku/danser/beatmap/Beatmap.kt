@@ -2,7 +2,7 @@ package me.wieku.danser.beatmap
 
 import me.wieku.danser.beatmap.parsing.BeatmapParser
 import me.wieku.danser.beatmap.timing.BeatmapTiming
-import me.wieku.danser.beatmap.timing.SampleData
+import me.wieku.danser.audio.SampleData
 import me.wieku.danser.audio.SampleSet
 import me.wieku.framework.audio.Track
 import me.wieku.framework.resource.FileHandle
@@ -66,7 +66,8 @@ class Beatmap(
 
     @PostLoad
     protected fun postLoad() {
-        timing.baseSampleData = SampleData(SampleSet[beatmapInfo.sampleSet], SampleSet.Normal, 1, 1f)
+        timing.baseSampleData =
+            SampleData(SampleSet[beatmapInfo.sampleSet], SampleSet.Normal, 1, 1f)
     }
 
     @Transient

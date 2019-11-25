@@ -2,7 +2,7 @@ package me.wieku.danser.beatmap.parsing
 
 import me.wieku.danser.beatmap.Beatmap
 import me.wieku.danser.beatmap.Break
-import me.wieku.danser.beatmap.timing.SampleData
+import me.wieku.danser.audio.SampleData
 import me.wieku.danser.audio.SampleSet
 import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.md5
@@ -90,7 +90,8 @@ class BeatmapParser {
             "Countdown" -> beatmap?.beatmapInfo?.countdown = line[1].toInt() == 1
             "SampleSet" -> {
                 beatmap?.beatmapInfo?.sampleSet = line[1]
-                beatmap?.timing?.baseSampleData = SampleData(SampleSet[line[1]], SampleSet.Inherited, 1, 1f)
+                beatmap?.timing?.baseSampleData =
+                    SampleData(SampleSet[line[1]], SampleSet.Inherited, 1, 1f)
             }
             "StackLeniency" -> beatmap?.beatmapInfo?.stackLeniency = line[1].toFloat()
             "Mode" -> beatmap?.beatmapInfo?.mode = line[1].toInt()
@@ -145,7 +146,12 @@ class BeatmapParser {
             beatmap!!.timing.addTimingPoint(
                 time,
                 bpm,
-                SampleData(SampleSet[line[3]], SampleSet.Inherited, line[4].toInt(), sampleVolume),
+                SampleData(
+                    SampleSet[line[3]],
+                    SampleSet.Inherited,
+                    line[4].toInt(),
+                    sampleVolume
+                ),
                 kiai
             )
         } else {
