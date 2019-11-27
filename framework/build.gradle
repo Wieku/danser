@@ -12,6 +12,7 @@ sourceSets.main.resources.srcDirs = ["src/main/resources"]
 
 dependencies {
     implementation fileTree(dir: 'libs', include: '*.jar')
+    api "org.koin:koin-core:$koin_version"
     api "org.lwjgl:lwjgl:$lwjglVersion"
     api "org.lwjgl:lwjgl-glfw:$lwjglVersion"
     api "org.lwjgl:lwjgl-nfd:$lwjglVersion"

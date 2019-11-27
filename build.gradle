@@ -49,6 +49,7 @@ allprojects {
     ext {
         lwjglVersion = "3.2.1"
         jomlVersion = "1.9.13"
+        koin_version = '2.0.1'
         switch (OperatingSystem.current()) {
             case OperatingSystem.LINUX:
                 lwjglNatives = "natives-linux"
