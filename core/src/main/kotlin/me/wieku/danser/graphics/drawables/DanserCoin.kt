@@ -88,7 +88,6 @@ class DanserCoin : Container(), KoinComponent {
 
         val timingPoint = beatmapBindable.value!!.timing.getPointAt(bTime)
 
-        coinSpriteTop.additive = timingPoint.kiai
         coinSpriteTop.color.w = if(timingPoint.kiai) 0.12f else 0.3f
 
         val bProg = ((bTime - timingPoint.time) / timingPoint.baseBpm)
