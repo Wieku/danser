@@ -1,13 +1,13 @@
 package me.wieku.danser.audio
 
-import me.wieku.danser.utils.OsuEnum
+import me.wieku.framework.utils.EnumWithId
 
-enum class SampleSet(override val osuEnumId: Int): OsuEnum {
+enum class SampleSet(override val enumId: Int): EnumWithId {
     Inherited(0),
     Normal(1),
     All(1),
     Soft(2),
     Drum(3);
 
-    companion object: OsuEnum.Companion<SampleSet>(Normal)
+    companion object: EnumWithId.Companion<SampleSet>(Normal)
 }

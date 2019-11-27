@@ -1,15 +1,15 @@
-package me.wieku.danser.utils
+package me.wieku.framework.utils
 
-interface OsuEnum {
-    val osuEnumId: Int
+interface EnumWithId {
+    val enumId: Int
 
-    open class Companion<T>(private val defaultReturn: T) where T:Enum<T>, T:OsuEnum {
+    open class Companion<T>(private val defaultReturn: T) where T:Enum<T>, T: EnumWithId {
         private val inverseLookupS = HashMap<String, T>()
 
         init {
             defaultReturn::class.java.enumConstants.forEach {
                 inverseLookupS[it.name] = it
-                inverseLookupS[it.osuEnumId.toString()] = it
+                inverseLookupS[it.enumId.toString()] = it
             }
         }
 
