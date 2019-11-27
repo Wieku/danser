@@ -136,8 +136,8 @@ class Track(file: FileHandle, val fftMode: FFTMode = FFTMode.FFT512) {
         )
     }
 
-    fun getState(): Int {
-        return BASS_ChannelIsActive(fxChannel.asInt())
+    fun getState(): ChannelStatus {
+        return ChannelStatus[BASS_ChannelIsActive(fxChannel.asInt())]
     }
 
     fun update() {
