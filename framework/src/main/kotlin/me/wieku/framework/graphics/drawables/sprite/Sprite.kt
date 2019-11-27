@@ -2,11 +2,48 @@ package me.wieku.framework.graphics.drawables.sprite
 
 import me.wieku.framework.animation.Transform
 import me.wieku.framework.animation.TransformType
+import me.wieku.framework.graphics.drawables.Drawable
 import me.wieku.framework.graphics.textures.TextureRegion
 import org.joml.Vector2f
 import org.joml.Vector4f
 import java.util.*
 
+open class Sprite(): Drawable() {
+
+    constructor(inContext: Sprite.() -> Unit):this(){
+        inContext()
+    }
+
+    override fun dispose() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    var texture: TextureRegion? = null
+
+    //var transforms = ArrayList<Transform>()
+
+    var flipX = false
+    var flipY = false
+    var rotation         = 0f
+    var additive         = false
+    //var showForever      = true
+
+    override fun draw(batch: SpriteBatch) {
+        batch.draw(this)
+        batch.flush()
+    }
+
+
+    /*constructor(texture: TextureRegion, width: Float = texture.getWidth(), height: Float = texture.getHeight(), origin: Vector2f = Vector2f(0.5f, 0.5f)): this() {
+        this.texture = texture
+        this.width = width
+        this.height = height
+        this.origin.set(origin)
+    }*/
+
+}
+
+/*
 open class Sprite() {
 
     var texture: TextureRegion? = null
@@ -105,3 +142,4 @@ open class Sprite() {
     }
 
 }
+ */

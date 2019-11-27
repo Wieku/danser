@@ -5,6 +5,7 @@ import me.wieku.framework.graphics.shaders.Shader
 import me.wieku.framework.graphics.textures.Texture
 import me.wieku.framework.graphics.textures.TextureRegion
 import me.wieku.framework.math.rot
+import me.wieku.framework.math.view.Camera
 import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.FileType
 import me.wieku.framework.utils.Disposable
@@ -32,13 +33,21 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
     private var drawing = false
     private var vertexCount: Int = 0
 
-    private var basePosition: Vector2f = Vector2f()
-    private var scale: Vector2f = Vector2f()
-    private var subscale: Vector2f = Vector2f()
+    //private var basePosition: Vector2f = Vector2f()
+    //private var scale: Vector2f = Vector2f()
+    //private var subscale: Vector2f = Vector2f()
 
-    private var rotation: Float = 0f
+    //private var rotation: Float = 0f
 
-    private var projectionView: Matrix4f = Matrix4f().ortho2D(-1f, 1f, -1f, 1f)
+    var camera: Camera = Camera()
+        set(value) {
+            if (drawing) {
+                flush()
+                helperBuffer.clear()
+                shader.setUniform("proj", camera.projectionView.get(helperBuffer))
+            }
+            field = value
+        }
     private var helperBuffer: FloatBuffer
 
     private var color: Vector4f = Vector4f(1f, 1f, 1f, 1f)
@@ -53,9 +62,14 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
         var attributes = arrayOf(
             VertexAttribute("in_position", VertexAttributeType.Vec3, 0),
             VertexAttribute("in_tex_coord", VertexAttributeType.Vec3, 1),
-            VertexAttribute("in_color", VertexAttributeType.Vec4, 2),
-            VertexAttribute("in_additive", VertexAttributeType.GlFloat, 3)
+            VertexAttribute("in_tex_bounds", VertexAttributeType.Vec4, 2),
+            VertexAttribute("in_color", VertexAttributeType.Vec4, 3),
+            VertexAttribute("in_additive", VertexAttributeType.GlFloat, 4)
         )
+
+        camera.setViewport(2, 2, false)
+        camera.position = Vector2f(0f)
+        camera.update()
 
         vertexSize = attributes.vertexSize() / 4
 
@@ -123,7 +137,7 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
 
         shader.bind()
         helperBuffer.clear()
-        shader.setUniform("proj", projectionView.get(helperBuffer))
+        shader.setUniform("proj", camera.projectionView.get(helperBuffer))
         vao.bind()
         ibo.bind()
 
@@ -179,7 +193,7 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
         glBlendFunc(preSFactor, preDFactor)
     }
 
-    private fun addVertex(position: Vector2f, texCoords: Vector3f, color: Vector4f, additive: Boolean = false) {
+    private fun addVertex(position: Vector2f, texCoords: Vector3f, texBounds: Vector4f, color: Vector4f, additive: Boolean = false) {
 
         vertexBuffer.put(position.x)
         vertexBuffer.put(position.y)
@@ -187,6 +201,10 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
         vertexBuffer.put(texCoords.x)
         vertexBuffer.put(texCoords.y)
         vertexBuffer.put(texCoords.z)
+        vertexBuffer.put(texBounds.x)
+        vertexBuffer.put(texBounds.y)
+        vertexBuffer.put(texBounds.z)
+        vertexBuffer.put(texBounds.w)
         vertexBuffer.put(color.x)
         vertexBuffer.put(color.y)
         vertexBuffer.put(color.z)
@@ -198,6 +216,7 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
 
     private var tmp = Vector2f()
     private var tmp1 = Vector3f()
+    private var tmp2 = Vector2f()
 
     fun draw(texture: Texture, x: Float, y: Float, scaleX: Float, scaleY: Float, color: Vector4f) {
         draw(texture.region, x, y, scaleX, scaleY, color)
@@ -215,21 +234,23 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
             flush()
         }
 
+        val texBounds = Vector4f(region.getU1(), region.getV1(), region.getU2(), region.getV2())
+
         tmp.set(-1f, -1f).mul(scaleX, scaleY).mul(region.getWidth() / 2, region.getHeight() / 2).add(x, y)
         tmp1.set(region.getU1(), region.getV1(), region.getLayer().toFloat())
-        addVertex(tmp, tmp1, color)
+        addVertex(tmp, tmp1, texBounds, color)
 
         tmp.set(1f, -1f).mul(scaleX, scaleY).mul(region.getWidth() / 2, region.getHeight() / 2).add(x, y)
         tmp1.set(region.getU2(), region.getV1(), region.getLayer().toFloat())
-        addVertex(tmp, tmp1, color)
+        addVertex(tmp, tmp1, texBounds, color)
 
         tmp.set(1f, 1f).mul(scaleX, scaleY).mul(region.getWidth() / 2, region.getHeight() / 2).add(x, y)
         tmp1.set(region.getU2(), region.getV2(), region.getLayer().toFloat())
-        addVertex(tmp, tmp1, color)
+        addVertex(tmp, tmp1, texBounds, color)
 
         tmp.set(-1f, 1f).mul(scaleX, scaleY).mul(region.getWidth() / 2, region.getHeight() / 2).add(x, y)
         tmp1.set(region.getU1(), region.getV2(), region.getLayer().toFloat())
-        addVertex(tmp, tmp1, color)
+        addVertex(tmp, tmp1, texBounds, color)
     }
 
     fun draw(sprite: Sprite) {
@@ -247,25 +268,34 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
         val fX = if (sprite.flipX) -1f else 1f
         val fY = if (sprite.flipY) -1f else 1f
 
-        tmp.set(0f, 0f).sub(sprite.origin).mul(sprite.scale)
-            .mul(sprite.width * fX, sprite.height * fY).rot(sprite.rotation).add(sprite.position)
-        tmp1.set(region.getU1(), region.getV1(), region.getLayer().toFloat())
-        addVertex(tmp, tmp1, sprite.color, sprite.additive)
+        val texBounds = Vector4f(region.getU1(), region.getV1(), region.getU2(), region.getV2())
 
-        tmp.set(1f, 0f).sub(sprite.origin).mul(sprite.scale)
-            .mul(sprite.width * fX, sprite.height * fY).rot(sprite.rotation).add(sprite.position)
-        tmp1.set(region.getU2(), region.getV1(), region.getLayer().toFloat())
-        addVertex(tmp, tmp1, sprite.color, sprite.additive)
+        tmp2.set(sprite.drawPosition).add(sprite.drawOrigin)
 
-        tmp.set(1f, 1f).sub(sprite.origin).mul(sprite.scale)
-            .mul(sprite.width * fX, sprite.height * fY).rot(sprite.rotation).add(sprite.position)
-        tmp1.set(region.getU2(), region.getV2(), region.getLayer().toFloat())
-        addVertex(tmp, tmp1, sprite.color, sprite.additive)
+        var u1 = if (sprite.flipX) region.getU2() else region.getU1()
+        var u2 = if (sprite.flipX) region.getU1() else region.getU2()
+        var v1 = if (sprite.flipX) region.getV2() else region.getV1()
+        var v2 = if (sprite.flipX) region.getV1() else region.getV2()
 
-        tmp.set(0f, 1f).sub(sprite.origin).mul(sprite.scale)
-            .mul(sprite.width * fX, sprite.height * fY).rot(sprite.rotation).add(sprite.position)
-        tmp1.set(region.getU1(), region.getV2(), region.getLayer().toFloat())
-        addVertex(tmp, tmp1, sprite.color, sprite.additive)
+        tmp.set(0f, 0f).mul(sprite.drawSize).sub(sprite.drawOrigin)
+            .rot(sprite.rotation).add(tmp2)
+        tmp1.set(u1, v1, region.getLayer().toFloat())
+        addVertex(tmp, tmp1, texBounds, sprite.color, sprite.additive)
+
+        tmp.set(1f, 0f).mul(sprite.drawSize).sub(sprite.drawOrigin)
+            .rot(sprite.rotation).add(tmp2)
+        tmp1.set(u2, v1, region.getLayer().toFloat())
+        addVertex(tmp, tmp1, texBounds, sprite.color, sprite.additive)
+
+        tmp.set(1f, 1f).mul(sprite.drawSize).sub(sprite.drawOrigin)
+            .rot(sprite.rotation).add(tmp2)
+        tmp1.set(u2, v2, region.getLayer().toFloat())
+        addVertex(tmp, tmp1, texBounds, sprite.color, sprite.additive)
+
+        tmp.set(0f, 1f).mul(sprite.drawSize).sub(sprite.drawOrigin)
+            .rot(sprite.rotation).add(tmp2)
+        tmp1.set(u1, v2, region.getLayer().toFloat())
+        addVertex(tmp, tmp1, texBounds, sprite.color, sprite.additive)
     }
 
     override fun dispose() {

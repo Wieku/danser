@@ -3,17 +3,27 @@ package me.wieku.danser.graphics.drawables
 import me.wieku.danser.beatmap.Beatmap
 import me.wieku.framework.audio.Track
 import me.wieku.framework.di.bindable.Bindable
+import me.wieku.framework.graphics.containers.Container
 import me.wieku.framework.graphics.drawables.Drawable
 import me.wieku.framework.graphics.drawables.sprite.Sprite
 import me.wieku.framework.graphics.drawables.sprite.SpriteBatch
 import me.wieku.framework.graphics.textures.Texture
 import me.wieku.framework.math.Easings
+import me.wieku.framework.math.Origin
+import me.wieku.framework.math.Scaling
 import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.FileType
 import org.joml.Vector2f
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 import kotlin.math.floor
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.math.pow
 
-class DanserCoin(val beatmapBindable: Bindable<Beatmap>, private val batch: SpriteBatch): Drawable {
+class DanserCoin : Container(), KoinComponent {
+
+    val beatmapBindable: Bindable<Beatmap> by inject()
 
     private var lastTime = 0L
     private var deltaSum = 0f
@@ -26,69 +36,80 @@ class DanserCoin(val beatmapBindable: Bindable<Beatmap>, private val batch: Spri
 
     private var beatProgress = 0f
 
-    //private val batch = SpriteBatch()
-    private val coinSprite: Sprite
+    private val coinSpriteBottom: Sprite
+    private val coinSpriteTop: Sprite
 
     init {
-        println("Preopoen")
-        coinSprite = Sprite(
-            Texture(
-                FileHandle(
-                    "assets/coinbig.png",
-                    FileType.Classpath
-                ),
-                4
-            ).region, 1.5f, 1.5f, Vector2f(0.5f, 0.5f)
+        size = Vector2f(800f, 800f).mul(0.7f)
+        position = Vector2f(400f, 400f)
+
+        val tex = Texture(
+            FileHandle(
+                "assets/coinbig.png",
+                FileType.Classpath
+            ),
+            4
         )
-        println("postopen")
+
+        coinSpriteBottom = Sprite {
+            texture = tex.region
+            fillMode = Scaling.Fit
+            color.w = 1f
+        }
+
+        coinSpriteTop = Sprite {
+            texture = tex.region
+            fillMode = Scaling.Fit
+            color.w = 0.3f
+        }
+
+
+        addChild(coinSpriteBottom, coinSpriteTop)
     }
 
-    override fun draw() {
+    override fun update() {
         val time = System.nanoTime()
-        val delta = ((time-lastTime)/1000000f)
+        if (lastTime == 0L) {
+            lastTime = time
+        }
+        val delta = ((time - lastTime) / 1000000f)
 
         deltaSum += delta
 
-        if(deltaSum >= 1000f/60) {
+        if (deltaSum >= 1000f / 60) {
 
             volume = beatmapBindable.value!!.getTrack().getLevelCombined()
-
             volumeAverage = volumeAverage * 0.9f + volume * 0.1f
 
-            deltaSum -= 1000f/60
+            deltaSum -= 1000f / 60
         }
 
-        val bTime = (beatmapBindable.value!!.getTrack().getPosition()*1000).toLong()
+        val bTime = (beatmapBindable.value!!.getTrack().getPosition() * 1000).toLong()
 
         val timingPoint = beatmapBindable.value!!.timing.getPointAt(bTime)
 
-        val bProg = ((bTime-timingPoint.time)/timingPoint.baseBpm)
+        coinSpriteTop.additive = timingPoint.kiai
+        coinSpriteTop.color.w = if(timingPoint.kiai) 0.12f else 0.3f
+
+        val bProg = ((bTime - timingPoint.time) / timingPoint.baseBpm)
 
         beatProgress = bProg - floor(bProg)
 
         val vprog = 1 - ((volume - volumeAverage) / 0.5f)
-        val pV = Math.min(1.0f, Math.max(0.0f, 1.0f-(vprog*0.5f+beatProgress*0.5f)))
+        val pV = min(1.0f, max(0.0f, 1.0f - (vprog * 0.5f + beatProgress * 0.5f)))
 
-        val ratio = Math.pow(0.5, delta/16.6666666666667).toFloat()
+        val ratio = 0.5f.pow(delta / 16.6666666666667f)
 
-        progress = lastProgress*ratio + (pV)*(1-ratio)
+        progress = lastProgress * ratio + (pV) * (1 - ratio)
         lastProgress = progress
 
-        batch.begin()
-
-        coinSprite.scale.set((1.05f - Easings.OutQuad(progress*0.05f)) /** scl * pl.hover*/)
-        coinSprite.color.w = 1.0f
-
-        batch.draw(coinSprite)
-
-        coinSprite.scale.set((1.05f + Easings.OutQuad(progress*0.03f)) /** scl * pl.hover*/)
-        coinSprite.color.w = 0.3f
-
-        batch.draw(coinSprite)
-
-        batch.end()
+        coinSpriteBottom.scale.set(1.05f - Easings.OutQuad(progress * 0.05f))
+        coinSpriteTop.scale.set(1.05f + Easings.OutQuad(progress * 0.03f))
 
         lastTime = time
+
+        invalidate()
+        super.update()
     }
 
     override fun dispose() {
