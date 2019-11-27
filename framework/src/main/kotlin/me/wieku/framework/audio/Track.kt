@@ -162,7 +162,7 @@ class Track(file: FileHandle, val fftMode: FFTMode = FFTMode.FFT512) {
         val level = BASS_ChannelGetLevel(fxChannel.asInt())
 
         leftChannelLevel = (level and 0xffff).toFloat() / 0x8000
-        rightChannelLevel = (level shr 16).toFloat() / 0x8000
+        rightChannelLevel = (level ushr 16).toFloat() / 0x8000
     }
 
     fun getLevelCombined(): Float {
