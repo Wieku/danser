@@ -46,8 +46,12 @@ val danserModule = module {
 
 }
 
-fun main(args: Array<String>) {
-    System.load("C:\\Users\\Wieku\\Google Drive\\danser\\danser/renderdoc.dll")
+fun main() {
+    //If we have renderdoc library in user directory, load it
+    if (File("renderdoc.dll").exists()) {
+        System.load(System.getProperty("user.dir")+"/renderdoc.dll")
+    }
+
     println("Version " + Build.Version)
 
     startKoin {}
