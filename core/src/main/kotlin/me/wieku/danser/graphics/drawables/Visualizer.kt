@@ -39,7 +39,7 @@ class Visualizer : Drawable(), KoinComponent {
             size = Vector2f(1f, 1f)
             origin = Origin.CentreLeft
         }
-        position = Vector2f(400f, 400f)
+
     }
 
 
@@ -95,10 +95,10 @@ class Visualizer : Drawable(), KoinComponent {
         for (i in 0 until 5) {
             offt.forEachIndexed { j, v ->
                 val rotation = (i / 5.0f + j / bars.toFloat()) * 2 * Math.PI.toFloat()
-                val position = vector2fRad(rotation, 400 * 0.66f).add(pos)
+                val position = vector2fRad(rotation, drawSize.y/2/*2 * 0.66f*/).add(pos)
                 tempSprite.position = position
                 tempSprite.rotation = rotation
-                tempSprite.scale = Vector2f(v * barLength, (2 * Math.PI.toFloat() * 400 * 0.66f) / bars.toFloat())
+                tempSprite.scale = Vector2f(v * barLength, (2 * Math.PI.toFloat() * /*400 * 0.66f*/drawSize.y/2) / bars.toFloat())
                 tempSprite.color.w = 0.3f
                 tempSprite.invalidate()
                 tempSprite.update()

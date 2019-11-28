@@ -3,16 +3,20 @@ package me.wieku.danser
 import me.wieku.danser.beatmap.*
 import me.wieku.danser.build.Build
 import me.wieku.danser.graphics.drawables.DanserCoin
+import me.wieku.danser.graphics.drawables.SideFlashes
 import me.wieku.danser.graphics.drawables.Triangles
 import me.wieku.danser.graphics.drawables.Visualizer
 import me.wieku.framework.audio.BassSystem
 import me.wieku.framework.audio.Track
 import me.wieku.framework.di.bindable.Bindable
 import me.wieku.framework.graphics.buffers.Framebuffer
+import me.wieku.framework.graphics.buffers.FramebufferTarget
+import me.wieku.framework.graphics.containers.Container
 import me.wieku.framework.graphics.drawables.sprite.Sprite
 import me.wieku.framework.graphics.drawables.sprite.SpriteBatch
 import me.wieku.framework.graphics.textures.Texture
 import me.wieku.framework.math.Origin
+import me.wieku.framework.math.Scaling
 import me.wieku.framework.math.vector2fRad
 import me.wieku.framework.math.view.Camera
 import me.wieku.framework.resource.FileHandle
@@ -52,7 +56,7 @@ fun main(args: Array<String>) {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE)
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, 1)
     glfwWindowHint(GLFW_SAMPLES, 4)
-    var handle = glfwCreateWindow(800, 800, "testdanser: " + Build.Version, 0, 0)
+    var handle = glfwCreateWindow(1920, 1080, "testdanser: " + Build.Version, 0, 0)
     glfwMakeContextCurrent(handle)
     glfwSwapInterval(0)
     GL.createCapabilities()
@@ -66,7 +70,7 @@ fun main(args: Array<String>) {
 
     BeatmapManager.loadBeatmaps(System.getenv("localappdata") + "\\osu!\\Songs")
 
-    var beatmap = BeatmapManager.beatmapSets.filter { /*it.metadata!!.title.contains("Windfall", true) &&*/ it.beatmaps.filter { bmap -> bmap.beatmapInfo.version == "Primordial Nucleosynthesis" }.isNotEmpty() }[0].beatmaps.filter { bmap -> bmap.beatmapInfo.version == "Primordial Nucleosynthesis" }[0]
+    var beatmap = BeatmapManager.beatmapSets.filter { /*it.metadata!!.title.contains("Windfall", true) &&*/ it.beatmaps.filter { bmap -> bmap.beatmapInfo.version == "Intense Ecstasy" }.isNotEmpty() }[0].beatmaps.filter { bmap -> bmap.beatmapInfo.version == "Intense Ecstasy" }[0]
 
     bindable.value = beatmap
 
@@ -76,36 +80,76 @@ fun main(args: Array<String>) {
     beatmap.loadTrack()
 
     beatmap.getTrack().play(0.1f)
-    beatmap.getTrack().setPosition(beatmap.beatmapMetadata.previewTime.toFloat()/1000)
-    val bindable = Bindable(beatmap)
+    beatmap.getTrack().setPosition(beatmap.beatmapMetadata.previewTime.toFloat()/1000-5)
+
+    val flashes = SideFlashes()
+        flashes.fillMode = Scaling.Stretch
+
     val coin = DanserCoin()
+        coin.scale = Vector2f(0.6f)
+        coin.fillMode = Scaling.Fit
+
     val vis = Visualizer()
+        vis.fillMode = Scaling.Fit
+        vis.scale = Vector2f(0.58f)
+
+
 
     var power = 0f
     var time = 0f
     var sectime = 0f
 
-    var fbf = Framebuffer(800, 800)
+    var fbf = Framebuffer(1920, 1080)
+    fbf.addRenderbuffer(FramebufferTarget.DEPTH)
     var fsprite = Sprite {
         this.texture = fbf.getTexture()!!.region
-        size = Vector2f(800f, 800f)
-        position = Vector2f(400f, 400f)
-    }/*{
+        size = Vector2f(1920f, 1080f)
+        position = Vector2f(1920f/2, 1080f/2)
+    }
+
+
+    val mainContainer = Container {
+        size = Vector2f(1920f, 1080f)
+        origin = Origin.TopLeft
+    }
+
+    println(System.getenv("localappdata") + "/osu!/Songs/" + beatmap.beatmapSet.directory + File.separator + beatmap.beatmapMetadata.backgroundFile)
+
+    val bgSprite = Sprite {
+        texture = Texture(
+            FileHandle(
+                System.getenv("localappdata") + "/osu!/Songs/" + beatmap.beatmapSet.directory + File.separator + beatmap.beatmapMetadata.backgroundFile,
+                FileType.Absolute
+            ),
+            4
+        ).region
+        size = Vector2f(texture!!.getWidth(), texture!!.getHeight())
+        fillMode = Scaling.Fill
+        this.color.w = 0.2f
+        anchor = Origin.Centre
+    }
+
+    mainContainer.addChild(bgSprite)
+    mainContainer.addChild(flashes)
+    mainContainer.addChild(vis)
+    mainContainer.addChild(coin)
+
+    /*{
         texture = fbf.getTexture()!!.region,
 
     }*/
 
-    var triangles = Triangles()
+    /*var triangles = Triangles()
     triangles.size = Vector2f(800f, 800f)
     triangles.position = Vector2f(400f, 400f)
-    triangles.invalidate()
+    triangles.invalidate()*/
 
 
-    var wWidth = 800
-    var wHeight = 800
+    var wWidth = 1920
+    var wHeight = 1080
 
     var camera = Camera()
-    camera.setViewportF(0, 0, 800, 800, true)
+    camera.setViewportF(0, 0, 1920, 1080, true)
     camera.update()
 
     glfwSetWindowSizeCallback(handle) { h, width, height ->
@@ -116,23 +160,28 @@ fun main(args: Array<String>) {
         camera.setViewportF(0, 0, wWidth, wHeight, true)
         camera.update()
         fbf = Framebuffer(width, height)
+        fbf.addRenderbuffer(FramebufferTarget.DEPTH)
         fsprite.texture = fbf.getTexture()!!.region
         fsprite.position = Vector2f(width.toFloat()/2, height.toFloat()/2)
         fsprite.invalidate()
         fsprite.update()
 
-        vis.position = Vector2f(width.toFloat()/2, height.toFloat()/2)
+        mainContainer.size = Vector2f(width.toFloat(), height.toFloat())
+        mainContainer.invalidate()
+        mainContainer.update()
+
+        /*vis.position = Vector2f(width.toFloat()/2, height.toFloat()/2)
         vis.invalidate()
         vis.update()
 
         coin.position = Vector2f(width.toFloat()/2, height.toFloat()/2)
         coin.invalidate()
-        coin.update()
+        coin.update()*/
 
-        triangles.position = Vector2f(width.toFloat()/2, height.toFloat()/2)
+        /*triangles.position = Vector2f(width.toFloat()/2, height.toFloat()/2)
         triangles.size = Vector2f(width.toFloat(), height.toFloat())
         triangles.invalidate()
-        triangles.update()
+        triangles.update()*/
 
         //println("test1")
     }
@@ -160,14 +209,17 @@ fun main(args: Array<String>) {
         batch.camera = camera
         batch.begin()
 
-        triangles.update()
-        triangles.draw(batch)
+        /*triangles.update()
+        triangles.draw(batch)*/
 
-        vis.update()
+        /*vis.update()
         vis.draw(batch)
 
         coin.update()
-        coin.draw(batch)
+        coin.draw(batch)*/
+
+        mainContainer.update()
+        mainContainer.draw(batch)
 
         batch.end()
         //fbf.unbind()

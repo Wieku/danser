@@ -9,6 +9,7 @@ import me.wieku.framework.math.view.Camera
 import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.FileType
 import me.wieku.framework.utils.Disposable
+import me.wieku.framework.utils.MaskingInfo
 import org.joml.Matrix4f
 import org.joml.Vector2f
 import org.joml.Vector3f
@@ -17,6 +18,7 @@ import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL33.*
 import org.lwjgl.system.MemoryUtil
 import java.nio.FloatBuffer
+import java.util.*
 
 //TODO: support Int IBOs
 /**
@@ -56,7 +58,6 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
         var attributes = arrayOf(
             VertexAttribute("in_position", VertexAttributeType.Vec3, 0),
             VertexAttribute("in_tex_coord", VertexAttributeType.Vec3, 1),
-            VertexAttribute("in_tex_bounds", VertexAttributeType.Vec4, 2),
             VertexAttribute("in_color", VertexAttributeType.Vec4, 3),
             VertexAttribute("in_additive", VertexAttributeType.GlFloat, 4)
         )
@@ -135,7 +136,6 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
         vao.bind()
         ibo.bind()
 
-
         preBlendState = GL11.glIsEnabled(GL_BLEND)
         preSFactor = glGetInteger(GL_BLEND_SRC_ALPHA)
         preDFactor = glGetInteger(GL_BLEND_SRC_ALPHA)
@@ -144,9 +144,13 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
             glEnable(GL_BLEND)
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
 
-        if (currentTexture != null) {
-            shader.setUniform("tex", currentTexture!!.getLocation().toFloat())
+        currentTexture?.let {
+            if (it.getLocation() == 0) {
+                it.bind(0)
+            }
+            shader.setUniform("tex", it.getLocation().toFloat())
         }
+        applyMaskingInfo()
     }
 
     fun flush() {
@@ -195,10 +199,6 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
         vertexBuffer.put(texCoords.x)
         vertexBuffer.put(texCoords.y)
         vertexBuffer.put(texCoords.z)
-        vertexBuffer.put(texBounds.x)
-        vertexBuffer.put(texBounds.y)
-        vertexBuffer.put(texBounds.z)
-        vertexBuffer.put(texBounds.w)
         vertexBuffer.put(color.x)
         vertexBuffer.put(color.y)
         vertexBuffer.put(color.z)
@@ -287,6 +287,30 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
             .rot(sprite.rotation).add(tmp2)
         tmp1.set(u1, v2, region.getLayer().toFloat())
         addVertex(tmp, tmp1, texBounds, sprite.color, sprite.additive)
+    }
+
+    private var maskingStack = ArrayDeque<MaskingInfo>()
+
+    fun pushMaskingInfo(info: MaskingInfo) {
+        maskingStack.push(info)
+        applyMaskingInfo(info)
+    }
+
+    fun applyMaskingInfo(info: MaskingInfo? = null) {
+        flush()
+        val inf: MaskingInfo? = info?:maskingStack.peek()
+        if (inf != null) {
+            shader.setUniform("maskRect", inf.rect.x, inf.rect.y, inf.rect.z, inf.rect.w)
+            shader.setUniform("g_CornerRadius", inf.radius)
+        } else {
+            shader.setUniform("maskRect", 0f, 0f, 1f, 1f)
+            shader.setUniform("g_CornerRadius", 0f)
+        }
+    }
+
+    fun popMaskingInfo() {
+        maskingStack.pop()
+        applyMaskingInfo()
     }
 
     override fun dispose() {

@@ -20,7 +20,7 @@ abstract class Drawable(): Disposable {
 
     var fixedPosition = Vector2f()
 
-    var computedPosition = Vector2f()
+    //var computedPosition = Vector2f()
 
     var drawPosition = Vector2f()
 
@@ -36,7 +36,7 @@ abstract class Drawable(): Disposable {
 
     var customOrigin = Vector2f()
 
-    var computedOrigin = Vector2f()
+    //var computedOrigin = Vector2f()
 
     var drawOrigin = Vector2f()
 
@@ -52,7 +52,7 @@ abstract class Drawable(): Disposable {
 
     var size = Vector2f(1f)
 
-    var computedSize = Vector2f()
+    //var computedSize = Vector2f()
 
     var drawSize = Vector2f()
 
@@ -83,39 +83,49 @@ abstract class Drawable(): Disposable {
         if (parent != null) {
             parent?.let {
 
-                if (inheritScale) {
+                /*if (inheritScale) {
                     drawScale.mul(it.drawScale)
-                }
+                }*/
 
-                computedSize.set(fillMode.apply(size.x, size.y, it.computedSize.x, it.computedSize.y))
+                //computedSize.set(fillMode.apply(size.x, size.y, it.computedSize.x, it.computedSize.y))
+                drawSize.set(fillMode.apply(size.x, size.y, it.drawSize.x, it.drawSize.y)).mul(drawScale)
 
-                drawSize.set(computedSize).mul(drawScale)
+                //drawSize.set(computedSize).mul(drawScale)
 
-                computedOrigin.set(if (origin == Origin.Custom) customOrigin else origin.offset).mul(computedSize)
+                /*computedOrigin.set(if (origin == Origin.Custom) customOrigin else origin.offset).mul(computedSize)
 
-                drawOrigin.set(computedOrigin).mul(drawScale)
+                drawOrigin.set(computedOrigin).mul(drawScale)*/
+
+                drawOrigin.set(if (origin == Origin.Custom) customOrigin else origin.offset).mul(drawSize)
+
+                //drawOrigin.set(computedOrigin).mul(drawScale)
 
                 val anchorV = Vector2f()
 
                 if (anchor != Origin.None) {
                     anchorV.set(if (anchor == Origin.Custom) customAnchor else anchor.offset)
 
-                    anchorV.mul(it.computedSize).add(it.computedPosition).add(it.childOffset)
+                    //anchorV.mul(it.computedSize).add(it.computedPosition).add(it.childOffset)
+                    anchorV.mul(it.drawSize).add(it.drawPosition).add(it.childOffset)
 
                 }
 
-                computedPosition.set(position).sub(computedOrigin).add(anchorV)
+                //computedPosition.set(position).sub(computedOrigin).add(anchorV)
                 drawPosition.set(position).sub(drawOrigin).add(anchorV)
                 return
             }
         } else {
-            computedSize.set(size.x, size.y)
+            /*computedSize.set(size.x, size.y)
             drawSize.set(computedSize).mul(drawScale)
 
             computedOrigin.set(if (origin == Origin.Custom) customOrigin else origin.offset).mul(computedSize)
             drawOrigin.set(computedOrigin).mul(drawScale)
 
             computedPosition.set(position).sub(computedOrigin)
+            drawPosition.set(position).sub(drawOrigin)*/
+
+            drawSize.set(size.x, size.y).mul(drawScale)
+            drawOrigin.set(if (origin == Origin.Custom) customOrigin else origin.offset).mul(drawSize)
             drawPosition.set(position).sub(drawOrigin)
         }
     }

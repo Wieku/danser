@@ -21,7 +21,7 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.pow
 
-class DanserCoin : Container(), KoinComponent {
+class SideFlashes : Container(), KoinComponent {
 
     val beatmapBindable: Bindable<Beatmap> by inject()
 
@@ -37,65 +37,39 @@ class DanserCoin : Container(), KoinComponent {
     private var beatProgress = 0f
 
    // private val coinSpriteBottom: Sprite
-    private val coinSpriteTop: Sprite
-
-    private val coinBottom: Container
+    private val flashLeft: Sprite
+    private val flashRight: Sprite
 
     init {
         /*size = Vector2f(800f, 800f).mul(0.7f)
         position = Vector2f(400f, 400f)*/
 
-        val bottomTexture = Texture(
+        val flashTexture = Texture(
             FileHandle(
-                "assets/coin-base.png",
+                "assets/flash.png",
                 FileType.Classpath
             ),
             4
         )
 
-        val overlayTexture = Texture(
-            FileHandle(
-                "assets/coin-overlay.png",
-                FileType.Classpath
-            ),
-            4
-        )
-
-        coinBottom = Container {
-            fillMode = Scaling.Fill
-            addChild(Sprite {
-                texture = bottomTexture.region
-                fillMode = Scaling.Fit
-                inheritScale = true
-                color.w = 1f
-            })
-            val triangles = Triangles()
-            triangles.fillMode = Scaling.Fill
-            //triangles.inheritScale = true
-            triangles.scale = Vector2f(0.95f)
-            addChild(triangles)
-            addChild(Sprite {
-                texture = overlayTexture.region
-                fillMode = Scaling.Fit
-                inheritScale = true
-                color.w = 1f
-            })
-        }
-
-        /*coinSpriteBottom = Sprite {
-            texture = bottomTexture.region
-            fillMode = Scaling.Fit
-            color.w = 1f
-        }*/
-
-        coinSpriteTop = Sprite {
-            texture = overlayTexture.region
+        flashLeft = Sprite {
+            texture = flashTexture.region
             fillMode = Scaling.FillY
-            color.w = 0.3f
+            flipX = true
+            color.w = 1f
+            anchor = Origin.CentreLeft
+            origin = Origin.CentreLeft
         }
 
+        flashRight = Sprite {
+            texture = flashTexture.region
+            fillMode = Scaling.FillY
+            color.w = 1f
+            anchor = Origin.CentreRight
+            origin = Origin.CentreRight
+        }
 
-        addChild(coinBottom, coinSpriteTop)
+        addChild(flashLeft, flashRight)
     }
 
     override fun update() {
@@ -119,7 +93,7 @@ class DanserCoin : Container(), KoinComponent {
 
         val timingPoint = beatmapBindable.value!!.timing.getPointAt(bTime)
 
-        coinSpriteTop.color.w = if(timingPoint.kiai) 0.12f else 0.3f
+        //coinSpriteTop.color.w = if(timingPoint.kiai) 0.12f else 0.3f
 
         val bProg = ((bTime - timingPoint.time) / timingPoint.baseBpm)
 
@@ -133,8 +107,8 @@ class DanserCoin : Container(), KoinComponent {
         progress = lastProgress * ratio + (pV) * (1 - ratio)
         lastProgress = progress
 
-        coinBottom.scale.set(1.05f - Easings.OutQuad(progress * 0.05f))
-        coinSpriteTop.scale.set(1.05f + Easings.OutQuad(progress * 0.03f))
+        //coinBottom.scale.set(1.05f - Easings.OutQuad(progress * 0.05f))
+        //coinSpriteTop.scale.set(1.05f + Easings.OutQuad(progress * 0.03f))
 
         lastTime = time
 
