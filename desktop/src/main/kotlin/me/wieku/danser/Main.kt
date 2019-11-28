@@ -21,6 +21,8 @@ import me.wieku.framework.math.vector2fRad
 import me.wieku.framework.math.view.Camera
 import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.FileType
+import me.wieku.framework.time.FramedClock
+import me.wieku.framework.time.IFramedClock
 import me.wieku.framework.utils.FpsLimiter
 import org.joml.Vector2f
 import org.joml.Vector4f
@@ -48,7 +50,7 @@ fun main(args: Array<String>) {
     System.load("C:\\Users\\Wieku\\Google Drive\\danser\\danser/renderdoc.dll")
     println("Version " + Build.Version)
 
-    val koin = startKoin { modules(danserModule) }
+    startKoin {}
 
     glfwInit()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3)
@@ -64,8 +66,6 @@ fun main(args: Array<String>) {
 
     var batch = SpriteBatch()
 
-    val color = Vector4f(1f, 1f, 1f, 0.6f)
-
     BassSystem.initSystem()
 
     BeatmapManager.loadBeatmaps(System.getenv("localappdata") + "\\osu!\\Songs")
@@ -74,7 +74,10 @@ fun main(args: Array<String>) {
 
     bindable.value = beatmap
 
+    val clock = FramedClock()
+
     danserModule.single { bindable }
+    danserModule.single { clock }
     loadKoinModules(danserModule)
 
     beatmap.loadTrack()
@@ -92,20 +95,6 @@ fun main(args: Array<String>) {
     val vis = Visualizer()
         vis.fillMode = Scaling.Fit
         vis.scale = Vector2f(0.58f)
-
-
-
-    var power = 0f
-    var time = 0f
-    var sectime = 0f
-
-    var fbf = Framebuffer(1920, 1080)
-    fbf.addRenderbuffer(FramebufferTarget.DEPTH)
-    var fsprite = Sprite {
-        this.texture = fbf.getTexture()!!.region
-        size = Vector2f(1920f, 1080f)
-        position = Vector2f(1920f/2, 1080f/2)
-    }
 
 
     val mainContainer = Container {
@@ -134,16 +123,6 @@ fun main(args: Array<String>) {
     mainContainer.addChild(vis)
     mainContainer.addChild(coin)
 
-    /*{
-        texture = fbf.getTexture()!!.region,
-
-    }*/
-
-    /*var triangles = Triangles()
-    triangles.size = Vector2f(800f, 800f)
-    triangles.position = Vector2f(400f, 400f)
-    triangles.invalidate()*/
-
 
     var wWidth = 1920
     var wHeight = 1080
@@ -152,85 +131,51 @@ fun main(args: Array<String>) {
     camera.setViewportF(0, 0, 1920, 1080, true)
     camera.update()
 
-    glfwSetWindowSizeCallback(handle) { h, width, height ->
-        //println("test")
-        fbf.dispose()
-        wWidth = width
-        wHeight = height
-        camera.setViewportF(0, 0, wWidth, wHeight, true)
-        camera.update()
-        fbf = Framebuffer(width, height)
-        fbf.addRenderbuffer(FramebufferTarget.DEPTH)
-        fsprite.texture = fbf.getTexture()!!.region
-        fsprite.position = Vector2f(width.toFloat()/2, height.toFloat()/2)
-        fsprite.invalidate()
-        fsprite.update()
-
-        mainContainer.size = Vector2f(width.toFloat(), height.toFloat())
-        mainContainer.invalidate()
-        mainContainer.update()
-
-        /*vis.position = Vector2f(width.toFloat()/2, height.toFloat()/2)
-        vis.invalidate()
-        vis.update()
-
-        coin.position = Vector2f(width.toFloat()/2, height.toFloat()/2)
-        coin.invalidate()
-        coin.update()*/
-
-        /*triangles.position = Vector2f(width.toFloat()/2, height.toFloat()/2)
-        triangles.size = Vector2f(width.toFloat(), height.toFloat())
-        triangles.invalidate()
-        triangles.update()*/
-
-        //println("test1")
-    }
-
-
-
-
     Thread {
         while (!glfwWindowShouldClose(handle)) {
             beatmap.getTrack().update()
-            Thread.sleep(40)
+            Thread.sleep(10)
         }
     }.start()
 
-    val limiter = FpsLimiter(240)
+    val limiter = FpsLimiter(0)
 
     glEnable(GL_MULTISAMPLE)
 
-    while (!glfwWindowShouldClose(handle)) {
+    val draw: ()->Unit = {
+        clock.updateClock()
         glViewport(0, 0, wWidth, wHeight)
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f)
         glClear(GL_COLOR_BUFFER_BIT)
-        //fbf.bind()
 
         batch.camera = camera
         batch.begin()
-
-        /*triangles.update()
-        triangles.draw(batch)*/
-
-        /*vis.update()
-        vis.draw(batch)
-
-        coin.update()
-        coin.draw(batch)*/
 
         mainContainer.update()
         mainContainer.draw(batch)
 
         batch.end()
-        //fbf.unbind()
-
-        //batch.begin()
-        //batch.draw(fsprite)
-        //batch.end()
 
         glfwPollEvents()
         glfwSwapBuffers(handle)
         limiter.sync()
+    }
+
+    glfwSetWindowSizeCallback(handle) { h, width, height ->
+        wWidth = width
+        wHeight = height
+        camera.setViewportF(0, 0, wWidth, wHeight, true)
+        camera.update()
+
+        mainContainer.size = Vector2f(width.toFloat(), height.toFloat())
+        mainContainer.invalidate()
+        mainContainer.update()
+
+        draw()
+    }
+
+    while (!glfwWindowShouldClose(handle)) {
+        draw()
     }
 
     glfwDestroyWindow(handle)

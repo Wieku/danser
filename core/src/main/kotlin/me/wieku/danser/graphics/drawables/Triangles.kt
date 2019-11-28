@@ -18,7 +18,11 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sqrt
 
-class Triangles : Container(), KoinComponent {
+class Triangles() : Container(), KoinComponent {
+
+    constructor(inContext: Triangles.() -> Unit):this(){
+        inContext()
+    }
 
     private val beatmapBindable: Bindable<Beatmap> by inject()
 
@@ -29,8 +33,6 @@ class Triangles : Container(), KoinComponent {
     private val maxSize = 0.520f
     private val bars = 40
     private val triangleSpawnRate = 0.25
-
-    private var lastTime = 0L
 
     private var velocity = 0f
 
@@ -73,11 +75,6 @@ class Triangles : Container(), KoinComponent {
 
     override fun update() {
         super.update()
-        val time = System.nanoTime()
-        if (lastTime == 0L) {
-            lastTime = time
-        }
-        val delta = ((time - lastTime) / 1000000f)
 
         var boost = 0f
 
@@ -93,14 +90,14 @@ class Triangles : Container(), KoinComponent {
 
         velocity = max(velocity, min(boost * 1.5f, 6f))
 
-        velocity *= 1.0f - 0.05f * delta / 16.66667f
+        velocity *= 1.0f - 0.05f * clock.time.frameTime / 16.66667f
 
         val localVelocity = (velocity + 0.5f) / drawSize.y
 
         var toRemove = children.filter {
             it.customAnchor.sub(
                 0f,
-                delta / 16.6667f * localVelocity * (0.2f + (1.0f - it.size.y / maxSize * 0.8f) * separation)
+                clock.time.frameTime / 16.6667f * localVelocity * (0.2f + (1.0f - it.size.y / maxSize * 0.8f) * separation)
             )
             it.scale.set(drawSize.y)
             it.customAnchor.y < -it.size.y / 2
@@ -112,15 +109,8 @@ class Triangles : Container(), KoinComponent {
 
         addTriangles(false)
 
-        lastTime = time
-
         super.invalidate()
         super.update()
-
-        /*println("${position.x}, ${position.y}, ${position.x+drawSize.x}, ${position.y + drawSize.y}")
-        println("${drawPosition.x}, ${drawPosition.y}, ${drawPosition.x+drawSize.x}, ${drawPosition.y + drawSize.y}")
-
-        println()*/
 
         maskInfo.rect.set(drawPosition.x, drawPosition.y, drawPosition.x+drawSize.x, drawPosition.y + drawSize.y)
         maskInfo.radius = drawSize.y/2

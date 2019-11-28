@@ -1,15 +1,11 @@
 package me.wieku.danser.graphics.drawables
 
 import me.wieku.danser.beatmap.Beatmap
-import me.wieku.framework.audio.Track
 import me.wieku.framework.di.bindable.Bindable
 import me.wieku.framework.graphics.containers.Container
-import me.wieku.framework.graphics.drawables.Drawable
 import me.wieku.framework.graphics.drawables.sprite.Sprite
-import me.wieku.framework.graphics.drawables.sprite.SpriteBatch
 import me.wieku.framework.graphics.textures.Texture
 import me.wieku.framework.math.Easings
-import me.wieku.framework.math.Origin
 import me.wieku.framework.math.Scaling
 import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.FileType
@@ -25,7 +21,6 @@ class DanserCoin : Container(), KoinComponent {
 
     val beatmapBindable: Bindable<Beatmap> by inject()
 
-    private var lastTime = 0L
     private var deltaSum = 0f
 
     private var volume = 0f
@@ -36,14 +31,10 @@ class DanserCoin : Container(), KoinComponent {
 
     private var beatProgress = 0f
 
-   // private val coinSpriteBottom: Sprite
-    private val coinSpriteTop: Sprite
-
     private val coinBottom: Container
+    private val coinTop: Sprite
 
     init {
-        /*size = Vector2f(800f, 800f).mul(0.7f)
-        position = Vector2f(400f, 400f)*/
 
         val bottomTexture = Texture(
             FileHandle(
@@ -63,49 +54,40 @@ class DanserCoin : Container(), KoinComponent {
 
         coinBottom = Container {
             fillMode = Scaling.Fill
-            addChild(Sprite {
-                texture = bottomTexture.region
-                fillMode = Scaling.Fit
-                inheritScale = true
-                color.w = 1f
-            })
-            val triangles = Triangles()
-            triangles.fillMode = Scaling.Fill
-            //triangles.inheritScale = true
-            triangles.scale = Vector2f(0.95f)
-            addChild(triangles)
-            addChild(Sprite {
-                texture = overlayTexture.region
-                fillMode = Scaling.Fit
-                inheritScale = true
-                color.w = 1f
-            })
+            addChild(
+                Sprite {
+                    texture = bottomTexture.region
+                    fillMode = Scaling.Fit
+                    inheritScale = true
+                    color.w = 1f
+                },
+                Triangles {
+                    fillMode = Scaling.Fit
+                    inheritScale = true
+                    scale = Vector2f(0.95f)
+                },
+                Sprite {
+                    texture = overlayTexture.region
+                    fillMode = Scaling.Fit
+                    inheritScale = true
+                    color.w = 1f
+                }
+            )
         }
 
-        /*coinSpriteBottom = Sprite {
-            texture = bottomTexture.region
-            fillMode = Scaling.Fit
-            color.w = 1f
-        }*/
-
-        coinSpriteTop = Sprite {
+        coinTop = Sprite {
             texture = overlayTexture.region
             fillMode = Scaling.FillY
             color.w = 0.3f
         }
 
 
-        addChild(coinBottom, coinSpriteTop)
+        addChild(coinBottom, coinTop)
     }
 
     override fun update() {
-        val time = System.nanoTime()
-        if (lastTime == 0L) {
-            lastTime = time
-        }
-        val delta = ((time - lastTime) / 1000000f)
 
-        deltaSum += delta
+        deltaSum += clock.time.frameTime
 
         if (deltaSum >= 1000f / 60) {
 
@@ -119,7 +101,7 @@ class DanserCoin : Container(), KoinComponent {
 
         val timingPoint = beatmapBindable.value!!.timing.getPointAt(bTime)
 
-        coinSpriteTop.color.w = if(timingPoint.kiai) 0.12f else 0.3f
+        coinTop.color.w = if (timingPoint.kiai) 0.12f else 0.3f
 
         val bProg = ((bTime - timingPoint.time) / timingPoint.baseBpm)
 
@@ -128,21 +110,17 @@ class DanserCoin : Container(), KoinComponent {
         val vprog = 1 - ((volume - volumeAverage) / 0.5f)
         val pV = min(1.0f, max(0.0f, 1.0f - (vprog * 0.5f + beatProgress * 0.5f)))
 
-        val ratio = 0.5f.pow(delta / 16.6666666666667f)
+        val ratio = 0.5f.pow(clock.time.frameTime / 16.6666666666667f)
 
         progress = lastProgress * ratio + (pV) * (1 - ratio)
         lastProgress = progress
 
         coinBottom.scale.set(1.05f - Easings.OutQuad(progress * 0.05f))
-        coinSpriteTop.scale.set(1.05f + Easings.OutQuad(progress * 0.03f))
-
-        lastTime = time
+        coinTop.scale.set(1.05f + Easings.OutQuad(progress * 0.03f))
 
         invalidate()
         super.update()
     }
 
-    override fun dispose() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun dispose() {}
 }
