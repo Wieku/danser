@@ -48,6 +48,7 @@ nb-configuration.xml
 gradle-app.setting
 /build/
 /core/build/
+/core/out/
 /framework/build/
 /desktop/build/
 /desktop/run/
