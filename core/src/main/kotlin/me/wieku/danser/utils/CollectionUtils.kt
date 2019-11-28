@@ -13,19 +13,19 @@ fun <T> List<T>.binarySearchApproximate(fromIndex: Int = 0, toIndex: Int = size,
 
         when {
             cmp < 0 -> {
-                if (mid + 1 >= size || comparison(get(mid + 1)) > 1) {
+                if (mid + 1 >= size || comparison(get(mid + 1)) > 0) {
                     return mid
                 }
                 low = mid + 1
             }
             cmp > 0 -> {
-                if (mid - 1 < 0 || comparison(get(mid - 1)) <= 0) {
+                if (mid - 1 < 0) {
                     return mid
                 }
                 high = mid - 1
             }
             else -> {
-                if (mid + 1 >= size || comparison(get(mid + 1)) > 1) {
+                if (mid + 1 >= size || comparison(get(mid + 1)) >= 0) {
                     return mid
                 }
                 low = mid + 1
