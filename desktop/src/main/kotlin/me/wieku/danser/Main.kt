@@ -76,8 +76,11 @@ fun main(args: Array<String>) {
 
     val clock = FramedClock()
 
+    //Hack to avoid autoformatting removing "as IFramedClock"
+    val iClock = clock as IFramedClock
+
     danserModule.single { bindable }
-    danserModule.single { clock }
+    danserModule.single { iClock }
     loadKoinModules(danserModule)
 
     beatmap.loadTrack()
