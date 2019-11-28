@@ -129,8 +129,8 @@ class BeatmapParser {
     private fun parseEvent(line: List<String>) {
         val event = Events[line[0]]
         when (event) {
-            Events.Background -> beatmap?.beatmapMetadata?.backgroundFile = line[1]
-            Events.Video -> beatmap?.beatmapMetadata?.videoFile = line[1]
+            Events.Background -> beatmap?.beatmapMetadata?.backgroundFile = line[2].removePrefix("\"").removeSuffix("\"")
+            Events.Video -> beatmap?.beatmapMetadata?.videoFile = line[2]
             Events.Break -> beatmap?.beatmapInfo!!.breaks += Break(line[1].toLong(), line[2].toLong())
         }
     }
@@ -139,6 +139,8 @@ class BeatmapParser {
         val time = line[0].toFloat().toLong()
         val bpm = line[1].toFloat()
 
+        val timeSignature = if(line.size > 2) line[2].toInt() else 4
+
         if (line.size > 3) {
             val sampleVolume = if (line.size > 5) line[5].toFloat() / 100 else 1.0f
             val kiai = if (line.size > 7) line[7].toInt() == 1 else false
@@ -146,6 +148,7 @@ class BeatmapParser {
             beatmap!!.timing.addTimingPoint(
                 time,
                 bpm,
+                timeSignature,
                 SampleData(
                     SampleSet[line[3]],
                     SampleSet.Inherited,
@@ -155,7 +158,7 @@ class BeatmapParser {
                 kiai
             )
         } else {
-            beatmap!!.timing.addTimingPoint(time, bpm, null, false)
+            beatmap!!.timing.addTimingPoint(time, bpm, timeSignature, null, false)
         }
     }
 

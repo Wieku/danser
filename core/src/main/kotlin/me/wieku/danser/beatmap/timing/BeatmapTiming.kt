@@ -18,7 +18,7 @@ class BeatmapTiming {
 
     private var sampleData: SampleData = baseSampleData
 
-    fun addTimingPoint(time: Long, bpm: Float, sampleData: SampleData?, kiai: Boolean) {
+    fun addTimingPoint(time: Long, bpm: Float, timeSignature: Int, sampleData: SampleData?, kiai: Boolean) {
         if (bpm > 0) {
             baseBpm = bpm
         }
@@ -32,7 +32,7 @@ class BeatmapTiming {
             )
         }
 
-        val point = TimingPoint(time, baseBpm, bpm, this.sampleData, kiai)
+        val point = TimingPoint(time, baseBpm, bpm, timeSignature, this.sampleData, kiai)
         points.add(point)
     }
 

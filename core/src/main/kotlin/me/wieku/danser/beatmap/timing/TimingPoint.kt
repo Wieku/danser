@@ -7,6 +7,7 @@ class TimingPoint(
     val time: Long,
     val baseBpm: Float,
     private val bpm: Float,
+    val timeSignature: Int,
     val sampleData: SampleData,
     val kiai: Boolean
 ) {
