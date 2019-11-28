@@ -9,11 +9,16 @@ open class Container(): Drawable() {
         inContext()
     }
 
-    private val children = ArrayList<Drawable>()
+    protected val children = ArrayList<Drawable>()
 
     fun addChild(vararg drawable: Drawable) {
         children.addAll(drawable)
         drawable.forEach { it.parent = this }
+    }
+
+    fun insertChild(drawable: Drawable, index: Int) {
+        children.add(index, drawable)
+        drawable.parent = this
     }
 
     fun removeChild(drawable: Drawable) {

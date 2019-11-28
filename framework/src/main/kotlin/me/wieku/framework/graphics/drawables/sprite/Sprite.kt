@@ -30,16 +30,7 @@ open class Sprite(): Drawable() {
 
     override fun draw(batch: SpriteBatch) {
         batch.draw(this)
-        batch.flush()
     }
-
-
-    /*constructor(texture: TextureRegion, width: Float = texture.getWidth(), height: Float = texture.getHeight(), origin: Vector2f = Vector2f(0.5f, 0.5f)): this() {
-        this.texture = texture
-        this.width = width
-        this.height = height
-        this.origin.set(origin)
-    }*/
 
 }
 

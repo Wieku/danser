@@ -33,12 +33,6 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
     private var drawing = false
     private var vertexCount: Int = 0
 
-    //private var basePosition: Vector2f = Vector2f()
-    //private var scale: Vector2f = Vector2f()
-    //private var subscale: Vector2f = Vector2f()
-
-    //private var rotation: Float = 0f
-
     var camera: Camera = Camera()
         set(value) {
             if (drawing) {
@@ -265,17 +259,14 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
             flush()
         }
 
-        val fX = if (sprite.flipX) -1f else 1f
-        val fY = if (sprite.flipY) -1f else 1f
-
         val texBounds = Vector4f(region.getU1(), region.getV1(), region.getU2(), region.getV2())
 
         tmp2.set(sprite.drawPosition).add(sprite.drawOrigin)
 
-        var u1 = if (sprite.flipX) region.getU2() else region.getU1()
-        var u2 = if (sprite.flipX) region.getU1() else region.getU2()
-        var v1 = if (sprite.flipX) region.getV2() else region.getV1()
-        var v2 = if (sprite.flipX) region.getV1() else region.getV2()
+        val u1 = if (sprite.flipX) region.getU2() else region.getU1()
+        val u2 = if (sprite.flipX) region.getU1() else region.getU2()
+        val v1 = if (sprite.flipX) region.getV2() else region.getV1()
+        val v2 = if (sprite.flipX) region.getV1() else region.getV2()
 
         tmp.set(0f, 0f).mul(sprite.drawSize).sub(sprite.drawOrigin)
             .rot(sprite.rotation).add(tmp2)

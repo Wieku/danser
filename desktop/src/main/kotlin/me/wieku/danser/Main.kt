@@ -3,6 +3,7 @@ package me.wieku.danser
 import me.wieku.danser.beatmap.*
 import me.wieku.danser.build.Build
 import me.wieku.danser.graphics.drawables.DanserCoin
+import me.wieku.danser.graphics.drawables.Triangles
 import me.wieku.danser.graphics.drawables.Visualizer
 import me.wieku.framework.audio.BassSystem
 import me.wieku.framework.audio.Track
@@ -27,6 +28,7 @@ import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL11.*
+import org.lwjgl.opengl.GL13.GL_MULTISAMPLE
 import java.awt.Frame
 import java.io.File
 import kotlin.math.pow
@@ -39,6 +41,7 @@ val danserModule = module {
 }
 
 fun main(args: Array<String>) {
+    System.load("C:\\Users\\Wieku\\Google Drive\\danser\\danser/renderdoc.dll")
     println("Version " + Build.Version)
 
     val koin = startKoin { modules(danserModule) }
@@ -48,6 +51,7 @@ fun main(args: Array<String>) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE)
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, 1)
+    glfwWindowHint(GLFW_SAMPLES, 4)
     var handle = glfwCreateWindow(800, 800, "testdanser: " + Build.Version, 0, 0)
     glfwMakeContextCurrent(handle)
     glfwSwapInterval(0)
@@ -62,7 +66,7 @@ fun main(args: Array<String>) {
 
     BeatmapManager.loadBeatmaps(System.getenv("localappdata") + "\\osu!\\Songs")
 
-    var beatmap = BeatmapManager.beatmapSets.filter { /*it.metadata!!.title.contains("Windfall", true) &&*/ it.beatmaps.filter { bmap -> bmap.beatmapInfo.version == "Intense Ecstasy" }.isNotEmpty() }[0].beatmaps.filter { bmap -> bmap.beatmapInfo.version == "Intense Ecstasy" }[0]
+    var beatmap = BeatmapManager.beatmapSets.filter { /*it.metadata!!.title.contains("Windfall", true) &&*/ it.beatmaps.filter { bmap -> bmap.beatmapInfo.version == "Primordial Nucleosynthesis" }.isNotEmpty() }[0].beatmaps.filter { bmap -> bmap.beatmapInfo.version == "Primordial Nucleosynthesis" }[0]
 
     bindable.value = beatmap
 
@@ -91,6 +95,12 @@ fun main(args: Array<String>) {
 
     }*/
 
+    var triangles = Triangles()
+    triangles.size = Vector2f(800f, 800f)
+    triangles.position = Vector2f(400f, 400f)
+    triangles.invalidate()
+
+
     var wWidth = 800
     var wHeight = 800
 
@@ -118,6 +128,12 @@ fun main(args: Array<String>) {
         coin.position = Vector2f(width.toFloat()/2, height.toFloat()/2)
         coin.invalidate()
         coin.update()
+
+        triangles.position = Vector2f(width.toFloat()/2, height.toFloat()/2)
+        triangles.size = Vector2f(width.toFloat(), height.toFloat())
+        triangles.invalidate()
+        triangles.update()
+
         //println("test1")
     }
 
@@ -127,11 +143,13 @@ fun main(args: Array<String>) {
     Thread {
         while (!glfwWindowShouldClose(handle)) {
             beatmap.getTrack().update()
-            Thread.sleep(16)
+            Thread.sleep(40)
         }
     }.start()
 
     val limiter = FpsLimiter(240)
+
+    glEnable(GL_MULTISAMPLE)
 
     while (!glfwWindowShouldClose(handle)) {
         glViewport(0, 0, wWidth, wHeight)
@@ -141,6 +159,9 @@ fun main(args: Array<String>) {
 
         batch.camera = camera
         batch.begin()
+
+        triangles.update()
+        triangles.draw(batch)
 
         vis.update()
         vis.draw(batch)
