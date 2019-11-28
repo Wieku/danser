@@ -26,8 +26,6 @@ class Triangles() : Container(), KoinComponent {
 
     private val beatmapBindable: Bindable<Beatmap> by inject()
 
-    private val maskInfo = MaskingInfo()
-
     private val separation = 1.4f
     private val minSize = 0.120f
     private val maxSize = 0.520f
@@ -111,15 +109,6 @@ class Triangles() : Container(), KoinComponent {
 
         super.invalidate()
         super.update()
-
-        maskInfo.rect.set(drawPosition.x, drawPosition.y, drawPosition.x+drawSize.x, drawPosition.y + drawSize.y)
-        maskInfo.radius = drawSize.y/2
-    }
-
-    override fun draw(batch: SpriteBatch) {
-        batch.pushMaskingInfo(maskInfo)
-        super.draw(batch)
-        batch.popMaskingInfo()
     }
 
 }

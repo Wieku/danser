@@ -2,6 +2,7 @@ package me.wieku.danser.graphics.drawables
 
 import me.wieku.danser.beatmap.Beatmap
 import me.wieku.framework.di.bindable.Bindable
+import me.wieku.framework.graphics.containers.CircularContainer
 import me.wieku.framework.graphics.containers.Container
 import me.wieku.framework.graphics.drawables.sprite.Sprite
 import me.wieku.framework.graphics.textures.Texture
@@ -61,10 +62,15 @@ class DanserCoin : Container(), KoinComponent {
                     inheritScale = true
                     color.w = 1f
                 },
-                Triangles {
-                    fillMode = Scaling.Fit
-                    inheritScale = true
+                CircularContainer {
                     scale = Vector2f(0.95f)
+                    fillMode = Scaling.Fit
+                    addChild(
+                        Triangles {
+                            fillMode = Scaling.Fit
+                            inheritScale = true
+                        }
+                    )
                 },
                 Sprite {
                     texture = overlayTexture.region
