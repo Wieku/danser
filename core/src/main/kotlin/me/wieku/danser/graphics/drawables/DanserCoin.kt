@@ -3,6 +3,7 @@ package me.wieku.danser.graphics.drawables
 import me.wieku.danser.beatmap.Beatmap
 import me.wieku.framework.di.bindable.Bindable
 import me.wieku.framework.graphics.containers.CircularContainer
+import me.wieku.framework.graphics.containers.ColorContainer
 import me.wieku.framework.graphics.containers.Container
 import me.wieku.framework.graphics.drawables.sprite.Sprite
 import me.wieku.framework.graphics.textures.Texture
@@ -11,6 +12,7 @@ import me.wieku.framework.math.Scaling
 import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.FileType
 import org.joml.Vector2f
+import org.joml.Vector4f
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import kotlin.math.floor
@@ -37,14 +39,6 @@ class DanserCoin : Container(), KoinComponent {
 
     init {
 
-        val bottomTexture = Texture(
-            FileHandle(
-                "assets/coin-base.png",
-                FileType.Classpath
-            ),
-            4
-        )
-
         val overlayTexture = Texture(
             FileHandle(
                 "assets/coin-overlay.png",
@@ -56,27 +50,22 @@ class DanserCoin : Container(), KoinComponent {
         coinBottom = Container {
             fillMode = Scaling.Fill
             addChild(
-                Sprite {
-                    texture = bottomTexture.region
-                    fillMode = Scaling.Fit
-                    inheritScale = true
-                    color.w = 1f
-                },
                 CircularContainer {
                     scale = Vector2f(0.95f)
                     fillMode = Scaling.Fit
                     addChild(
+                        ColorContainer {
+                            fillMode = Scaling.Stretch
+                            color = Vector4f(28f/255, 28f/255, 28f/255, 1f)
+                        },
                         Triangles {
                             fillMode = Scaling.Fit
-                            inheritScale = true
                         }
                     )
                 },
                 Sprite {
                     texture = overlayTexture.region
                     fillMode = Scaling.Fit
-                    inheritScale = true
-                    color.w = 1f
                 }
             )
         }
@@ -86,7 +75,6 @@ class DanserCoin : Container(), KoinComponent {
             fillMode = Scaling.FillY
             color.w = 0.3f
         }
-
 
         addChild(coinBottom, coinTop)
     }
