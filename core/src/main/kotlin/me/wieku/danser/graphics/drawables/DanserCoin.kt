@@ -76,7 +76,14 @@ class DanserCoin : Container(), KoinComponent {
             color.w = 0.3f
         }
 
-        addChild(coinBottom, coinTop)
+        addChild(
+            Ripples {
+                scale = Vector2f(0.95f)
+                fillMode = Scaling.Fit
+            },
+            coinBottom,
+            coinTop
+        )
     }
 
     override fun update() {

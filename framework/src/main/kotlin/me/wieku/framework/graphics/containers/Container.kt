@@ -34,6 +34,7 @@ open class Container(): Drawable() {
     override fun update() {
         super.update()
         children.forEach { it.update() }
+        children.removeIf { it.canBeDeleted() }
     }
 
     override fun draw(batch: SpriteBatch) {
