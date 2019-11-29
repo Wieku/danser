@@ -5,6 +5,8 @@ import me.wieku.framework.graphics.buffers.VertexAttributeType
 import me.wieku.framework.resource.FileHandle
 import org.lwjgl.opengl.GL33.*
 import java.nio.FloatBuffer
+import java.util.*
+import kotlin.collections.HashMap
 
 class Shader(private val vertex: String, private val fragment: String) {
     var shaderId: Int = 0
@@ -56,7 +58,7 @@ class Shader(private val vertex: String, private val fragment: String) {
         if (isBound) {
             throw IllegalStateException("Shader is already bound")
         }
-
+        stack.push(glGetInteger(GL_CURRENT_PROGRAM))
         glUseProgram(shaderId)
         isBound = true
     }
@@ -66,7 +68,8 @@ class Shader(private val vertex: String, private val fragment: String) {
             throw IllegalStateException("Shader is already not bound")
         }
 
-        glUseProgram(0)
+        val binding = stack.pop()
+        glUseProgram(binding ?: 0)
         isBound = false
     }
 
@@ -118,6 +121,10 @@ class Shader(private val vertex: String, private val fragment: String) {
             VertexAttributeType.Mat42 -> glUniformMatrix4x2fv(uniforms[name]!!.location, false, values)
             VertexAttributeType.Mat43 -> glUniformMatrix4x3fv(uniforms[name]!!.location, false, values)
         }
+    }
+
+    private companion object {
+        private var stack = ArrayDeque<Int>()
     }
 
 }

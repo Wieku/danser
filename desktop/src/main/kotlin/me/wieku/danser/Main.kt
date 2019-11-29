@@ -11,6 +11,7 @@ import me.wieku.framework.audio.Track
 import me.wieku.framework.di.bindable.Bindable
 import me.wieku.framework.graphics.buffers.Framebuffer
 import me.wieku.framework.graphics.buffers.FramebufferTarget
+import me.wieku.framework.graphics.containers.BlurredContainer
 import me.wieku.framework.graphics.containers.Container
 import me.wieku.framework.graphics.drawables.sprite.Sprite
 import me.wieku.framework.graphics.drawables.sprite.SpriteBatch
@@ -119,7 +120,12 @@ fun main() {
         anchor = Origin.Centre
     }
 
-    mainContainer.addChild(bgSprite)
+    mainContainer.addChild(
+        BlurredContainer{
+            fillMode = Scaling.Stretch
+            addChild(bgSprite)
+        }
+    )
     mainContainer.addChild(flashes)
     mainContainer.addChild(coin)
 
