@@ -60,6 +60,7 @@ class DanserCoin : Container(), KoinComponent {
                         },
                         Triangles {
                             fillMode = Scaling.Fit
+                            spawnRate = 0.25f
                         }
                     )
                 },

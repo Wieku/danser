@@ -32,6 +32,8 @@ class Triangles() : Container(), KoinComponent {
     private val bars = 40
     private val triangleSpawnRate = 0.25
 
+    var spawnRate = 1f
+
     private var velocity = 0f
 
     private val triangleTexture: Texture = Texture(
@@ -43,7 +45,7 @@ class Triangles() : Container(), KoinComponent {
     )
 
     fun addTriangles(onscreen: Boolean = false) {
-        val maxTriangles = (sqrt(drawSize.x * drawSize.y) * triangleSpawnRate).toInt()
+        val maxTriangles = (sqrt(drawSize.x * drawSize.y) * triangleSpawnRate * spawnRate).toInt()
 
         for (i in 0 until maxTriangles - children.size) {
             addTriangle(onscreen)
@@ -63,7 +65,7 @@ class Triangles() : Container(), KoinComponent {
             inheritScale = false
             anchor = Origin.Custom
             customAnchor = position
-            color = Vector4f(col, col, col, /*0.5f + Math.random().toFloat() * 0.5f*/1f)
+            color = Vector4f(col, col, col, 1f)
         }
 
         sprite.flipX = Math.random().toFloat() >= 0.5
@@ -86,16 +88,16 @@ class Triangles() : Container(), KoinComponent {
             boost += 2 * fft[i] * (bars - i).toFloat() / bars.toFloat()
         }
 
-        velocity = max(velocity, min(boost * 1.5f, 6f))
+        velocity = max(velocity, min(boost * 0.15f, 0.6f))
 
         velocity *= 1.0f - 0.05f * clock.time.frameTime / 16.66667f
 
-        val localVelocity = (velocity + 0.5f) / drawSize.y
+        velocity = max(velocity, 0.1f)
 
         var toRemove = children.filter {
             it.customAnchor.sub(
                 0f,
-                clock.time.frameTime / 16.6667f * localVelocity * (0.2f + (1.0f - it.size.y / maxSize * 0.8f) * separation)
+                clock.time.frameTime / 1000f * velocity * (0.2f + (1.0f - it.size.y / maxSize * 0.8f) * separation)
             )
             it.scale.set(drawSize.y)
             it.customAnchor.y < -it.size.y / 2
