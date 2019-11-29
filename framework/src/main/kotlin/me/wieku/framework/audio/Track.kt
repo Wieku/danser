@@ -7,11 +7,12 @@ import jouvieje.bass.defines.BASS_POS.BASS_POS_BYTE
 import jouvieje.bass.defines.BASS_STREAM
 import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.FileType
+import me.wieku.framework.time.IClock
 import org.lwjgl.BufferUtils
 import org.lwjgl.system.MemoryStack
 import java.lang.ref.WeakReference
 
-class Track(file: FileHandle, val fftMode: FFTMode = FFTMode.FFT512) {
+class Track(file: FileHandle, val fftMode: FFTMode = FFTMode.FFT512) : IClock {
     private var channelStream = when (file.fileType) {
         FileType.Classpath -> {
             val buffer = file.toBuffer()
@@ -55,6 +56,22 @@ class Track(file: FileHandle, val fftMode: FFTMode = FFTMode.FFT512) {
 
     var rightChannelLevel: Float = 0.0f
         private set
+
+    override var currentTime: Float
+        get() = getPosition() * 1000
+        set(value) {
+            setPosition(value / 1000)
+        }
+
+    override var clockRate: Float
+        get() = getTempo()
+        set(value) {
+            setTempo(value)
+        }
+
+    override var isRunning: Boolean
+        get() = getState() == ChannelStatus.Playing
+        set(value) {}
 
     init {
         synchronized(BassSystem.tracks) {
@@ -126,6 +143,18 @@ class Track(file: FileHandle, val fftMode: FFTMode = FFTMode.FFT512) {
             jouvieje.bass.enumerations.BASS_ATTRIB.BASS_ATTRIB_TEMPO.asInt(),
             (tempo - 1.0f) * 100
         )
+    }
+
+    fun getTempo(): Float {
+        return MemoryStack.stackPush().use { stack ->
+            val buffer = stack.mallocFloat(1)
+            BASS_ChannelGetAttribute(
+                fxChannel.asInt(),
+                jouvieje.bass.enumerations.BASS_ATTRIB.BASS_ATTRIB_TEMPO.asInt(),
+                buffer
+            )
+            (buffer.get(0) / 100) + 1f
+        }
     }
 
     fun setPitch(tempo: Float) {
