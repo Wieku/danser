@@ -44,7 +44,9 @@ abstract class Drawable(): Disposable, KoinComponent {
     var size = Vector2f(1f)
     var drawSize = Vector2f()
 
+    var inheritColor = false
     var color = Vector4f(1f, 1f, 1f, 1f)
+    var drawColor = Vector4f(1f, 1f, 1f, 1f)
 
     var flipX = false
     var flipY = false
@@ -78,7 +80,7 @@ abstract class Drawable(): Disposable, KoinComponent {
 
     private fun updateDrawable() {
         drawScale.set(scale)
-
+        drawColor.set(color)
         if (parent != null) {
             parent?.let {
 
@@ -93,6 +95,7 @@ abstract class Drawable(): Disposable, KoinComponent {
                 }
 
                 drawPosition.set(position).sub(drawOrigin).add(anchorV)
+                drawColor.mul(it.drawColor)
                 return
             }
         } else {

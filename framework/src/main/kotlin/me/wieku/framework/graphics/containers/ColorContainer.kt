@@ -7,26 +7,19 @@ import me.wieku.framework.math.Scaling
 
 class ColorContainer() : Container() {
 
-    private val sprite: Sprite
-
     init {
         if (pixel == null) {
             pixel = Texture(1, 1, 1, TextureFormat.RGBA, intArrayOf(0xffffffff.toInt()))
         }
-        sprite = Sprite {
+        addChild(Sprite {
             texture = pixel!!.region
             fillMode = Scaling.Stretch
-        }
-        addChild(sprite)
+            inheritColor = true
+        })
     }
 
     constructor(inContext: ColorContainer.() -> Unit) : this() {
         inContext()
-    }
-
-    override fun update() {
-        super.update()
-        sprite.color = color
     }
 
     private companion object {

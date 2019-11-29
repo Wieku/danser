@@ -271,22 +271,22 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
         tmp.set(0f, 0f).mul(sprite.drawSize).sub(sprite.drawOrigin)
             .rot(sprite.rotation).add(tmp2)
         tmp1.set(u1, v1, region.getLayer().toFloat())
-        addVertex(tmp, tmp1, texBounds, sprite.color, sprite.additive)
+        addVertex(tmp, tmp1, texBounds, sprite.drawColor, sprite.additive)
 
         tmp.set(1f, 0f).mul(sprite.drawSize).sub(sprite.drawOrigin)
             .rot(sprite.rotation).add(tmp2)
         tmp1.set(u2, v1, region.getLayer().toFloat())
-        addVertex(tmp, tmp1, texBounds, sprite.color, sprite.additive)
+        addVertex(tmp, tmp1, texBounds, sprite.drawColor, sprite.additive)
 
         tmp.set(1f, 1f).mul(sprite.drawSize).sub(sprite.drawOrigin)
             .rot(sprite.rotation).add(tmp2)
         tmp1.set(u2, v2, region.getLayer().toFloat())
-        addVertex(tmp, tmp1, texBounds, sprite.color, sprite.additive)
+        addVertex(tmp, tmp1, texBounds, sprite.drawColor, sprite.additive)
 
         tmp.set(0f, 1f).mul(sprite.drawSize).sub(sprite.drawOrigin)
             .rot(sprite.rotation).add(tmp2)
         tmp1.set(u1, v2, region.getLayer().toFloat())
-        addVertex(tmp, tmp1, texBounds, sprite.color, sprite.additive)
+        addVertex(tmp, tmp1, texBounds, sprite.drawColor, sprite.additive)
     }
 
     private var maskingStack = ArrayDeque<MaskingInfo>()
