@@ -109,14 +109,13 @@ fun main() {
     val bgSprite = Sprite {
         texture = Texture(
             FileHandle(
-                System.getenv("localappdata") + "/osu!/Songs/" + beatmap.beatmapSet.directory + File.separator + beatmap.beatmapMetadata.backgroundFile,
-                FileType.Absolute
+                "assets/background-1.png",
+                FileType.Classpath
             ),
             4
         ).region
         size = Vector2f(texture!!.getWidth(), texture!!.getHeight())
         fillMode = Scaling.Fill
-        this.color.w = 0.2f
         anchor = Origin.Centre
     }
 
