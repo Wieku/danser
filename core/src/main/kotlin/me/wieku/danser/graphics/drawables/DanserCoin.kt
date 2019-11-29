@@ -24,6 +24,8 @@ class DanserCoin : Container(), KoinComponent {
 
     val beatmapBindable: Bindable<Beatmap> by inject()
 
+    private val defaultBeatLength = 500f
+
     private var deltaSum = 0f
 
     private var volume = 0f
@@ -109,11 +111,14 @@ class DanserCoin : Container(), KoinComponent {
 
         coinTop.color.w = if (timingPoint.kiai) 0.12f else 0.3f
 
-        val bProg = ((bTime - timingPoint.time) / timingPoint.baseBpm)
+        val bProg = when (beatmapBindable.value!!.getTrack().isRunning) {
+            true -> ((bTime - timingPoint.time) / timingPoint.baseBpm)
+            false -> ((clock.currentTime) / defaultBeatLength)
+        }
 
         beatProgress = bProg - floor(bProg)
 
-        val vprog = 1 - ((volume - volumeAverage) / 0.5f)
+        val vprog = if (beatmapBindable.value!!.getTrack().isRunning) 1f - ((volume - volumeAverage) / 0.5f) else 1f
         val pV = min(1.0f, max(0.0f, 1.0f - (vprog * 0.5f + beatProgress * 0.5f)))
 
         val ratio = 0.5f.pow(clock.time.frameTime / 16.6666666666667f)
