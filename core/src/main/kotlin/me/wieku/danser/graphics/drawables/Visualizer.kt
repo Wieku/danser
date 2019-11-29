@@ -13,7 +13,11 @@ import org.koin.core.KoinComponent
 import org.koin.core.inject
 import kotlin.math.min
 
-class Visualizer : Drawable(), KoinComponent {
+class Visualizer() : Drawable(), KoinComponent {
+
+    constructor(inContext: Visualizer.() -> Unit):this(){
+        inContext()
+    }
 
     private val beatmapBindable: Bindable<Beatmap> by inject()
 
@@ -84,6 +88,7 @@ class Visualizer : Drawable(), KoinComponent {
                 val rotation = (i / 5.0f + j / bars.toFloat()) * 2 * Math.PI.toFloat()
                 val position = vector2fRad(rotation, drawSize.y / 2).add(pos)
                 tempSprite.position = position
+                tempSprite.rotation = rotation
                 tempSprite.scale = Vector2f(v * min(drawSize.y, barLength), (2 * Math.PI.toFloat() * drawSize.y / 2) / bars.toFloat())
                 tempSprite.color.w = 0.3f
                 tempSprite.invalidate()

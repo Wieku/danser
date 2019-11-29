@@ -99,11 +99,6 @@ fun main() {
         coin.scale = Vector2f(0.6f)
         coin.fillMode = Scaling.Fit
 
-    val vis = Visualizer()
-        vis.fillMode = Scaling.Fit
-        vis.scale = Vector2f(0.58f)
-
-
     val mainContainer = Container {
         size = Vector2f(1920f, 1080f)
         origin = Origin.TopLeft
@@ -127,7 +122,6 @@ fun main() {
 
     mainContainer.addChild(bgSprite)
     mainContainer.addChild(flashes)
-    mainContainer.addChild(vis)
     mainContainer.addChild(coin)
 
 

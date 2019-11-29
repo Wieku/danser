@@ -56,7 +56,7 @@ class DanserCoin : Container(), KoinComponent {
                     addChild(
                         ColorContainer {
                             fillMode = Scaling.Stretch
-                            color = Vector4f(28f/255, 28f/255, 28f/255, 1f)
+                            color = Vector4f(28f / 255, 28f / 255, 28f / 255, 1f)
                         },
                         Triangles {
                             fillMode = Scaling.Fit
@@ -77,6 +77,10 @@ class DanserCoin : Container(), KoinComponent {
         }
 
         addChild(
+            Visualizer {
+                fillMode = Scaling.Fit
+                scale = Vector2f(0.95f)
+            },
             Ripples {
                 scale = Vector2f(0.95f)
                 fillMode = Scaling.Fit
