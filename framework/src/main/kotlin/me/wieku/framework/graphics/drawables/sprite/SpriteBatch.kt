@@ -40,10 +40,11 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
             if (drawing) {
                 flush()
                 helperBuffer.clear()
-                shader.setUniform("proj", camera.projectionView.get(helperBuffer))
+                shader.setUniform("proj", value.projectionView.get(helperBuffer))
             }
             field = value
         }
+
     private var helperBuffer: FloatBuffer
 
     private var color: Vector4f = Vector4f(1f, 1f, 1f, 1f)
@@ -51,11 +52,13 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
     private var currentTexture: Texture? = null
 
     init {
-        var location = "frameworkAssets/sprite"
-        shader =
-                Shader(FileHandle("$location.vsh", FileType.Classpath), FileHandle("$location.fsh", FileType.Classpath))
+        val location = "frameworkAssets/sprite"
+        shader = Shader(
+            FileHandle("$location.vsh", FileType.Classpath),
+            FileHandle("$location.fsh", FileType.Classpath)
+        )
 
-        var attributes = arrayOf(
+        val attributes = arrayOf(
             VertexAttribute("in_position", VertexAttributeType.Vec3, 0),
             VertexAttribute("in_tex_coord", VertexAttributeType.Vec3, 1),
             VertexAttribute("in_color", VertexAttributeType.Vec4, 3),
@@ -137,8 +140,8 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
         ibo.bind()
 
         preBlendState = GL11.glIsEnabled(GL_BLEND)
-        preSFactor = glGetInteger(GL_BLEND_SRC_ALPHA)
-        preDFactor = glGetInteger(GL_BLEND_SRC_ALPHA)
+        preSFactor = glGetInteger(GL_BLEND_SRC)
+        preDFactor = glGetInteger(GL_BLEND_DST)
 
         if (!preBlendState)
             glEnable(GL_BLEND)
@@ -191,7 +194,7 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
         glBlendFunc(preSFactor, preDFactor)
     }
 
-    private fun addVertex(position: Vector2f, texCoords: Vector3f, texBounds: Vector4f, color: Vector4f, additive: Boolean = false) {
+    private fun addVertex(position: Vector2f, texCoords: Vector3f, color: Vector4f, additive: Boolean = false) {
 
         vertexBuffer.put(position.x)
         vertexBuffer.put(position.y)
@@ -228,23 +231,21 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
             flush()
         }
 
-        val texBounds = Vector4f(region.getU1(), region.getV1(), region.getU2(), region.getV2())
-
         tmp.set(-1f, -1f).mul(scaleX, scaleY).mul(region.getWidth() / 2, region.getHeight() / 2).add(x, y)
         tmp1.set(region.getU1(), region.getV1(), region.getLayer().toFloat())
-        addVertex(tmp, tmp1, texBounds, color)
+        addVertex(tmp, tmp1, color)
 
         tmp.set(1f, -1f).mul(scaleX, scaleY).mul(region.getWidth() / 2, region.getHeight() / 2).add(x, y)
         tmp1.set(region.getU2(), region.getV1(), region.getLayer().toFloat())
-        addVertex(tmp, tmp1, texBounds, color)
+        addVertex(tmp, tmp1, color)
 
         tmp.set(1f, 1f).mul(scaleX, scaleY).mul(region.getWidth() / 2, region.getHeight() / 2).add(x, y)
         tmp1.set(region.getU2(), region.getV2(), region.getLayer().toFloat())
-        addVertex(tmp, tmp1, texBounds, color)
+        addVertex(tmp, tmp1, color)
 
         tmp.set(-1f, 1f).mul(scaleX, scaleY).mul(region.getWidth() / 2, region.getHeight() / 2).add(x, y)
         tmp1.set(region.getU1(), region.getV2(), region.getLayer().toFloat())
-        addVertex(tmp, tmp1, texBounds, color)
+        addVertex(tmp, tmp1, color)
     }
 
     fun draw(sprite: Sprite) {
@@ -259,8 +260,6 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
             flush()
         }
 
-        val texBounds = Vector4f(region.getU1(), region.getV1(), region.getU2(), region.getV2())
-
         tmp2.set(sprite.drawPosition).add(sprite.drawOrigin)
 
         val u1 = if (sprite.flipX) region.getU2() else region.getU1()
@@ -271,22 +270,22 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
         tmp.set(0f, 0f).mul(sprite.drawSize).sub(sprite.drawOrigin)
             .rot(sprite.rotation).add(tmp2)
         tmp1.set(u1, v1, region.getLayer().toFloat())
-        addVertex(tmp, tmp1, texBounds, sprite.drawColor, sprite.additive)
+        addVertex(tmp, tmp1, sprite.drawColor, sprite.additive)
 
         tmp.set(1f, 0f).mul(sprite.drawSize).sub(sprite.drawOrigin)
             .rot(sprite.rotation).add(tmp2)
         tmp1.set(u2, v1, region.getLayer().toFloat())
-        addVertex(tmp, tmp1, texBounds, sprite.drawColor, sprite.additive)
+        addVertex(tmp, tmp1, sprite.drawColor, sprite.additive)
 
         tmp.set(1f, 1f).mul(sprite.drawSize).sub(sprite.drawOrigin)
             .rot(sprite.rotation).add(tmp2)
         tmp1.set(u2, v2, region.getLayer().toFloat())
-        addVertex(tmp, tmp1, texBounds, sprite.drawColor, sprite.additive)
+        addVertex(tmp, tmp1, sprite.drawColor, sprite.additive)
 
         tmp.set(0f, 1f).mul(sprite.drawSize).sub(sprite.drawOrigin)
             .rot(sprite.rotation).add(tmp2)
         tmp1.set(u1, v2, region.getLayer().toFloat())
-        addVertex(tmp, tmp1, texBounds, sprite.drawColor, sprite.additive)
+        addVertex(tmp, tmp1, sprite.drawColor, sprite.additive)
     }
 
     private var maskingStack = ArrayDeque<MaskingInfo>()
@@ -296,9 +295,9 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
         applyMaskingInfo(info)
     }
 
-    fun applyMaskingInfo(info: MaskingInfo? = null) {
+    private fun applyMaskingInfo(info: MaskingInfo? = null) {
         flush()
-        val inf: MaskingInfo? = info?:maskingStack.peek()
+        val inf: MaskingInfo? = info ?: maskingStack.peek()
         if (inf != null) {
             shader.setUniform("maskRect", inf.rect.x, inf.rect.y, inf.rect.z, inf.rect.w)
             shader.setUniform("g_CornerRadius", inf.radius)
