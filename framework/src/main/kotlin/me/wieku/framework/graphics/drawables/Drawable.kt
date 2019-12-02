@@ -7,6 +7,7 @@ import me.wieku.framework.math.Origin
 import me.wieku.framework.math.Scaling
 import me.wieku.framework.time.IFramedClock
 import me.wieku.framework.utils.Disposable
+import me.wieku.framework.utils.synchronized
 import org.joml.Vector2f
 import org.joml.Vector4f
 import org.koin.core.KoinComponent
@@ -121,71 +122,77 @@ abstract class Drawable() : Disposable, KoinComponent {
     }
 
     fun update(time: Float) {
-
-        var i = 0
-        while (i < transforms.size) {
-            val transform = transforms[i]
-            if (time < transform.startTime) {
-                break
-            }
-
-            when (transform.getType()) {
-                TransformType.Fade, TransformType.Scale, TransformType.Rotate, TransformType.MoveX, TransformType.MoveY -> {
-                    val value = transform.getSingle(time)
-                    when (transform.transformType) {
-                        TransformType.Fade -> color.w = value
-                        TransformType.Scale -> scale.set(value)
-                        TransformType.Rotate -> rotation = value
-                        TransformType.MoveX -> position.x = value
-                        TransformType.MoveY -> position.y = value
-                        TransformType.OriginX -> customOrigin.x = value
-                        TransformType.OriginY -> customOrigin.y = value
-                        else -> {}
-                    }
+        transforms.synchronized {
+            var i = 0
+            while (i < transforms.size) {
+                val transform = transforms[i]
+                if (time < transform.startTime) {
+                    break
                 }
-                TransformType.Origin -> transform.getVector2f(time, customOrigin)
-                TransformType.Move -> transform.getVector2f(time, position)
-                TransformType.ScaleVector -> transform.getVector2f(time, scale)
-                TransformType.Additive, TransformType.HorizontalFlip, TransformType.VerticalFlip -> {
-                    val value = transform.getBoolean(time)
-                    when (transform.transformType) {
-                        TransformType.Additive -> additive = value
-                        TransformType.HorizontalFlip -> flipX = value
-                        TransformType.VerticalFlip -> flipY = value
-                        else -> {}
+
+                isValid = false
+
+                when (transform.getType()) {
+                    TransformType.Fade, TransformType.Scale, TransformType.Rotate, TransformType.MoveX, TransformType.MoveY -> {
+                        val value = transform.getSingle(time)
+                        when (transform.transformType) {
+                            TransformType.Fade -> color.w = value
+                            TransformType.Scale -> scale.set(value)
+                            TransformType.Rotate -> rotation = value
+                            TransformType.MoveX -> position.x = value
+                            TransformType.MoveY -> position.y = value
+                            TransformType.OriginX -> customOrigin.x = value
+                            TransformType.OriginY -> customOrigin.y = value
+                            else -> {}
+                        }
                     }
+                    TransformType.Origin -> transform.getVector2f(time, customOrigin)
+                    TransformType.Move -> transform.getVector2f(time, position)
+                    TransformType.ScaleVector -> transform.getVector2f(time, scale)
+                    TransformType.Additive, TransformType.HorizontalFlip, TransformType.VerticalFlip -> {
+                        val value = transform.getBoolean(time)
+                        when (transform.transformType) {
+                            TransformType.Additive -> additive = value
+                            TransformType.HorizontalFlip -> flipX = value
+                            TransformType.VerticalFlip -> flipY = value
+                            else -> {}
+                        }
+                    }
+                    TransformType.Color3 -> transform.getColor3(time, color)
+                    TransformType.Color4 -> transform.getColor4(time, color)
+                    else -> {}
                 }
-                TransformType.Color3 -> transform.getColor3(time, color)
-                TransformType.Color4 -> transform.getColor4(time, color)
-                else -> {}
-            }
 
-            if (time >= transform.endTime) {
-                transforms.removeAt(i)
-                i--
-            }
+                if (time >= transform.endTime) {
+                    transforms.removeAt(i)
+                    i--
+                }
 
-            i++
+                i++
+            }
         }
     }
 
     fun addTransform(transform: Transform, sortAfter: Boolean = false) {
-        transforms.add(transform)
+        transforms.synchronized {
+            add(transform)
 
-        if (sortAfter)
-            sortTransformations()
+            if (sortAfter) sortTransformations()
+        }
     }
 
     private fun sortTransformations() {
-        transforms.sortBy { tranform -> tranform.startTime }
+        transforms.sortBy { transform -> transform.startTime }
     }
 
     fun adjustTimesToTransformations() {
         var startTime = Float.MAX_VALUE
         var endTime = -Float.MAX_VALUE
-        transforms.forEach {
-            startTime = min(startTime, it.startTime)
-            endTime = max(endTime, it.endTime)
+        transforms.synchronized {
+            forEach {
+                startTime = min(startTime, it.startTime)
+                endTime = max(endTime, it.endTime)
+            }
         }
         this.startTime = startTime
         this.endTime = endTime
