@@ -43,6 +43,11 @@ class BlurredContainer(): Container() {
             drawPosition = this@BlurredContainer.drawPosition
             drawOrigin = this@BlurredContainer.drawOrigin
             drawSize = this@BlurredContainer.drawSize
+            shearX = this@BlurredContainer.shearX
+            shearY = this@BlurredContainer.shearY
+            additive = this@BlurredContainer.additive
+            flipX = this@BlurredContainer.flipX
+            flipY = this@BlurredContainer.flipY
         }
     }
 
