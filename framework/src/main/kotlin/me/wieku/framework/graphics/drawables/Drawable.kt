@@ -11,12 +11,14 @@ import org.joml.Vector2f
 import org.joml.Vector4f
 import org.koin.core.KoinComponent
 import org.koin.core.inject
+import kotlin.math.max
+import kotlin.math.min
 
-abstract class Drawable(): Disposable, KoinComponent {
+abstract class Drawable() : Disposable, KoinComponent {
 
     val clock: IFramedClock by inject()
 
-    constructor(inContext: Drawable.() -> Unit):this(){
+    constructor(inContext: Drawable.() -> Unit) : this() {
         inContext()
     }
 
@@ -31,6 +33,7 @@ abstract class Drawable(): Disposable, KoinComponent {
 
     var anchor = Origin.Centre
     var customAnchor = Vector2f()
+    private val drawAnchor = Vector2f()
 
     var origin = Origin.Centre
     var customOrigin = Vector2f()
@@ -50,8 +53,13 @@ abstract class Drawable(): Disposable, KoinComponent {
 
     var flipX = false
     var flipY = false
-    var rotation         = 0f
-    var additive         = false
+    
+    var rotation = 0f
+    
+    var additive = false
+
+    var shearX = 0f
+    var shearY = 0f
 
     var startTime = 0f
     var endTime = 0f
@@ -81,25 +89,26 @@ abstract class Drawable(): Disposable, KoinComponent {
     private fun updateDrawable() {
         drawScale.set(scale)
         drawColor.set(color)
-        if (parent != null) {
-            parent?.let {
 
-                drawSize.set(fillMode.apply(size.x, size.y, it.drawSize.x, it.drawSize.y)).mul(drawScale)
-                drawOrigin.set(if (origin == Origin.Custom) customOrigin else origin.offset).mul(drawSize)
+        parent?.let { parent ->
 
-                val anchorV = Vector2f()
+            drawSize.set(fillMode.apply(size.x, size.y, parent.drawSize.x, parent.drawSize.y)).mul(drawScale)
+            drawOrigin.set(if (origin == Origin.Custom) customOrigin else origin.offset).mul(drawSize)
 
-                if (anchor != Origin.None) {
-                    anchorV.set(if (anchor == Origin.Custom) customAnchor else anchor.offset)
-                    anchorV.mul(it.drawSize).add(it.drawPosition).add(it.childOffset)
-                }
+            drawAnchor.set(0f)
 
-                drawPosition.set(position).sub(drawOrigin).add(anchorV)
-                drawColor.mul(it.drawColor)
-                return
+            if (anchor != Origin.None) {
+                drawAnchor.set(if (anchor == Origin.Custom) customAnchor else anchor.offset)
+                drawAnchor.mul(parent.drawSize).add(parent.drawPosition).add(parent.childOffset)
             }
-        } else {
-            drawSize.set(size.x, size.y).mul(drawScale)
+
+            drawPosition.set(position).sub(drawOrigin).add(drawAnchor)
+            drawColor.mul(parent.drawColor)
+            return
+        }
+
+        if (parent == null) {
+            drawSize.set(size).mul(drawScale)
             drawOrigin.set(if (origin == Origin.Custom) customOrigin else origin.offset).mul(drawSize)
             drawPosition.set(position).sub(drawOrigin)
         }
@@ -115,7 +124,7 @@ abstract class Drawable(): Disposable, KoinComponent {
 
         var i = 0
         while (i < transforms.size) {
-            var transform = transforms.get(i)
+            val transform = transforms[i]
             if (time < transform.startTime) {
                 break
             }
@@ -131,6 +140,7 @@ abstract class Drawable(): Disposable, KoinComponent {
                         TransformType.MoveY -> position.y = value
                         TransformType.OriginX -> customOrigin.x = value
                         TransformType.OriginY -> customOrigin.y = value
+                        else -> {}
                     }
                 }
                 TransformType.Origin -> transform.getVector2f(time, customOrigin)
@@ -139,13 +149,15 @@ abstract class Drawable(): Disposable, KoinComponent {
                 TransformType.Additive, TransformType.HorizontalFlip, TransformType.VerticalFlip -> {
                     val value = transform.getBoolean(time)
                     when (transform.transformType) {
-                        TransformType.Additive->additive = value
-                        TransformType.HorizontalFlip->flipX=value
-                        TransformType.VerticalFlip->flipY=value
+                        TransformType.Additive -> additive = value
+                        TransformType.HorizontalFlip -> flipX = value
+                        TransformType.VerticalFlip -> flipY = value
+                        else -> {}
                     }
                 }
-                TransformType.Color3-> transform.getColor3(time, color)
-                TransformType.Color4-> transform.getColor4(time, color)
+                TransformType.Color3 -> transform.getColor3(time, color)
+                TransformType.Color4 -> transform.getColor4(time, color)
+                else -> {}
             }
 
             if (time >= transform.endTime) {
@@ -172,8 +184,8 @@ abstract class Drawable(): Disposable, KoinComponent {
         var startTime = Float.MAX_VALUE
         var endTime = -Float.MAX_VALUE
         transforms.forEach {
-            startTime = Math.min(startTime, it.startTime)
-            endTime = Math.max(endTime, it.endTime)
+            startTime = min(startTime, it.startTime)
+            endTime = max(endTime, it.endTime)
         }
         this.startTime = startTime
         this.endTime = endTime
