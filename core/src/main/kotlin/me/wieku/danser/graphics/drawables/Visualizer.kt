@@ -84,12 +84,12 @@ class Visualizer() : Drawable(), KoinComponent {
         val pos = Vector2f(drawPosition).add(drawOrigin)
         for (i in 0 until 5) {
             amplitudes.forEachIndexed { j, v ->
-                if (v < 1 / min(drawSize.y, barLength)) return@forEachIndexed
+                if (v < 1 / /* min(*/drawSize.y*1.5f/*, barLength)*/) return@forEachIndexed
                 val rotation = (i / 5.0f + j / bars.toFloat()) * 2 * Math.PI.toFloat()
                 val position = vector2fRad(rotation, drawSize.y / 2).add(pos)
                 tempSprite.position = position
                 tempSprite.rotation = rotation
-                tempSprite.scale = Vector2f(v * min(drawSize.y, barLength), (2 * Math.PI.toFloat() * drawSize.y / 2) / bars.toFloat())
+                tempSprite.scale = Vector2f(v * /*min(drawSize.y*1.5f, barLength)*/drawSize.y*1.5f, (2 * Math.PI.toFloat() * drawSize.y / 2) / bars.toFloat())
                 tempSprite.color.w = 0.3f
                 tempSprite.invalidate()
                 tempSprite.update()

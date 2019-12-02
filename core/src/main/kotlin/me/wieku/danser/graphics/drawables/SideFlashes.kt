@@ -40,7 +40,8 @@ class SideFlashes : Container(), KoinComponent {
         flashLeft = Sprite {
             texture = flashTexture.region
             fillMode = Scaling.FillY
-            flipX = true
+            size.x = 0.4f
+            flipY = true
             color.w = 0f
             anchor = Origin.CentreLeft
             origin = Origin.CentreLeft
@@ -49,6 +50,7 @@ class SideFlashes : Container(), KoinComponent {
 
         flashRight = Sprite {
             texture = flashTexture.region
+            size.x = 0.4f
             fillMode = Scaling.FillY
             color.w = 0f
             anchor = Origin.CentreRight
@@ -76,8 +78,10 @@ class SideFlashes : Container(), KoinComponent {
         val progress = floor(bProg).toInt()
 
         if (progress > lastProgress) {
-            if (timingPoint.kiai || progress % timingPoint.timeSignature == 0) {
+
+            if (timingPoint.kiai || timingPoint.timeSignature == 1 ||progress % timingPoint.timeSignature == 0) {
                 if (!timingPoint.kiai || progress % 2 == 0) {
+                    flashLeft.transforms.clear()
                     flashLeft.addTransform(
                         Transform(
                             TransformType.Fade,
@@ -90,6 +94,7 @@ class SideFlashes : Container(), KoinComponent {
                 }
 
                 if (!timingPoint.kiai || progress % 2 == 1) {
+                    flashRight.transforms.clear()
                     flashRight.addTransform(
                         Transform(
                             TransformType.Fade,

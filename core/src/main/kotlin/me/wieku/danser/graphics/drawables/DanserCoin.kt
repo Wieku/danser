@@ -1,12 +1,16 @@
 package me.wieku.danser.graphics.drawables
 
 import me.wieku.danser.beatmap.Beatmap
+import me.wieku.framework.animation.Transform
+import me.wieku.framework.animation.TransformType
 import me.wieku.framework.di.bindable.Bindable
+import me.wieku.framework.graphics.containers.BlurredContainer
 import me.wieku.framework.graphics.containers.CircularContainer
 import me.wieku.framework.graphics.containers.ColorContainer
 import me.wieku.framework.graphics.containers.Container
 import me.wieku.framework.graphics.drawables.sprite.Sprite
 import me.wieku.framework.graphics.textures.Texture
+import me.wieku.framework.math.Easing
 import me.wieku.framework.math.Easings
 import me.wieku.framework.math.Scaling
 import me.wieku.framework.resource.FileHandle
@@ -36,7 +40,12 @@ class DanserCoin : Container(), KoinComponent {
 
     private var beatProgress = 0f
 
+    private var lastBeatLength = 0f
+    private var lastBeatStart = 0f
+    private var lastBeatProgress = 0
+
     private val coinBottom: Container
+    private val coinFlash: ColorContainer
     private val coinTop: Sprite
 
     init {
@@ -48,6 +57,11 @@ class DanserCoin : Container(), KoinComponent {
             ),
             4
         )
+
+        coinFlash = ColorContainer {
+            fillMode = Scaling.Stretch
+            color = Vector4f(1f, 1f, 1f, 0f)
+        }
 
         coinBottom = Container {
             fillMode = Scaling.Fill
@@ -69,6 +83,11 @@ class DanserCoin : Container(), KoinComponent {
                 Sprite {
                     texture = overlayTexture.region
                     fillMode = Scaling.Fit
+                },
+                CircularContainer {
+                    scale = Vector2f(0.95f)
+                    fillMode = Scaling.Fit
+                    addChild(coinFlash)
                 }
             )
         }
@@ -83,10 +102,6 @@ class DanserCoin : Container(), KoinComponent {
             Visualizer {
                 fillMode = Scaling.Fit
                 scale = Vector2f(0.95f)
-            },
-            Ripples {
-                scale = Vector2f(0.95f)
-                fillMode = Scaling.Fit
             },
             coinBottom,
             coinTop
@@ -117,6 +132,33 @@ class DanserCoin : Container(), KoinComponent {
         }
 
         beatProgress = bProg - floor(bProg)
+
+        if (timingPoint.baseBpm != lastBeatLength) {
+            lastBeatProgress = -1
+            lastBeatLength = timingPoint.baseBpm
+            lastBeatStart = timingPoint.time.toFloat()
+        }
+
+        val beatLength = max(300f, lastBeatLength)
+        val b1Prog = ((bTime - lastBeatStart) / lastBeatLength)
+        val progress1 = floor(b1Prog).toInt()
+
+        if (progress1 > lastBeatProgress) {
+            if (timingPoint.kiai) {
+                coinFlash.addTransform(
+                    Transform(
+                        TransformType.Fade,
+                        clock.currentTime,
+                        clock.currentTime + beatLength,
+                        0.6f,
+                        0f,
+                        Easing.OutQuad
+                    ), false
+                )
+            }
+
+            lastBeatProgress++
+        }
 
         val vprog = if (beatmapBindable.value!!.getTrack().isRunning) 1f - ((volume - volumeAverage) / 0.5f) else 1f
         val pV = min(1.0f, max(0.0f, 1.0f - (vprog * 0.5f + beatProgress * 0.5f)))
