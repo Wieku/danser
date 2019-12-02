@@ -10,7 +10,6 @@ import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.FileType
 import me.wieku.framework.utils.Disposable
 import me.wieku.framework.utils.MaskingInfo
-import org.joml.Matrix4f
 import org.joml.Vector2f
 import org.joml.Vector3f
 import org.joml.Vector4f
@@ -262,8 +261,8 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
 
         tmp2.set(sprite.drawPosition).add(sprite.drawOrigin)
 
-        val u1 = if (sprite.flipX) region.getU2() else region.getU1()
-        val u2 = if (sprite.flipX) region.getU1() else region.getU2()
+        val u1 = if (sprite.flipY) region.getU2() else region.getU1()
+        val u2 = if (sprite.flipY) region.getU1() else region.getU2()
         val v1 = if (sprite.flipX) region.getV2() else region.getV1()
         val v2 = if (sprite.flipX) region.getV1() else region.getV2()
 

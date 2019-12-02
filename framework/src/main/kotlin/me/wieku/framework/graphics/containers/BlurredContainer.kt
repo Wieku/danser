@@ -3,10 +3,12 @@ package me.wieku.framework.graphics.containers
 import me.wieku.framework.graphics.drawables.sprite.Sprite
 import me.wieku.framework.graphics.drawables.sprite.SpriteBatch
 import me.wieku.framework.graphics.effects.BlurEffect
+import me.wieku.framework.math.view.Camera
 import me.wieku.framework.utils.MaskingInfo
 import org.joml.Rectanglef
 import org.joml.Vector2f
 import org.lwjgl.opengl.GL11
+import org.lwjgl.opengl.GL33
 import kotlin.math.min
 
 class BlurredContainer(): Container() {
@@ -18,6 +20,8 @@ class BlurredContainer(): Container() {
 
     var needsRedraw = true
 
+    private var camera = Camera()
+
     constructor(inContext: BlurredContainer.() -> Unit):this(){
         inContext()
     }
@@ -28,6 +32,8 @@ class BlurredContainer(): Container() {
 
     override fun update() {
         super.update()
+        camera.setViewportF(drawPosition.x.toInt(), drawPosition.y.toInt(), drawSize.x.toInt(), drawSize.y.toInt())
+        camera.update()
         if (lastDrawSize != drawSize) {
             blur.resize(drawSize.x.toInt(), drawSize.y.toInt())
             lastDrawSize.set(drawSize)
@@ -44,11 +50,14 @@ class BlurredContainer(): Container() {
         if (needsRedraw) {
             batch.flush()
             blur.begin()
+            val oldCamera = batch.camera
+            batch.camera = camera
             super.draw(batch)
             batch.flush()
             tempSprite.apply {
                 texture = blur.endAndProcess().region
             }
+            batch.camera = oldCamera
             needsRedraw = false
         }
 

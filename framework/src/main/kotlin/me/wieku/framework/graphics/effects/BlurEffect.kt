@@ -8,27 +8,28 @@ import me.wieku.framework.graphics.shaders.Shader
 import me.wieku.framework.graphics.textures.Texture
 import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.FileType
-import org.joml.Rectanglef
 import org.joml.Vector2f
+import org.joml.Vector2i
 import org.joml.Vector4f
-import org.lwjgl.opengl.GL11
+import org.lwjgl.opengl.GL33.*
 import kotlin.math.exp
 
 class BlurEffect(var width: Int, var height: Int) {
 
-    var blurShader: Shader
-    var fbo1: Framebuffer
-    var fbo2: Framebuffer
-    var kernelSize = Vector2f()
-    var sigma = Vector2f()
-    var size = Vector2f()
+    private var blurShader: Shader = Shader(FileHandle("frameworkAssets/fbopass.vsh", FileType.Classpath), FileHandle("frameworkAssets/blur.fsh", FileType.Classpath))
+
+    private var fbo1: Framebuffer
+    private var fbo2: Framebuffer
+
+    private var kernelSize = Vector2f()
+    private var sigma = Vector2f()
+    private var size = Vector2i()
     
     var vao = VertexArrayObject()
 
-    init {
+    private var previousViewport = intArrayOf(0, 0, 0, 0)
 
-        blurShader =
-            Shader(FileHandle("frameworkAssets/fbopass.vsh", FileType.Classpath), FileHandle("frameworkAssets/blur.fsh", FileType.Classpath))
+    init {
 
         var attributes = arrayOf(
             VertexAttribute("in_position", VertexAttributeType.Vec3, 0),
@@ -58,20 +59,24 @@ class BlurEffect(var width: Int, var height: Int) {
 
         fbo1 = Framebuffer(width, height)
         fbo2 = Framebuffer(width, height)
-        size = Vector2f(width.toFloat(), height.toFloat())
+        size = Vector2i(width, height)
         setBlur(0f, 0f)
     }
 
     fun begin() {
-        fbo1.bind(true, Vector4f(0f, 0f, 0f, 1f))
+        fbo1.bind(true, Vector4f(0f, 0f, 0f, 0f))
+        glGetIntegerv(GL_VIEWPORT, previousViewport)
+        glViewport(0, 0, size.x, size.y)
     }
 
     fun resize(width:Int, height:Int) {
         fbo1.dispose()
-        fbo2.dispose()
         fbo1 = Framebuffer(width, height)
+
+        fbo2.dispose()
         fbo2 = Framebuffer(width, height)
-        size = Vector2f(width.toFloat(), height.toFloat())
+
+        size.set(width, height)
     }
 
     fun endAndProcess(): Texture {
@@ -82,7 +87,7 @@ class BlurEffect(var width: Int, var height: Int) {
         blurShader.setUniform("kernelSize", kernelSize.x, kernelSize.y)
         blurShader.setUniform("direction", 1f, 0f)
         blurShader.setUniform("sigma", sigma.x, sigma.y)
-        blurShader.setUniform("size", size.x, size.y)
+        blurShader.setUniform("size", size.x.toFloat(), size.y.toFloat())
 
         vao.bind()
 
@@ -105,31 +110,34 @@ class BlurEffect(var width: Int, var height: Int) {
 
         vao.unbind()
         blurShader.unbind()
-        //GL11.glViewport(0, 0, 1920, 1080)
+        glViewport(previousViewport[0], previousViewport[1], previousViewport[2], previousViewport[3])
         return fbo1.getTexture()!!
     }
 
     fun setBlur(blurX: Float, blurY: Float) {
         var sigmaX = blurX*25
         var sigmaY = blurY*25
-        var kX = kernelSize(sigmaX)
+
+        val kX = kernelSize(sigmaX)
         if (kX == 0) {
             sigmaX = 1.0f
         }
-        var kY = kernelSize(sigmaY)
+
+        val kY = kernelSize(sigmaY)
         if (kY == 0) {
             sigmaY = 1.0f
         }
+
         kernelSize = Vector2f(kX.toFloat(), kY.toFloat())
         sigma = Vector2f(sigmaX, sigmaY)
     }
 
-    fun gauss(x: Int, sigma: Float): Float {
+    private fun gauss(x: Int, sigma: Float): Float {
         val factor = 0.398942f
         return (factor * exp(-0.5f*(x*x)/(sigma*sigma))) / sigma
     }
 
-    fun kernelSize(sigma: Float): Int {
+    private fun kernelSize(sigma: Float): Int {
         if (sigma == 0f) {
             return 0
         }
