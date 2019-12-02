@@ -81,11 +81,11 @@ class Camera {
 
     fun setViewportF(x: Int, y: Int, width: Int, height: Int, yDown: Boolean = true) {
         screenRect.minX = x.toFloat()
-        screenRect.maxX = width.toFloat()
-        screenRect.minY = if (yDown) height.toFloat() else y.toFloat()
-        screenRect.maxY = if (yDown) y.toFloat() else height.toFloat()
+        screenRect.maxX = width.toFloat()+x.toFloat()
+        screenRect.minY = if (yDown) height.toFloat()+y.toFloat() else y.toFloat()
+        screenRect.maxY = if (yDown) y.toFloat() else height.toFloat()+y.toFloat()
 
-        projection.identity().ortho((screenRect.minX), (screenRect.maxX), (screenRect.minY), (screenRect.maxY), 1f, -1f)
+        projection.identity().ortho((screenRect.minX), (screenRect.maxX), (screenRect.minY), (screenRect.maxY), -1f, 1f)
         //rebuildCache = true
         viewDirty = true
     }
