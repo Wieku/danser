@@ -87,7 +87,7 @@ abstract class Drawable() : Disposable, KoinComponent {
         }
     }
 
-    private fun updateDrawable() {
+    protected open fun updateDrawable() {
         drawScale.set(scale)
         drawColor.set(color)
 

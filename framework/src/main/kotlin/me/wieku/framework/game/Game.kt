@@ -1,11 +1,16 @@
 package me.wieku.framework.game
 
+import me.wieku.framework.time.FramedClock
+import me.wieku.framework.time.IFramedClock
 import me.wieku.framework.utils.Disposable
 
-interface Game: Disposable {
-    fun setup()
-    fun update(delta: Float)
-    fun draw(delta: Float)
-    fun focus()
-    fun unfocus()
+abstract class Game: Disposable {
+
+    var updateClock: IFramedClock = FramedClock()
+    var graphicsClock: IFramedClock = FramedClock()
+
+    abstract fun setup()
+    abstract fun update()
+    abstract fun draw()
+
 }

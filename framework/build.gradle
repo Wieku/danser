@@ -14,7 +14,6 @@ dependencies {
     implementation fileTree(dir: 'libs', include: '*.jar')
     api "org.koin:koin-core:$koin_version"
     api "org.lwjgl:lwjgl:$lwjglVersion"
-    api "org.lwjgl:lwjgl-glfw:$lwjglVersion"
     api "org.lwjgl:lwjgl-nfd:$lwjglVersion"
     api "org.lwjgl:lwjgl-opengl:$lwjglVersion"
     api "org.lwjgl:lwjgl-opengles:$lwjglVersion"
@@ -22,7 +21,6 @@ dependencies {
     api "org.lwjgl:lwjgl-yoga:$lwjglVersion"
     api "org.joml:joml:${jomlVersion}"
     runtimeOnly "org.lwjgl:lwjgl:$lwjglVersion:$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-glfw:$lwjglVersion:$lwjglNatives"
     runtimeOnly "org.lwjgl:lwjgl-nfd:$lwjglVersion:$lwjglNatives"
     runtimeOnly "org.lwjgl:lwjgl-opengl:$lwjglVersion:$lwjglNatives"
     runtimeOnly "org.lwjgl:lwjgl-opengles:$lwjglVersion:$lwjglNatives"

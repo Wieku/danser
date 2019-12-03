@@ -10,17 +10,28 @@ import java.io.File
 import java.lang.Exception
 import java.nio.file.Path
 import java.util.zip.ZipFile
+import javax.persistence.EntityManager
+import javax.persistence.EntityManagerFactory
 import javax.persistence.Persistence
 
 object BeatmapManager {
-    private var entityManagerFactory = Persistence.createEntityManagerFactory("default")
-    private var entityManager = entityManagerFactory.createEntityManager()
+    private var entityManagerFactory:EntityManagerFactory
+    private var entityManager: EntityManager
     private var parser = BeatmapParser()
 
     val beatmapSets = ArrayList<BeatmapSet>()
     private var beatmapSetCache: HashMap<String, BeatmapSet>
 
     init {
+        val time = System.currentTimeMillis()
+        entityManagerFactory = Persistence.createEntityManagerFactory("default")
+
+        val time2 = System.currentTimeMillis()
+
+        entityManager = entityManagerFactory.createEntityManager()
+
+        val time3 = System.currentTimeMillis()
+
         Runtime.getRuntime().addShutdownHook(Thread {
             entityManager.close()
             entityManagerFactory.close()
@@ -32,6 +43,13 @@ object BeatmapManager {
                 BeatmapSet::class.java
             ).resultList as ArrayList<BeatmapSet>
         )
+
+        val time4 = System.currentTimeMillis()
+
+        println("First ${time2-time}ms")
+        println("Second ${time3-time2}ms")
+        println("Third ${time4-time3}ms")
+
         beatmapSetCache = beatmapSets.map { it.directory to it }.toMap().toMutableMap() as HashMap<String, BeatmapSet>
     }
 

@@ -14,7 +14,7 @@ class FramedClock: IFramedClock {
     private var cTime = 0L
     private var lTime = 0L
 
-    fun updateClock() {
+    override fun updateClock() {
         time.lastTime = time.currentTime
         cTime = System.nanoTime()
 

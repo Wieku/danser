@@ -253,6 +253,8 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
             throw IllegalStateException("Batching not started")
         }
 
+        if (sprite.texture == null) return
+
         val region = sprite.texture!!
 
         bind(region.getTexture())

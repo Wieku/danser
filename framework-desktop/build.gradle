@@ -1,26 +1,18 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm'
     id 'de.fuerstenau.buildconfig'
-    id 'application'
-    id "com.github.johnrengelman.shadow" version "4.0.0"
 }
 
 sourceCompatibility = 1.8
-
-mkdir "run"
-tasks.run.workingDir = "run"
 
 sourceSets.main.kotlin.srcDirs = ["src/main/kotlin"]
 sourceSets.main.resources.srcDirs = ["src/main/resources"]
 
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
-application {
-    applicationName = 'danser'
-    mainClassName = 'me.wieku.danser.MainKt'
-}
-
 dependencies {
-    implementation project(":framework-desktop")
-    implementation project(":core")
+    api project(":framework")
+    api "org.lwjgl:lwjgl-glfw:$lwjglVersion"
+
+    runtimeOnly "org.lwjgl:lwjgl-glfw:$lwjglVersion:$lwjglNatives"
 }

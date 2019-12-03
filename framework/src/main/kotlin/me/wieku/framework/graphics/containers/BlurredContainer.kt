@@ -16,9 +16,11 @@ class BlurredContainer(): Container() {
     private val blur = BlurEffect(1920, 1080)
     private val tempSprite = Sprite()
 
-    private var lastDrawSize = Vector2f(1920f, 1080f)
+    private var lastDrawSize = Vector2f(-1000f, -1000f)
 
     var needsRedraw = true
+
+    private var needsResize = true
 
     private var camera = Camera()
 
@@ -35,10 +37,14 @@ class BlurredContainer(): Container() {
         camera.setViewportF(drawPosition.x.toInt(), drawPosition.y.toInt(), drawSize.x.toInt(), drawSize.y.toInt())
         camera.update()
         if (lastDrawSize != drawSize) {
-            blur.resize(drawSize.x.toInt(), drawSize.y.toInt())
             lastDrawSize.set(drawSize)
             needsRedraw = true
+            needsResize = true
         }
+    }
+
+    override fun updateDrawable() {
+        super.updateDrawable()
         tempSprite.apply {
             drawPosition = this@BlurredContainer.drawPosition
             drawOrigin = this@BlurredContainer.drawOrigin
@@ -52,6 +58,11 @@ class BlurredContainer(): Container() {
     }
 
     override fun draw(batch: SpriteBatch) {
+        if (needsResize) {
+            blur.resize(drawSize.x.toInt(), drawSize.y.toInt())
+            needsResize = false
+        }
+
         if (needsRedraw) {
             batch.flush()
             blur.begin()

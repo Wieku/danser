@@ -50,6 +50,7 @@ gradle-app.setting
 /core/build/
 /core/out/
 /framework/build/
+/framework-desktop/build/
 /desktop/build/
 /desktop/run/
 

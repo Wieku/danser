@@ -2,6 +2,7 @@ package me.wieku.framework.graphics.containers
 
 import me.wieku.framework.graphics.drawables.Drawable
 import me.wieku.framework.graphics.drawables.sprite.SpriteBatch
+import me.wieku.framework.utils.synchronized
 
 open class Container(): Drawable() {
 
@@ -12,17 +13,25 @@ open class Container(): Drawable() {
     protected val children = ArrayList<Drawable>()
 
     fun addChild(vararg drawable: Drawable) {
-        children.addAll(drawable)
+        children.synchronized {
+            addAll(drawable)
+        }
+
         drawable.forEach { it.parent = this }
     }
 
     fun insertChild(drawable: Drawable, index: Int) {
-        children.add(index, drawable)
+        children.synchronized {
+            add(index, drawable)
+        }
         drawable.parent = this
     }
 
     fun removeChild(drawable: Drawable) {
-        children.remove(drawable)
+        children.synchronized {
+            remove(drawable)
+        }
+
         drawable.parent = null
     }
 
@@ -33,12 +42,18 @@ open class Container(): Drawable() {
 
     override fun update() {
         super.update()
-        children.forEach { it.update() }
-        children.removeIf { it.canBeDeleted() }
+        children.synchronized {
+            forEach { it.update() }
+        }
+        children.synchronized {
+            removeIf { it.canBeDeleted() }
+        }
     }
 
     override fun draw(batch: SpriteBatch) {
-        children.forEach { it.draw(batch) }
+        children.synchronized {
+            forEach { it.draw(batch) }
+        }
     }
 
     override fun dispose() {
