@@ -18,7 +18,7 @@ import kotlin.math.max
 
 class SideFlashes : Container(), KoinComponent {
 
-    private val beatmapBindable: Bindable<Beatmap> by inject()
+    private val beatmapBindable: Bindable<Beatmap?> by inject()
 
     private val flashLeft: Sprite
     private val flashRight: Sprite

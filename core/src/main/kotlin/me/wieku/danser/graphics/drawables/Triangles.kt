@@ -24,7 +24,7 @@ class Triangles() : Container(), KoinComponent {
         inContext()
     }
 
-    private val beatmapBindable: Bindable<Beatmap> by inject()
+    private val beatmapBindable: Bindable<Beatmap?> by inject()
 
     private val separation = 1.4f
     private val minSize = 0.120f

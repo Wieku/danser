@@ -23,7 +23,7 @@ class Ripples() : Container(), KoinComponent {
         inContext()
     }
 
-    private val beatmapBindable: Bindable<Beatmap> by inject()
+    private val beatmapBindable: Bindable<Beatmap?> by inject()
 
     private var lastBeatLength = 0f
     private var lastBeatStart = 0f

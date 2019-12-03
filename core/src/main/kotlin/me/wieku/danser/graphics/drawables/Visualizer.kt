@@ -19,7 +19,7 @@ class Visualizer() : Drawable(), KoinComponent {
         inContext()
     }
 
-    private val beatmapBindable: Bindable<Beatmap> by inject()
+    private val beatmapBindable: Bindable<Beatmap?> by inject()
 
     private var deltaSum = 0f
 

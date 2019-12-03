@@ -2,14 +2,14 @@ package me.wieku.framework.di.bindable
 
 import java.lang.ref.WeakReference
 
-open class Bindable<T> (startValue: T? = null) {
+open class Bindable<T> (startValue: T) {
 
     /**
      * Backing value for this bindable
      */
-    private var _value: T? = startValue
+    private var _value: T = startValue
 
-    var value: T?
+    var value: T
         get() = _value
         set(value) {
             if (value == _value) return

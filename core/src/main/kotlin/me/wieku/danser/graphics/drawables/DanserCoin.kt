@@ -26,7 +26,7 @@ import kotlin.math.pow
 
 class DanserCoin : Container(), KoinComponent {
 
-    val beatmapBindable: Bindable<Beatmap> by inject()
+    val beatmapBindable: Bindable<Beatmap?> by inject()
 
     private val defaultBeatLength = 500f
 

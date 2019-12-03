@@ -27,7 +27,7 @@ import java.io.File
 class Danser: Game() {
 
     lateinit var batch: SpriteBatch
-    val bindable = Bindable<Beatmap>()
+    val bindable = Bindable<Beatmap?>(null)
     val camera = Camera()
     lateinit var mainContainer: Container
 
