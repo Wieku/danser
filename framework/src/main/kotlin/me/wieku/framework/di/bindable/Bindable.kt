@@ -2,7 +2,7 @@ package me.wieku.framework.di.bindable
 
 import java.lang.ref.WeakReference
 
-class Bindable<T> (startValue: T? = null) {
+open class Bindable<T> (startValue: T? = null) {
 
     /**
      * Backing value for this bindable
