@@ -3,6 +3,7 @@ package me.wieku.danser
 import me.wieku.danser.beatmap.*
 import me.wieku.danser.build.Build
 import me.wieku.framework.backend.WindowMode
+import me.wieku.framework.configuration.FrameworkConfig
 import me.wieku.framework.di.bindable.Bindable
 import me.wieku.framework.game.DesktopContext
 
@@ -17,13 +18,9 @@ fun main() {
 
     println("Version " + Build.Version)
 
+    FrameworkConfig.windowTitle.value = "danser " + Build.Version
+
     val context = DesktopContext()
-
-    context.foregroundFPS = 240
-    context.updateRate = 1000
-    context.windowMode = WindowMode.Windowed
-    context.windowTitle = "danser " + Build.Version
-
     context.start(Danser())
 
 }

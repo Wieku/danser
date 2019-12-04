@@ -1,5 +1,6 @@
 package me.wieku.framework.di.bindable
 
+import java.lang.ref.Reference
 import java.lang.ref.WeakReference
 
 open class Bindable<T> (startValue: T) {
@@ -19,7 +20,7 @@ open class Bindable<T> (startValue: T) {
             setValue(value, this)
         }
 
-    private val listeners = ArrayList<WeakReference<BindableListener<T>>>()
+    private val listeners = ArrayList<BindableListener<T>>()
 
     private val bounded = ArrayList<WeakReference<Bindable<T>>>()
 
@@ -37,8 +38,7 @@ open class Bindable<T> (startValue: T) {
     }
 
     private fun notifyListeners() {
-        listeners.removeIf { it.get() == null }
-        listeners.forEach { it.get()?.valueChanged(this) }
+        listeners.forEach { it.valueChanged(this) }
     }
 
     fun bindTo(bindable: Bindable<T>) {
@@ -54,14 +54,15 @@ open class Bindable<T> (startValue: T) {
     }
 
     fun addListener(listener: BindableListener<T>, notifyNow: Boolean = false) {
-        listeners.add(WeakReference(listener))
+        listeners.add(listener)
+
         if (notifyNow) {
             listener.valueChanged(this)
         }
     }
 
     fun removeListener(listener: BindableListener<T>) {
-        listeners.removeIf { reference -> reference.get() == null || reference.get()!! == listener }
+        listeners.removeIf { reference -> reference == listener }
     }
 
 }

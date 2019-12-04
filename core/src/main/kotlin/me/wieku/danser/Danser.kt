@@ -7,6 +7,7 @@ import me.wieku.danser.graphics.drawables.SideFlashes
 import me.wieku.framework.audio.BassSystem
 import me.wieku.framework.di.bindable.Bindable
 import me.wieku.framework.game.Game
+import me.wieku.framework.game.GameContext
 import me.wieku.framework.graphics.containers.BlurredContainer
 import me.wieku.framework.graphics.containers.Container
 import me.wieku.framework.graphics.drawables.sprite.Sprite
@@ -20,16 +21,22 @@ import me.wieku.framework.resource.FileType
 import me.wieku.framework.time.FramedClock
 import me.wieku.framework.time.IFramedClock
 import org.joml.Vector2f
+import org.joml.Vector2i
+import org.koin.core.KoinComponent
 import org.koin.core.context.loadKoinModules
+import org.koin.core.inject
 import org.koin.dsl.module
 import java.io.File
 
-class Danser: Game() {
+class Danser: Game(), KoinComponent {
 
     lateinit var batch: SpriteBatch
     val bindable = Bindable<Beatmap?>(null)
     val camera = Camera()
     lateinit var mainContainer: Container
+
+    val gameContext: GameContext by inject()
+    val lastContextSize = Vector2i()
 
     override fun setup() {
         batch = SpriteBatch()
@@ -98,6 +105,15 @@ class Danser: Game() {
 
     override fun update() {
         bindable.value!!.getTrack().update()
+        if (lastContextSize != gameContext.contextSize) {
+            println(lastContextSize)
+            println(gameContext.contextSize)
+            lastContextSize.set(gameContext.contextSize)
+            mainContainer.size.set(lastContextSize)
+            mainContainer.invalidate()
+            camera.setViewportF(0, 0, lastContextSize.x, lastContextSize.y)
+            camera.update()
+        }
         mainContainer.update()
     }
 

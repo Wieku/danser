@@ -2,136 +2,32 @@ package me.wieku.framework.game
 
 import me.wieku.framework.audio.BassSystem
 import me.wieku.framework.backend.WindowMode
+import me.wieku.framework.configuration.FrameworkConfig
 import me.wieku.framework.utils.FpsLimiter
 import org.joml.Vector2i
+import org.koin.core.context.loadKoinModules
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
+import java.awt.Frame
 import kotlin.system.exitProcess
 
 abstract class GameContext {
 
     init {
-        startKoin {
-            module {
-                single {
-                    this@GameContext
-                }
-            }
-        }
+        startKoin {}
     }
 
-    var contextRunning = false
-        private set
+    /*var contextRunning = false
+        private set*/
 
-    var windowTitle: String = "framework basic title"
-        set(value) {
-            field = value
-            if (contextRunning)
-                setWindowTitleC(windowTitle)
-        }
+    var focused = true
+        protected set
 
-    protected abstract fun setWindowTitleC(title: String)
-    
-    private var _windowPositionX = 50
-    var windowPositionX: Int
-        get() = _windowPositionX
-        set(value) {
-            _windowPositionX = value
-            if (contextRunning)
-                setPositionC(_windowPositionX, _windowPositionY)
-        }
-
-    private var _windowPositionY = 50
-    var windowPositionY: Int
-        get() = _windowPositionY
-        set(value) {
-            _windowPositionY = value
-            if (contextRunning)
-                setPositionC(_windowPositionX, _windowPositionY)
-        }
-    
-    fun getPosition() = Vector2i(_windowPositionX, _windowPositionY)
-    
-    protected abstract fun setPositionC(x: Int, y: Int)
-    
-    fun setPosition(x: Int, y: Int) {
-        _windowPositionX = x
-        _windowPositionY = y
-        if (contextRunning)
-            setPositionC(x, y)
-    }
-    
-    protected fun positionChanged(x: Int, y: Int) {
-        _windowPositionX = x
-        _windowPositionY = y
-    }
-
-    private var _windowWidth = 1920
-    var windowWidth: Int
-        get() = _windowWidth
-        set(value) {
-            _windowWidth = value
-            if (contextRunning)
-                setWindowSizeC(_windowWidth, _windowHeight)
-        }
-
-    private var _windowHeight = 1080
-    var windowHeight: Int
-        get() = _windowHeight
-        set(value) {
-            _windowHeight = value
-            if (contextRunning)
-                setWindowSizeC(_windowWidth, _windowHeight)
-        }
-    
-    fun getWindowSize() = Vector2i(_windowWidth, _windowHeight)
-    
-    protected abstract fun setWindowSizeC(width: Int, height: Int)
-
-    fun setWindowSize(width: Int, height: Int) {
-        _windowWidth = width
-        _windowHeight = height
-        if (contextRunning)
-            setWindowSizeC(width, height)
-    }
-
-    protected fun sizeChanged(width: Int, height: Int) {
-        _windowWidth = width
-        _windowHeight = height
-    }
-
-    private var _windowMode = WindowMode.Fullscreen
-    var windowMode: WindowMode
-        get() = _windowMode
-        set(value) {
-            _windowMode = value
-            if (contextRunning)
-                setWindowModeC(_windowMode)
-        }
-
-    protected abstract fun setWindowModeC(windowMode: WindowMode)
-
-    private var _vSync = false
-    var vSync: Boolean
-        get() = _vSync
-        set(value) {
-            _vSync = value
-            if (contextRunning)
-                setVSyncC(_vSync)
-        }
-
-    protected abstract fun setVSyncC(vSync: Boolean)
-
-    var updateRate = 60
-
-    var foregroundFPS = 60
-
-    var backgroundFPS = 60
-
+    val contextSize = Vector2i(0, 0)
 
     private val updateLimiter = FpsLimiter()
 
-    private val fpsLimiter = FpsLimiter()
+    protected val fpsLimiter = FpsLimiter()
 
     protected abstract fun startContext()
 
@@ -142,7 +38,12 @@ abstract class GameContext {
     protected var game: Game? = null
 
     fun start(game: Game) {
+        val frameworkModule = module {
+            single { this@GameContext }
+        }
 
+
+        loadKoinModules(frameworkModule)
         startContext()
         BassSystem.initSystem()
 
@@ -155,7 +56,7 @@ abstract class GameContext {
         var thread = Thread {
             while (keepRunning) {
                 game.update()
-                updateLimiter.fps = updateRate
+                updateLimiter.fps = (if (focused) FrameworkConfig.updateRate else FrameworkConfig.updateRateBackground).value
                 updateLimiter.sync()
                 game.updateClock.updateClock()
             }
@@ -163,7 +64,12 @@ abstract class GameContext {
 
         thread.start()
 
-        while (!handleGameCycle());
+        while (!handleGameCycle()) {
+            fpsLimiter.fps = (if (focused) FrameworkConfig.foregroundFPS else FrameworkConfig.backgroundFPS).value
+
+            if(!FrameworkConfig.vSync.value)
+                fpsLimiter.sync()
+        }
 
         keepRunning = false
         game.dispose()

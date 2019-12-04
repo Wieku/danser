@@ -4,11 +4,11 @@ import me.wieku.framework.di.bindable.Bindable
 import me.wieku.framework.resource.Parsable
 import org.joml.Vector2i
 
-class BindableVector2i(default: Vector2i? = null): Bindable<Vector2i>(default), Parsable {
+class BindableVector2i(default: Vector2i = Vector2i()): Bindable<Vector2i>(default), Parsable {
 
     override fun parseToString(): String {
-        val x = value?.x?:0
-        val y = value?.y?:0
+        val x = value.x
+        val y = value.y
         return "${x}x$y"
     }
 
