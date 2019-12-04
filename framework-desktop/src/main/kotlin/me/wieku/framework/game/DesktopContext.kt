@@ -14,6 +14,9 @@ class DesktopContext: GameContext() {
 
     private var windowHandle: Long = 0
 
+    private val pos1 = Vector2i()
+    private val pos2 = Vector2i()
+
     private fun setWindowTitle(title: String) {
         glfwSetWindowTitle(windowHandle, title)
     }
@@ -23,6 +26,7 @@ class DesktopContext: GameContext() {
     }
 
     private fun setWindowSize(width: Int, height: Int) {
+        if (FrameworkConfig.windowMode.value == WindowMode.Maximized) return
         glfwSetWindowSize(windowHandle, width, height)
         contextSize.set(width, height)
     }
@@ -75,7 +79,6 @@ class DesktopContext: GameContext() {
                             setWindowSize(bindable.value.x, bindable.value.y)
                     }
                     FrameworkConfig.windowSize -> {
-                        println("windowsize")
                         if (FrameworkConfig.windowMode.value == WindowMode.Windowed)
                             setWindowSize(bindable.value.x, bindable.value.y)
                     }
@@ -112,20 +115,28 @@ class DesktopContext: GameContext() {
         }
 
         glfwSetWindowSizeCallback(windowHandle) { _, width, height ->
-            FrameworkConfig.windowSize.value = Vector2i(width, height)
+            println("size")
+            if (FrameworkConfig.windowMode.value != WindowMode.Maximized)
+                FrameworkConfig.windowSize.value = Vector2i(width, height)
             handleGameCycle()
         }
 
         glfwSetWindowPosCallback(windowHandle) { _, x, y ->
-            FrameworkConfig.windowPosition.value = Vector2i(x, y)
+            pos2.set(pos1)
+            pos1.set(x, y)
+            if (FrameworkConfig.windowMode.value != WindowMode.Maximized)
+                FrameworkConfig.windowPosition.value = Vector2i(x, y)
             handleGameCycle()
         }
 
-        glfwSetWindowMaximizeCallback(windowHandle) { _, maximized ->  FrameworkConfig.windowMode.value = if (maximized) WindowMode.Maximized else WindowMode.Windowed }
+        glfwSetWindowMaximizeCallback(windowHandle) { _, maximized ->
+            if(maximized) FrameworkConfig.windowPosition.value = Vector2i(pos2)
+            FrameworkConfig.windowMode.value = if (maximized) WindowMode.Maximized else WindowMode.Windowed }
 
     }
 
     override fun startContext() {
+        pos1.set(FrameworkConfig.windowPosition.value)
         GLFWErrorCallback.createPrint(System.err).set()
 
         glfwInit()
@@ -137,6 +148,7 @@ class DesktopContext: GameContext() {
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE)
 
         windowHandle = glfwCreateWindow(100, 100, FrameworkConfig.windowTitle.value, 0, 0)
+        setWindowMode(WindowMode.Windowed)
         setWindowMode(FrameworkConfig.windowMode.value)
         glfwMakeContextCurrent(windowHandle)
         setVSync(FrameworkConfig.vSync.value)
