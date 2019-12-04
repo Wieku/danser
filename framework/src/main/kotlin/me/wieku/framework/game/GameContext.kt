@@ -42,6 +42,7 @@ abstract class GameContext {
             single { this@GameContext }
         }
 
+        FrameworkConfig.openConfig()
 
         loadKoinModules(frameworkModule)
         startContext()
@@ -74,6 +75,9 @@ abstract class GameContext {
         keepRunning = false
         game.dispose()
         closeContext()
+
+        FrameworkConfig.saveConfig()
+
         exitProcess(0)
     }
 

@@ -106,8 +106,6 @@ class Danser: Game(), KoinComponent {
     override fun update() {
         bindable.value!!.getTrack().update()
         if (lastContextSize != gameContext.contextSize) {
-            println(lastContextSize)
-            println(gameContext.contextSize)
             lastContextSize.set(gameContext.contextSize)
             mainContainer.size.set(lastContextSize)
             mainContainer.invalidate()
