@@ -6,7 +6,7 @@ import me.wieku.framework.resource.Parsable
 class BindableString(default: String = ""): Bindable<String>(default), Parsable {
 
     override fun parseToString(): String {
-        return value.toString()
+        return value
     }
 
     override fun parseFrom(data: String) {
