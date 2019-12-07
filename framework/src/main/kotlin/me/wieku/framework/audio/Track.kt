@@ -5,6 +5,7 @@ import jouvieje.bass.defines.BASS_ATTRIB
 import jouvieje.bass.defines.BASS_FX
 import jouvieje.bass.defines.BASS_POS.BASS_POS_BYTE
 import jouvieje.bass.defines.BASS_STREAM
+import me.wieku.framework.configuration.FrameworkConfig
 import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.FileType
 import me.wieku.framework.time.IClock
@@ -103,7 +104,7 @@ class Track(file: FileHandle, val fftMode: FFTMode = FFTMode.FFT512) : IClock {
         BASS_ChannelSetAttribute(
             fxChannel.asInt(),
             BASS_ATTRIB.BASS_ATTRIB_VOL,
-            if (isAbsolute) vol else BassSystem.globalVolume * BassSystem.musicVolume * vol
+            if (isAbsolute) vol else FrameworkConfig.generalVolume.value * FrameworkConfig.musicVolume.value * vol
         )
     }
 
@@ -111,7 +112,7 @@ class Track(file: FileHandle, val fftMode: FFTMode = FFTMode.FFT512) : IClock {
         MemoryStack.stackPush().use { stack ->
             var buf = stack.mallocFloat(1)
             BASS_ChannelGetAttribute(fxChannel.asInt(), BASS_ATTRIB.BASS_ATTRIB_VOL, buf)
-            return buf.get() / (if (isVolumeAbsolute) 1f else (BassSystem.globalVolume * BassSystem.musicVolume))
+            return buf.get() / (if (isVolumeAbsolute) 1f else (FrameworkConfig.generalVolume.value * FrameworkConfig.musicVolume.value))
         }
     }
 

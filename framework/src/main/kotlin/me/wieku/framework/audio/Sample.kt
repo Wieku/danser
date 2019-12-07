@@ -5,6 +5,7 @@ import jouvieje.bass.defines.BASS_ATTRIB.BASS_ATTRIB_VOL
 import jouvieje.bass.defines.BASS_SAMPLE
 import jouvieje.bass.utils.BufferUtils
 import jouvieje.bass.utils.Pointer
+import me.wieku.framework.configuration.FrameworkConfig
 import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.FileType
 
@@ -38,7 +39,7 @@ class Sample(file: FileHandle) {
         BASS_ChannelSetAttribute(
             channel.asInt(),
             BASS_ATTRIB_VOL,
-            if (isAbsolute) volume else BassSystem.globalVolume * BassSystem.sampleVolume * volume
+            if (isAbsolute) volume else FrameworkConfig.generalVolume.value * FrameworkConfig.effectsVolume.value * volume
         )
         BASS_ChannelPlay(channel.asInt(), true)
     }

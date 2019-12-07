@@ -72,7 +72,6 @@ class DesktopContext: GameContext() {
 
         val vectorListeners = object : BindableListener<Vector2i> {
             override fun valueChanged(bindable: Bindable<Vector2i>) {
-                println("val ch")
                 when (bindable) {
                     FrameworkConfig.fullScreenResolution -> {
                         if (FrameworkConfig.windowMode.value == WindowMode.Fullscreen)
@@ -111,11 +110,9 @@ class DesktopContext: GameContext() {
     private fun generateGLFWCallbacks() {
         glfwSetWindowFocusCallback(windowHandle) { _, focused ->
             this.focused = focused
-            println(focused)
         }
 
         glfwSetWindowSizeCallback(windowHandle) { _, width, height ->
-            println("size")
             if (FrameworkConfig.windowMode.value != WindowMode.Maximized)
                 FrameworkConfig.windowSize.value = Vector2i(width, height)
             handleGameCycle()
