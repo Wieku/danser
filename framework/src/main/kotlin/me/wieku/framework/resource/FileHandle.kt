@@ -2,6 +2,7 @@ package me.wieku.framework.resource
 
 import org.lwjgl.BufferUtils
 import java.io.File
+import java.io.InputStream
 import java.lang.IllegalStateException
 import java.net.URL
 import java.nio.ByteBuffer
@@ -54,6 +55,10 @@ class FileHandle(path: String, val fileType: FileType) {
         val bytes = fileURL.readBytes()
         val buffer = BufferUtils.createByteBuffer(bytes.size).put(bytes)
         return if(flip) (buffer.flip() as ByteBuffer) else buffer
+    }
+
+    fun inputStream(): InputStream {
+        return fileURL.openStream()
     }
 
 }
