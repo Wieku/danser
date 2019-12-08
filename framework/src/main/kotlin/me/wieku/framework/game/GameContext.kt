@@ -70,6 +70,7 @@ abstract class GameContext {
 
             if(!FrameworkConfig.vSync.value)
                 fpsLimiter.sync()
+            game.graphicsClock.updateClock()
         }
 
         keepRunning = false
