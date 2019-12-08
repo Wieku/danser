@@ -54,8 +54,6 @@ class Danser: Game(), KoinComponent {
 
         bindable.value = beatmap
 
-        //Hack to avoid autoformatting removing "as IFramedClock"
-
         val danserModule = module {
             single { bindable }
             single { updateClock }
