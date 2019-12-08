@@ -19,6 +19,7 @@ open class TextSprite(var font: BitmapFont) : Sprite() {
     var fontSize = 64f
         set(value) {
             field = value
+            size.set(font.getTextWidth(text).toFloat(), font.ascent.toFloat()).mul(fontScale)
             invalidate()
         }
 
@@ -66,6 +67,7 @@ open class TextSprite(var font: BitmapFont) : Sprite() {
             }
 
             internalSprite.texture = internalTextureRegion
+            internalSprite.drawColor.set(drawColor)
 
             batch.draw(internalSprite)
 
