@@ -179,6 +179,7 @@ abstract class Drawable() : Disposable, KoinComponent {
 
             if (sortAfter) sortTransformations()
         }
+        adjustTimesToTransformations()
     }
 
     private fun sortTransformations() {
