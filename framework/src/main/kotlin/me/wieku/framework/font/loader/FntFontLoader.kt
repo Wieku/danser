@@ -11,14 +11,13 @@ import java.io.InputStreamReader
 import java.util.regex.Pattern
 import kotlin.math.abs
 
-internal class FntFontLoader: IFontLoader {
+internal class FntFontLoader : IFontLoader {
     override fun loadFont(font: BitmapFont, file: FileHandle) {
         val reader = BufferedReader(InputStreamReader(file.inputStream()))
 
         val pattern = Pattern.compile("\\s+(?=([^\"]*\"[^\"]*\")*[^\"]*\$)|[=]")
 
         var baseline = 0
-
         var width = 0
         var height = 0
 
@@ -26,18 +25,18 @@ internal class FntFontLoader: IFontLoader {
             val line: String = reader.readLine() ?: break
 
             if (line.isBlank()) continue
-            println(line)
-            val exploded = pattern.split(line)
 
-            when(exploded[0]) {
+            val splitted = pattern.split(line)
+
+            when (splitted[0]) {
                 "info" -> {
-                    for (i in 1 until exploded.size-1 step 2) {
-                        val key = exploded[i]
-                        val value = exploded[i+1]
+                    for (i in 1 until splitted.size - 1 step 2) {
+                        val key = splitted[i]
+                        val value = splitted[i + 1]
                         when (key) {
                             "face" -> font.name = value.replace("\"", "")
                             "size" -> font.defaultSize = abs(value.toInt())
-                            "padding" ->  {
+                            "padding" -> {
                                 val padding = value.split(",")
                                 font.padTop = padding[0].toInt()
                                 font.padRight = padding[1].toInt()
@@ -48,9 +47,9 @@ internal class FntFontLoader: IFontLoader {
                     }
                 }
                 "common" -> {
-                    for (i in 1 until exploded.size-1 step 2) {
-                        val key = exploded[i]
-                        val value = exploded[i+1].toInt()
+                    for (i in 1 until splitted.size - 1 step 2) {
+                        val key = splitted[i]
+                        val value = splitted[i + 1].toInt()
                         when (key) {
                             "base" -> baseline = value
                             "scaleW" -> width = value
@@ -61,9 +60,9 @@ internal class FntFontLoader: IFontLoader {
                 "page" -> {
                     var page = 0
                     var name = ""
-                    for (i in 1 until exploded.size-1 step 2) {
-                        val key = exploded[i]
-                        val value = exploded[i+1]
+                    for (i in 1 until splitted.size - 1 step 2) {
+                        val key = splitted[i]
+                        val value = splitted[i + 1]
                         when (key) {
                             "id" -> page = value.toInt()
                             "file" -> name = value.replace("\"", "")
@@ -73,9 +72,9 @@ internal class FntFontLoader: IFontLoader {
                 }
                 "char" -> {
                     val glyph = Glyph()
-                    for (i in 1 until exploded.size-1 step 2) {
-                        val key = exploded[i]
-                        val value = exploded[i+1].toInt()
+                    for (i in 1 until splitted.size - 1 step 2) {
+                        val key = splitted[i]
+                        val value = splitted[i + 1].toInt()
                         when (key) {
                             "id" -> glyph.index = value
                             "x" -> glyph.x = value
@@ -89,10 +88,10 @@ internal class FntFontLoader: IFontLoader {
                         }
                     }
 
-                    glyph.u1 = glyph.x.toFloat()/width
-                    glyph.u2 = (glyph.x+glyph.width).toFloat()/width
-                    glyph.v1 = glyph.y.toFloat()/height
-                    glyph.v2 = (glyph.y+glyph.height).toFloat()/height
+                    glyph.u1 = glyph.x.toFloat() / width
+                    glyph.u2 = (glyph.x + glyph.width).toFloat() / width
+                    glyph.v1 = glyph.y.toFloat() / height
+                    glyph.v2 = (glyph.y + glyph.height).toFloat() / height
 
                     font.glyphs[glyph.index] = glyph
                 }
@@ -100,9 +99,9 @@ internal class FntFontLoader: IFontLoader {
                     var first = 0
                     var second = 0
                     var amount = 0
-                    for (i in 1 until exploded.size-1 step 2) {
-                        val key = exploded[i]
-                        val value = exploded[i+1].toInt()
+                    for (i in 1 until splitted.size - 1 step 2) {
+                        val key = splitted[i]
+                        val value = splitted[i + 1].toInt()
                         when (key) {
                             "first" -> first = value
                             "second" -> second = value
