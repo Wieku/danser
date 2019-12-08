@@ -232,19 +232,19 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
         }
 
         tmp.set(-1f, -1f).mul(scaleX, scaleY).mul(region.getWidth() / 2, region.getHeight() / 2).add(x, y)
-        tmp1.set(region.getU1(), region.getV1(), region.getLayer().toFloat())
+        tmp1.set(region.U1, region.V1, region.layer.toFloat())
         addVertex(tmp, tmp1, color)
 
         tmp.set(1f, -1f).mul(scaleX, scaleY).mul(region.getWidth() / 2, region.getHeight() / 2).add(x, y)
-        tmp1.set(region.getU2(), region.getV1(), region.getLayer().toFloat())
+        tmp1.set(region.U2, region.V1, region.layer.toFloat())
         addVertex(tmp, tmp1, color)
 
         tmp.set(1f, 1f).mul(scaleX, scaleY).mul(region.getWidth() / 2, region.getHeight() / 2).add(x, y)
-        tmp1.set(region.getU2(), region.getV2(), region.getLayer().toFloat())
+        tmp1.set(region.U2, region.V2, region.layer.toFloat())
         addVertex(tmp, tmp1, color)
 
         tmp.set(-1f, 1f).mul(scaleX, scaleY).mul(region.getWidth() / 2, region.getHeight() / 2).add(x, y)
-        tmp1.set(region.getU1(), region.getV2(), region.getLayer().toFloat())
+        tmp1.set(region.U1, region.V2, region.layer.toFloat())
         addVertex(tmp, tmp1, color)
     }
 
@@ -264,32 +264,32 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
 
         tmp2.set(sprite.drawPosition).add(sprite.drawOrigin)
 
-        val u1 = if (sprite.flipY) region.getU2() else region.getU1()
-        val u2 = if (sprite.flipY) region.getU1() else region.getU2()
-        val v1 = if (sprite.flipX) region.getV2() else region.getV1()
-        val v2 = if (sprite.flipX) region.getV1() else region.getV2()
+        val u1 = if (sprite.flipY) region.U2 else region.U1
+        val u2 = if (sprite.flipY) region.U1 else region.U2
+        val v1 = if (sprite.flipX) region.V2 else region.V1
+        val v2 = if (sprite.flipX) region.V1 else region.V2
 
         val halfShearX = sprite.shearX / 2
         val halfShearY = sprite.shearY / 2
 
         tmp.set(0f + halfShearX, 0f + halfShearY).mul(sprite.drawSize).sub(sprite.drawOrigin)
             .rot(sprite.rotation).add(tmp2)
-        tmp1.set(u1, v1, region.getLayer().toFloat())
+        tmp1.set(u1, v1, region.layer.toFloat())
         addVertex(tmp, tmp1, sprite.drawColor, sprite.additive)
 
         tmp.set(1f + halfShearX, 0f - halfShearY).mul(sprite.drawSize).sub(sprite.drawOrigin)
             .rot(sprite.rotation).add(tmp2)
-        tmp1.set(u2, v1, region.getLayer().toFloat())
+        tmp1.set(u2, v1, region.layer.toFloat())
         addVertex(tmp, tmp1, sprite.drawColor, sprite.additive)
 
         tmp.set(1f - halfShearX, 1f - halfShearY).mul(sprite.drawSize).sub(sprite.drawOrigin)
             .rot(sprite.rotation).add(tmp2)
-        tmp1.set(u2, v2, region.getLayer().toFloat())
+        tmp1.set(u2, v2, region.layer.toFloat())
         addVertex(tmp, tmp1, sprite.drawColor, sprite.additive)
 
         tmp.set(0f - halfShearX, 1f + halfShearY).mul(sprite.drawSize).sub(sprite.drawOrigin)
             .rot(sprite.rotation).add(tmp2)
-        tmp1.set(u1, v2, region.getLayer().toFloat())
+        tmp1.set(u1, v2, region.layer.toFloat())
         addVertex(tmp, tmp1, sprite.drawColor, sprite.additive)
     }
 
