@@ -4,19 +4,11 @@ import me.wieku.framework.graphics.drawables.sprite.Sprite
 import me.wieku.framework.graphics.drawables.sprite.SpriteBatch
 import me.wieku.framework.graphics.effects.BlurEffect
 import me.wieku.framework.math.view.Camera
-import me.wieku.framework.utils.MaskingInfo
-import org.joml.Rectanglef
-import org.joml.Vector2f
-import org.lwjgl.opengl.GL11
-import org.lwjgl.opengl.GL33
-import kotlin.math.min
 
-class BlurredContainer(): Container() {
+class BlurredContainer() : Container() {
 
     private val blur = BlurEffect(1920, 1080)
     private val tempSprite = Sprite()
-
-    private var lastDrawSize = Vector2f(-1000f, -1000f)
 
     var needsRedraw = true
 
@@ -24,7 +16,7 @@ class BlurredContainer(): Container() {
 
     private var camera = Camera()
 
-    constructor(inContext: BlurredContainer.() -> Unit):this(){
+    constructor(inContext: BlurredContainer.() -> Unit) : this() {
         inContext()
     }
 
@@ -36,8 +28,7 @@ class BlurredContainer(): Container() {
         super.update()
         camera.setViewportF(drawPosition.x.toInt(), drawPosition.y.toInt(), drawSize.x.toInt(), drawSize.y.toInt())
         camera.update()
-        if (lastDrawSize != drawSize) {
-            lastDrawSize.set(drawSize)
+        if (drawSize.x.toInt() != blur.width || drawSize.y.toInt() != blur.height) {
             needsRedraw = true
             needsResize = true
         }
