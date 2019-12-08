@@ -8,7 +8,6 @@ import me.wieku.framework.graphics.containers.Container
 import me.wieku.framework.graphics.drawables.sprite.Sprite
 import me.wieku.framework.graphics.textures.Texture
 import me.wieku.framework.math.Easing
-import me.wieku.framework.math.Origin
 import me.wieku.framework.math.Scaling
 import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.FileType
@@ -31,7 +30,7 @@ class Ripples() : Container(), KoinComponent {
 
     private val rippleTexture: Texture = Texture(
         FileHandle(
-            "assets/coin-wave.png",
+            "assets/textures/menu/coin-wave.png",
             FileType.Classpath
         ),
         4

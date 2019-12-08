@@ -31,7 +31,7 @@ class SideFlashes : Container(), KoinComponent {
 
         val flashTexture = Texture(
             FileHandle(
-                "assets/flash.png",
+                "assets/textures/menu/flash.png",
                 FileType.Classpath
             ),
             4
@@ -109,7 +109,7 @@ class SideFlashes : Container(), KoinComponent {
             lastProgress++
         }
 
-        invalidate()
+        //invalidate()
         super.update()
     }
 

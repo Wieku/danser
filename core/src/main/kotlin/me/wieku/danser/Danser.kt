@@ -4,7 +4,6 @@ import me.wieku.danser.beatmap.Beatmap
 import me.wieku.danser.beatmap.BeatmapManager
 import me.wieku.danser.graphics.drawables.DanserCoin
 import me.wieku.danser.graphics.drawables.SideFlashes
-import me.wieku.framework.audio.BassSystem
 import me.wieku.framework.di.bindable.Bindable
 import me.wieku.framework.font.BitmapFont
 import me.wieku.framework.game.Game
@@ -20,8 +19,6 @@ import me.wieku.framework.math.Scaling
 import me.wieku.framework.math.view.Camera
 import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.FileType
-import me.wieku.framework.time.FramedClock
-import me.wieku.framework.time.IFramedClock
 import me.wieku.framework.utils.FpsCounter
 import org.joml.Vector2f
 import org.joml.Vector2i
@@ -84,7 +81,7 @@ class Danser: Game(), KoinComponent {
         val bgSprite = Sprite {
             texture = Texture(
                 FileHandle(
-                    "assets/background-1.png",
+                    "assets/textures/menu/backgrounds/background-1.png",
                     FileType.Classpath
                 ),
                 4
@@ -104,7 +101,7 @@ class Danser: Game(), KoinComponent {
         mainContainer.addChild(flashes)
         mainContainer.addChild(coin)
 
-        val font = BitmapFont(FileHandle("assets/Fonts/Exo2/Exo2.fnt", FileType.Classpath))
+        val font = BitmapFont(FileHandle("assets/fonts/Exo2/Exo2.fnt", FileType.Classpath))
 
         fpsSprite = TextSprite(font) {
             text = "0.00 ms"

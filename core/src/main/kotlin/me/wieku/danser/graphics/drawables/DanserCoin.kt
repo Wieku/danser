@@ -4,7 +4,6 @@ import me.wieku.danser.beatmap.Beatmap
 import me.wieku.framework.animation.Transform
 import me.wieku.framework.animation.TransformType
 import me.wieku.framework.di.bindable.Bindable
-import me.wieku.framework.graphics.containers.BlurredContainer
 import me.wieku.framework.graphics.containers.CircularContainer
 import me.wieku.framework.graphics.containers.ColorContainer
 import me.wieku.framework.graphics.containers.Container
@@ -52,7 +51,7 @@ class DanserCoin : Container(), KoinComponent {
 
         val overlayTexture = Texture(
             FileHandle(
-                "assets/coin-overlay.png",
+                "assets/textures/menu/coin-overlay.png",
                 FileType.Classpath
             ),
             4

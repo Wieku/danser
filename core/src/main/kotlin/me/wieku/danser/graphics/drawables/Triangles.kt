@@ -4,12 +4,10 @@ import me.wieku.danser.beatmap.Beatmap
 import me.wieku.framework.di.bindable.Bindable
 import me.wieku.framework.graphics.containers.Container
 import me.wieku.framework.graphics.drawables.sprite.Sprite
-import me.wieku.framework.graphics.drawables.sprite.SpriteBatch
 import me.wieku.framework.graphics.textures.Texture
 import me.wieku.framework.math.Origin
 import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.FileType
-import me.wieku.framework.utils.MaskingInfo
 import org.joml.Vector2f
 import org.joml.Vector4f
 import org.koin.core.KoinComponent
@@ -38,7 +36,7 @@ class Triangles() : Container(), KoinComponent {
 
     private val triangleTexture: Texture = Texture(
         FileHandle(
-            "assets/triangle.png",
+            "assets/textures/misc/triangle.png",
             FileType.Classpath
         ),
         4
