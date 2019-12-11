@@ -9,8 +9,6 @@ open class Screen : Container() {
         fillMode = Scaling.Stretch
     }
 
-    open fun onResume(previous: Screen?) {}
-    open fun onSuspend(next: Screen?) {}
     open fun onEnter(previous: Screen?) {}
     open fun onExit(next: Screen?) {}
 
