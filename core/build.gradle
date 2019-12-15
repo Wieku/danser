@@ -6,7 +6,8 @@ plugins {
 
 sourceCompatibility = 1.8
 
-project.ext.hibernateVersion = "5.2.4.Final"
+project.ext.hibernateVersion = "5.4.10.Final"
+project.ext.hibernateValidatorVersion = "6.1.0.Final"
 
 sourceSets.main.kotlin.srcDirs = ["src/main/kotlin"]
 sourceSets.main.resources.srcDirs = ["src/main/resources"]
@@ -19,7 +20,7 @@ dependencies {
     api "org.xerial:sqlite-jdbc:3.21.0.1"
     api "org.hibernate:hibernate-core:${hibernateVersion}"
     api "org.hibernate:hibernate-entitymanager:${hibernateVersion}"
-    api "org.hibernate:hibernate-validator:${hibernateVersion}"
+    api "org.hibernate:hibernate-validator:${hibernateValidatorVersion}"
     api "com.github.gwenn:sqlite-dialect:0.1.0"
     api "org.glassfish:javax.el:3.0.1-b11"
 }
