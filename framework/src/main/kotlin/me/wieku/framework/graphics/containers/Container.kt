@@ -6,6 +6,15 @@ import me.wieku.framework.utils.synchronized
 
 open class Container(): Drawable() {
 
+    override var wasUpdated: Boolean
+        get() {
+            children.forEach {
+                if (it.wasUpdated) return true
+            }
+            return false
+        }
+        set(value) {}
+
     constructor(inContext: Container.() -> Unit):this(){
         inContext()
     }

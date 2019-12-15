@@ -48,7 +48,7 @@ abstract class Drawable() : Disposable, KoinComponent {
     var size = Vector2f(1f)
     var drawSize = Vector2f()
 
-    var inheritColor = false
+    var inheritColor = true
     var color = Vector4f(1f, 1f, 1f, 1f)
     var drawColor = Vector4f(1f, 1f, 1f, 1f)
 
@@ -76,14 +76,19 @@ abstract class Drawable() : Disposable, KoinComponent {
     var isValid = false
         private set
 
+    open var wasUpdated = false
+
     open fun invalidate() {
         isValid = false
     }
 
     open fun update() {
+        wasUpdated = false
         update(clock.currentTime)
         if (!isValid) {
             updateDrawable()
+            isValid = true
+            wasUpdated = true
         }
     }
 
@@ -104,7 +109,9 @@ abstract class Drawable() : Disposable, KoinComponent {
             }
 
             drawPosition.set(position).sub(drawOrigin).add(drawAnchor)
-            drawColor.mul(parent.drawColor)
+            if (inheritColor) {
+                drawColor.mul(parent.drawColor)
+            }
             return
         }
 
@@ -130,7 +137,7 @@ abstract class Drawable() : Disposable, KoinComponent {
                     break
                 }
 
-                isValid = false
+                invalidate()
 
                 when (transform.getType()) {
                     TransformType.Fade, TransformType.Scale, TransformType.Rotate, TransformType.MoveX, TransformType.MoveY -> {
@@ -173,7 +180,7 @@ abstract class Drawable() : Disposable, KoinComponent {
         }
     }
 
-    fun addTransform(transform: Transform, sortAfter: Boolean = false) {
+    fun addTransform(transform: Transform, sortAfter: Boolean = true) {
         transforms.synchronized {
             add(transform)
 
