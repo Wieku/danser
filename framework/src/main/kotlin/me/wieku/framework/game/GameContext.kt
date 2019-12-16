@@ -1,14 +1,13 @@
 package me.wieku.framework.game
 
 import me.wieku.framework.audio.BassSystem
-import me.wieku.framework.backend.WindowMode
 import me.wieku.framework.configuration.FrameworkConfig
 import me.wieku.framework.utils.FpsLimiter
 import org.joml.Vector2i
 import org.koin.core.context.loadKoinModules
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
-import java.awt.Frame
+import kotlin.Exception
 import kotlin.system.exitProcess
 
 abstract class GameContext {
@@ -54,23 +53,32 @@ abstract class GameContext {
 
         var keepRunning = true
 
-        var thread = Thread {
+        Thread.setDefaultUncaughtExceptionHandler { _, e ->
+            println("*** Uncaught exception in update thread! ***")
+            e.printStackTrace()
+            keepRunning = false
+        }
+
+        Thread {
             while (keepRunning) {
                 game.update()
                 updateLimiter.fps = (if (focused) FrameworkConfig.updateRate else FrameworkConfig.updateRateBackground).value
                 updateLimiter.sync()
                 game.updateClock.updateClock()
             }
-        }
+        }.start()
 
-        thread.start()
+        try {
+            while (!handleGameCycle() && keepRunning) {
+                fpsLimiter.fps = (if (focused) FrameworkConfig.foregroundFPS else FrameworkConfig.backgroundFPS).value
 
-        while (!handleGameCycle()) {
-            fpsLimiter.fps = (if (focused) FrameworkConfig.foregroundFPS else FrameworkConfig.backgroundFPS).value
-
-            if(!FrameworkConfig.vSync.value)
-                fpsLimiter.sync()
-            game.graphicsClock.updateClock()
+                if(!FrameworkConfig.vSync.value)
+                    fpsLimiter.sync()
+                game.graphicsClock.updateClock()
+            }
+        } catch (exception: Exception) {
+            println("*** Uncaught exception in rendering thread! ***")
+            exception.printStackTrace()
         }
 
         keepRunning = false
