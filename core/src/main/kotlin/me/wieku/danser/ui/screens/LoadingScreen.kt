@@ -59,6 +59,12 @@ class LoadingScreen : Screen(), KoinComponent {
 
         addChild(coin)
         addChild(text)
+        addChild(TextSprite(font) {
+            text = "Early build. Please visit github.com/Wieku/danser for more info"
+            fontSize = 16f
+            anchor = Origin.TopLeft
+            origin = Origin.TopLeft
+        })
 
         mainMenu = MainMenu()
     }
@@ -74,6 +80,7 @@ class LoadingScreen : Screen(), KoinComponent {
                 1f
             ), false
         )
+
         Thread {
             BeatmapManager.loadBeatmaps(System.getenv("localappdata") + "\\osu!\\Songs")
             stack.push(mainMenu)
@@ -82,7 +89,7 @@ class LoadingScreen : Screen(), KoinComponent {
 
     override fun onExit(next: Screen?) {
         super.onExit(next)
-        coin.addTransform(
+        /*coin.addTransform(
             Transform(
                 TransformType.Scale,
                 clock.currentTime,
@@ -100,7 +107,7 @@ class LoadingScreen : Screen(), KoinComponent {
                 1f,
                 0f
             ), false
-        )
+        )*/
 
         addTransform(
             Transform(

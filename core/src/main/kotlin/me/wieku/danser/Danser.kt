@@ -45,6 +45,8 @@ class Danser : Game(), KoinComponent {
 
     private val counter = FpsCounter()
 
+    private var deltaSum = 0f
+
     override fun setup() {
         batch = SpriteBatch()
         screenCahe = ScreenCache()
@@ -82,7 +84,14 @@ class Danser : Game(), KoinComponent {
     }
 
     override fun update() {
-        fpsSprite.text = String.format("%.2f ms", counter.frameTime)
+
+        deltaSum += updateClock.time.frameTime
+
+        if (deltaSum >= 16.666667f) {
+            fpsSprite.text = String.format("%.2f ms, %d FPS", counter.frameTime, counter.fps.toInt())
+            deltaSum -= 16.666667f
+        }
+
         bindable.value?.getTrack()?.update()
         if (lastContextSize != gameContext.contextSize) {
             lastContextSize.set(gameContext.contextSize)

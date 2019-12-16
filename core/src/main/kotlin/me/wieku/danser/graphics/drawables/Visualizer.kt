@@ -90,7 +90,7 @@ class Visualizer() : Drawable(), KoinComponent {
                 tempSprite.position = position
                 tempSprite.rotation = rotation
                 tempSprite.scale = Vector2f(v * /*min(drawSize.y*1.5f, barLength)*/drawSize.y*1.5f, (2 * Math.PI.toFloat() * drawSize.y / 2) / bars.toFloat())
-                tempSprite.color.w = 0.3f
+                tempSprite.color.w = 0.3f * drawColor.w
                 tempSprite.invalidate()
                 tempSprite.update()
                 batch.draw(tempSprite)
