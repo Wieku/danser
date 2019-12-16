@@ -28,7 +28,10 @@ class BlurredContainer() : Container() {
         super.update()
         camera.setViewportF(drawPosition.x.toInt(), drawPosition.y.toInt(), drawSize.x.toInt(), drawSize.y.toInt())
         camera.update()
-        if (drawSize.x.toInt() != blur.width || drawSize.y.toInt() != blur.height) {
+        if (wasUpdated) {
+            needsRedraw = true
+        }
+        if ((drawSize.x.toInt() != blur.width || drawSize.y.toInt() != blur.height) && !needsResize) {
             needsRedraw = true
             needsResize = true
         }

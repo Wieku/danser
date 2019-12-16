@@ -8,7 +8,7 @@ import java.nio.FloatBuffer
 import java.util.*
 import kotlin.collections.HashMap
 
-class Shader(private val vertex: String, private val fragment: String) {
+class Shader(vertex: String, fragment: String) {
     var shaderId: Int = 0
         private set
 
@@ -55,17 +55,18 @@ class Shader(private val vertex: String, private val fragment: String) {
     }
 
     fun bind() {
-        if (isBound) {
-            throw IllegalStateException("Shader is already bound")
+        check(!isBound) {
+            "Shader is already bound"
         }
+
         stack.push(glGetInteger(GL_CURRENT_PROGRAM))
         glUseProgram(shaderId)
         isBound = true
     }
 
     fun unbind() {
-        if (!isBound) {
-            throw IllegalStateException("Shader is already not bound")
+        check(isBound) {
+            "Shader is already not bound"
         }
 
         val binding = stack.pop()
@@ -78,48 +79,60 @@ class Shader(private val vertex: String, private val fragment: String) {
     }
 
     fun setUniform(name: String, vararg values: Float) {
-        if (!isBound) {
-            throw IllegalStateException("Shader is not bound")
+        check(isBound) {
+            "Shader is not bound"
         }
 
-        when (uniforms[name]!!.attributeType) {
-            VertexAttributeType.GlInt -> glUniform1i(uniforms[name]!!.location, values[0].toInt())
-            VertexAttributeType.GlFloat -> glUniform1f(uniforms[name]!!.location, values[0])
-            VertexAttributeType.Vec2 -> glUniform2fv(uniforms[name]!!.location, values)
-            VertexAttributeType.Vec3 -> glUniform3fv(uniforms[name]!!.location, values)
-            VertexAttributeType.Vec4 -> glUniform4fv(uniforms[name]!!.location, values)
-            VertexAttributeType.Mat2 -> glUniformMatrix2fv(uniforms[name]!!.location, false, values)
-            VertexAttributeType.Mat23 -> glUniformMatrix2x3fv(uniforms[name]!!.location, false, values)
-            VertexAttributeType.Mat24 -> glUniformMatrix2x4fv(uniforms[name]!!.location, false, values)
-            VertexAttributeType.Mat3 -> glUniformMatrix3fv(uniforms[name]!!.location, false, values)
-            VertexAttributeType.Mat32 -> glUniformMatrix3x2fv(uniforms[name]!!.location, false, values)
-            VertexAttributeType.Mat34 -> glUniformMatrix3x4fv(uniforms[name]!!.location, false, values)
-            VertexAttributeType.Mat4 -> glUniformMatrix4fv(uniforms[name]!!.location, false, values)
-            VertexAttributeType.Mat42 -> glUniformMatrix4x2fv(uniforms[name]!!.location, false, values)
-            VertexAttributeType.Mat43 -> glUniformMatrix4x3fv(uniforms[name]!!.location, false, values)
+        require(values.isNotEmpty()) {
+            "No values given"
+        }
+
+        val uniform = uniforms[name] ?: throw IllegalArgumentException("Uniform does not exist")
+
+        when (uniform.attributeType) {
+            VertexAttributeType.GlInt -> glUniform1i(uniform.location, values[0].toInt())
+            VertexAttributeType.GlFloat -> glUniform1f(uniform.location, values[0])
+            VertexAttributeType.Vec2 -> glUniform2fv(uniform.location, values)
+            VertexAttributeType.Vec3 -> glUniform3fv(uniform.location, values)
+            VertexAttributeType.Vec4 -> glUniform4fv(uniform.location, values)
+            VertexAttributeType.Mat2 -> glUniformMatrix2fv(uniform.location, false, values)
+            VertexAttributeType.Mat23 -> glUniformMatrix2x3fv(uniform.location, false, values)
+            VertexAttributeType.Mat24 -> glUniformMatrix2x4fv(uniform.location, false, values)
+            VertexAttributeType.Mat3 -> glUniformMatrix3fv(uniform.location, false, values)
+            VertexAttributeType.Mat32 -> glUniformMatrix3x2fv(uniform.location, false, values)
+            VertexAttributeType.Mat34 -> glUniformMatrix3x4fv(uniform.location, false, values)
+            VertexAttributeType.Mat4 -> glUniformMatrix4fv(uniform.location, false, values)
+            VertexAttributeType.Mat42 -> glUniformMatrix4x2fv(uniform.location, false, values)
+            VertexAttributeType.Mat43 -> glUniformMatrix4x3fv(uniform.location, false, values)
         }
     }
 
     fun setUniform(name: String, values: FloatBuffer) {
-        if (!isBound) {
-            throw IllegalStateException("Shader is not bound")
+        check(isBound) {
+            "Shader is not bound"
         }
 
-        when (uniforms[name]!!.attributeType) {
-            VertexAttributeType.GlInt -> glUniform1i(uniforms[name]!!.location, values[0].toInt())
-            VertexAttributeType.GlFloat -> glUniform1fv(uniforms[name]!!.location, values)
-            VertexAttributeType.Vec2 -> glUniform2fv(uniforms[name]!!.location, values)
-            VertexAttributeType.Vec3 -> glUniform3fv(uniforms[name]!!.location, values)
-            VertexAttributeType.Vec4 -> glUniform4fv(uniforms[name]!!.location, values)
-            VertexAttributeType.Mat2 -> glUniformMatrix2fv(uniforms[name]!!.location, false, values)
-            VertexAttributeType.Mat23 -> glUniformMatrix2x3fv(uniforms[name]!!.location, false, values)
-            VertexAttributeType.Mat24 -> glUniformMatrix2x4fv(uniforms[name]!!.location, false, values)
-            VertexAttributeType.Mat3 -> glUniformMatrix3fv(uniforms[name]!!.location, false, values)
-            VertexAttributeType.Mat32 -> glUniformMatrix3x2fv(uniforms[name]!!.location, false, values)
-            VertexAttributeType.Mat34 -> glUniformMatrix3x4fv(uniforms[name]!!.location, false, values)
-            VertexAttributeType.Mat4 -> glUniformMatrix4fv(uniforms[name]!!.location, false, values)
-            VertexAttributeType.Mat42 -> glUniformMatrix4x2fv(uniforms[name]!!.location, false, values)
-            VertexAttributeType.Mat43 -> glUniformMatrix4x3fv(uniforms[name]!!.location, false, values)
+        require(values.limit() > 0) {
+            "Buffer is empty"
+        }
+
+        val uniform = uniforms[name] ?: throw IllegalArgumentException("Uniform does not exist")
+
+        when (uniform.attributeType) {
+            VertexAttributeType.GlInt -> glUniform1i(uniform.location, values[0].toInt())
+            VertexAttributeType.GlFloat -> glUniform1f(uniform.location, values[0])
+            VertexAttributeType.Vec2 -> glUniform2fv(uniform.location, values)
+            VertexAttributeType.Vec3 -> glUniform3fv(uniform.location, values)
+            VertexAttributeType.Vec4 -> glUniform4fv(uniform.location, values)
+            VertexAttributeType.Mat2 -> glUniformMatrix2fv(uniform.location, false, values)
+            VertexAttributeType.Mat23 -> glUniformMatrix2x3fv(uniform.location, false, values)
+            VertexAttributeType.Mat24 -> glUniformMatrix2x4fv(uniform.location, false, values)
+            VertexAttributeType.Mat3 -> glUniformMatrix3fv(uniform.location, false, values)
+            VertexAttributeType.Mat32 -> glUniformMatrix3x2fv(uniform.location, false, values)
+            VertexAttributeType.Mat34 -> glUniformMatrix3x4fv(uniform.location, false, values)
+            VertexAttributeType.Mat4 -> glUniformMatrix4fv(uniform.location, false, values)
+            VertexAttributeType.Mat42 -> glUniformMatrix4x2fv(uniform.location, false, values)
+            VertexAttributeType.Mat43 -> glUniformMatrix4x3fv(uniform.location, false, values)
         }
     }
 

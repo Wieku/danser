@@ -14,17 +14,34 @@ import org.joml.Vector4f
 import org.lwjgl.opengl.GL33.*
 import kotlin.math.exp
 
-class BlurEffect(var width: Int, var height: Int) {
+class BlurEffect(__width: Int, __height: Int) {
 
-    private var blurShader: Shader = Shader(FileHandle("frameworkAssets/fbopass.vsh", FileType.Classpath), FileHandle("frameworkAssets/blur.fsh", FileType.Classpath))
+    private var blurShader: Shader = Shader(
+        FileHandle("frameworkAssets/fbopass.vsh", FileType.Classpath),
+        FileHandle("frameworkAssets/blur.fsh", FileType.Classpath)
+    )
 
     private var fbo1: Framebuffer
     private var fbo2: Framebuffer
 
     private var kernelSize = Vector2f()
     private var sigma = Vector2f()
-    private var size = Vector2i()
-    
+
+    private var _width = __width
+    private var _height = __height
+
+    var width: Int
+        get() = _width
+        set(value) {
+            resize(value, _height)
+        }
+
+    var height: Int
+        get() = _height
+        set(value) {
+            resize(_width, value)
+        }
+
     var vao = VertexArrayObject()
 
     private var previousViewport = intArrayOf(0, 0, 0, 0)
@@ -38,45 +55,48 @@ class BlurEffect(var width: Int, var height: Int) {
 
         vao.addVBO("default", 12, 0, attributes)
 
-        vao.setData("default", floatArrayOf(
-            -1f, -1f, 0f, 0f, 0f,
-            1f, -1f, 0f, 1f, 0f,
-            1f, 1f, 0f, 1f, 1f,
-            1f, 1f, 0f, 1f, 1f,
-            -1f, 1f, 0f, 0f, 1f,
-            -1f, -1f, 0f, 0f, 0f,
-            -1f, -1f, 0f, 0f, 1f,
-            1f, -1f, 0f, 1f, 1f,
-            1f, 1f, 0f, 1f, 0f,
-            1f, 1f, 0f, 1f, 0f,
-            -1f, 1f, 0f, 0f, 0f,
-            -1f, -1f, 0f, 0f, 1f
-        )) //we need two quads, one is flipping fbo texture
+        vao.setData(
+            "default",
+            floatArrayOf(
+                -1f, -1f, 0f, 0f, 0f,
+                1f, -1f, 0f, 1f, 0f,
+                1f, 1f, 0f, 1f, 1f,
+                1f, 1f, 0f, 1f, 1f,
+                -1f, 1f, 0f, 0f, 1f,
+                -1f, -1f, 0f, 0f, 0f,
+                -1f, -1f, 0f, 0f, 1f,
+                1f, -1f, 0f, 1f, 1f,
+                1f, 1f, 0f, 1f, 0f,
+                1f, 1f, 0f, 1f, 0f,
+                -1f, 1f, 0f, 0f, 0f,
+                -1f, -1f, 0f, 0f, 1f
+            )
+        ) //we need two quads, one is flipping fbo texture
 
         vao.bind()
         vao.bindToShader(blurShader)
         vao.unbind()
 
-        fbo1 = Framebuffer(width, height)
-        fbo2 = Framebuffer(width, height)
-        size = Vector2i(width, height)
+        fbo1 = Framebuffer(_width, _height)
+        fbo2 = Framebuffer(_width, _height)
         setBlur(0f, 0f)
     }
 
     fun begin() {
         fbo1.bind(true, Vector4f(0f, 0f, 0f, 0f))
         glGetIntegerv(GL_VIEWPORT, previousViewport)
-        glViewport(0, 0, size.x, size.y)
+        glViewport(0, 0, _width, _height)
     }
 
-    fun resize(width:Int, height:Int) {
+    fun resize(width: Int, height: Int) {
         fbo1.dispose()
         fbo1 = Framebuffer(width, height)
 
         fbo2.dispose()
         fbo2 = Framebuffer(width, height)
 
-        size.set(width, height)
+        _width = width
+        _height = height
     }
 
     fun endAndProcess(): Texture {
@@ -87,7 +107,7 @@ class BlurEffect(var width: Int, var height: Int) {
         blurShader.setUniform("kernelSize", kernelSize.x, kernelSize.y)
         blurShader.setUniform("direction", 1f, 0f)
         blurShader.setUniform("sigma", sigma.x, sigma.y)
-        blurShader.setUniform("size", size.x.toFloat(), size.y.toFloat())
+        blurShader.setUniform("size", _width.toFloat(), _height.toFloat())
 
         vao.bind()
 
@@ -115,8 +135,8 @@ class BlurEffect(var width: Int, var height: Int) {
     }
 
     fun setBlur(blurX: Float, blurY: Float) {
-        var sigmaX = blurX*25
-        var sigmaY = blurY*25
+        var sigmaX = blurX * 25
+        var sigmaY = blurY * 25
 
         val kX = kernelSize(sigmaX)
         if (kX == 0) {
@@ -134,7 +154,7 @@ class BlurEffect(var width: Int, var height: Int) {
 
     private fun gauss(x: Int, sigma: Float): Float {
         val factor = 0.398942f
-        return (factor * exp(-0.5f*(x*x)/(sigma*sigma))) / sigma
+        return (factor * exp(-0.5f * (x * x) / (sigma * sigma))) / sigma
     }
 
     private fun kernelSize(sigma: Float): Int {
