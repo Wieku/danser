@@ -111,6 +111,7 @@ class Texture {
                 System.out.println("OK with reason: " + stbi_failure_reason())
             }
 
+
             //System.out.println("Image width: " + w.get(0));
             //System.out.println("Image height: " + h.get(0));
             //System.out.println("Image components: " + comp.get(0));
@@ -120,6 +121,7 @@ class Texture {
             var image: ByteBuffer? =
                 stbi_load_from_memory(imageBuffer, w, h, comp, 4)
                     ?: throw RuntimeException("Failed to load image: " + stbi_failure_reason())
+
 
             var ww = w.get(0)
             var hh = h.get(0)

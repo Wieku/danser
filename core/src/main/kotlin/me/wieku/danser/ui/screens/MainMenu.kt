@@ -4,14 +4,13 @@ import me.wieku.danser.beatmap.Beatmap
 import me.wieku.danser.beatmap.BeatmapManager
 import me.wieku.danser.graphics.drawables.DanserCoin
 import me.wieku.danser.graphics.drawables.SideFlashes
-import me.wieku.danser.graphics.drawables.Triangles
 import me.wieku.framework.animation.Transform
 import me.wieku.framework.animation.TransformType
 import me.wieku.framework.di.bindable.Bindable
 import me.wieku.framework.di.bindable.BindableListener
 import me.wieku.framework.font.BitmapFont
-import me.wieku.framework.graphics.containers.BlurredContainer
-import me.wieku.framework.graphics.containers.ColorContainer
+import me.wieku.framework.graphics.drawables.containers.BlurredContainer
+import me.wieku.framework.graphics.drawables.containers.ColorContainer
 import me.wieku.framework.graphics.drawables.sprite.Sprite
 import me.wieku.framework.graphics.drawables.sprite.TextSprite
 import me.wieku.framework.graphics.textures.Texture

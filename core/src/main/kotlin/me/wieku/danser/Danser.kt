@@ -1,23 +1,16 @@
 package me.wieku.danser
 
 import me.wieku.danser.beatmap.Beatmap
-import me.wieku.danser.beatmap.BeatmapManager
-import me.wieku.danser.graphics.drawables.DanserCoin
-import me.wieku.danser.graphics.drawables.SideFlashes
 import me.wieku.danser.ui.screens.LoadingScreen
 import me.wieku.framework.di.bindable.Bindable
 import me.wieku.framework.font.BitmapFont
 import me.wieku.framework.game.Game
 import me.wieku.framework.game.GameContext
-import me.wieku.framework.graphics.containers.BlurredContainer
-import me.wieku.framework.graphics.containers.Container
-import me.wieku.framework.graphics.drawables.sprite.Sprite
+import me.wieku.framework.graphics.drawables.containers.Container
 import me.wieku.framework.graphics.drawables.sprite.SpriteBatch
 import me.wieku.framework.graphics.drawables.sprite.TextSprite
-import me.wieku.framework.graphics.textures.Texture
 import me.wieku.framework.gui.screen.ScreenCache
 import me.wieku.framework.math.Origin
-import me.wieku.framework.math.Scaling
 import me.wieku.framework.math.view.Camera
 import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.FileType
@@ -28,7 +21,6 @@ import org.koin.core.KoinComponent
 import org.koin.core.context.loadKoinModules
 import org.koin.core.inject
 import org.koin.dsl.module
-import java.io.File
 
 class Danser : Game(), KoinComponent {
 

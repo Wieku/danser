@@ -1,6 +1,6 @@
 package me.wieku.framework.gui.screen
 
-import me.wieku.framework.graphics.containers.Container
+import me.wieku.framework.graphics.drawables.containers.Container
 import me.wieku.framework.math.Scaling
 
 open class Screen : Container() {

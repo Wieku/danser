@@ -4,9 +4,9 @@ import me.wieku.danser.beatmap.Beatmap
 import me.wieku.framework.animation.Transform
 import me.wieku.framework.animation.TransformType
 import me.wieku.framework.di.bindable.Bindable
-import me.wieku.framework.graphics.containers.CircularContainer
-import me.wieku.framework.graphics.containers.ColorContainer
-import me.wieku.framework.graphics.containers.Container
+import me.wieku.framework.graphics.drawables.containers.CircularContainer
+import me.wieku.framework.graphics.drawables.containers.ColorContainer
+import me.wieku.framework.graphics.drawables.containers.Container
 import me.wieku.framework.graphics.drawables.sprite.Sprite
 import me.wieku.framework.graphics.textures.Texture
 import me.wieku.framework.math.Easing

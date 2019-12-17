@@ -1,4 +1,4 @@
-package me.wieku.framework.graphics.containers
+package me.wieku.framework.graphics.drawables.containers
 
 import me.wieku.framework.graphics.drawables.sprite.Sprite
 import me.wieku.framework.graphics.textures.Texture
@@ -14,7 +14,6 @@ class ColorContainer() : Container() {
         addChild(Sprite {
             texture = pixel!!.region
             fillMode = Scaling.Stretch
-            inheritColor = true
         })
     }
 
