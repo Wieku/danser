@@ -41,7 +41,9 @@ object BassSystem {
                 libraryName,
                 Library::class.java.classLoader.getResource("$use64/$libraryName")
             ) as FileChannel
-            Library.loadSystem(it)
+
+            //Library.loadSystem(it)
+            Library.loadSystem("bass", it)
         }
     }
 
