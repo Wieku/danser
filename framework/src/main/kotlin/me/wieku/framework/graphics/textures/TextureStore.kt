@@ -3,19 +3,15 @@ package me.wieku.framework.graphics.textures
 import org.lwjgl.opengl.ARBTextureStorage.glTexStorage3D
 import org.lwjgl.opengl.GL33.*
 
-enum class TextureFilter(val glId: Int) {
-    Nearest(GL_NEAREST),
-    Linear(GL_LINEAR),
-    MipMap(GL_LINEAR_MIPMAP_LINEAR),
-    MipMapNearestNearest(GL_NEAREST_MIPMAP_NEAREST),
-    MipMapLinearNearest(GL_LINEAR_MIPMAP_NEAREST),
-    MipMapNearestLinear(GL_NEAREST_MIPMAP_LINEAR),
-    MipMapLinearLinear(GL_LINEAR_MIPMAP_LINEAR)
-}
-
 internal class TextureStore(var layers: Int, var width: Int, var height: Int, var mipmaps: Int = 1, val format: TextureFormat = TextureFormat.RGBA) {
     var id: Int = -1
     var binding: Int = -1
+
+    var minFilter = TextureFilter.Linear
+        private set
+
+    var magFilter = TextureFilter.Linear
+        private set
 
     init {
         id = glGenTextures()
@@ -51,6 +47,8 @@ internal class TextureStore(var layers: Int, var width: Int, var height: Int, va
     }
 
     fun setFiltering(min: TextureFilter, mag: TextureFilter) {
+        minFilter = min
+        magFilter = mag
         glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, min.glId)
         glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, mag.glId)
     }

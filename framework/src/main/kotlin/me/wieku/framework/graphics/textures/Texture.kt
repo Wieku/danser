@@ -9,13 +9,13 @@ import java.nio.ByteBuffer
 import java.nio.FloatBuffer
 import java.nio.IntBuffer
 
-class Texture {
+class Texture: ITexture {
     private lateinit var store: TextureStore
     val region = TextureRegion(this, 0f, 1f, 0f, 1f, 0)
 
-    var width: Int = 0
+    override var width: Int = 0
         private set
-    var height: Int = 0
+    override var height: Int = 0
         private set
     var mipmaps: Int = 1
         private set
@@ -217,5 +217,5 @@ class Texture {
 
     fun bind(loc: Int) = store.bind(loc)
     fun getLocation() = store.binding
-    fun dispose() = store.dispose()
+    override fun dispose() = store.dispose()
 }

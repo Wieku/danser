@@ -1,7 +1,7 @@
 package me.wieku.framework.graphics.textures
 
 class TextureRegion(
-    var baseTexture: Texture,
+    var baseTexture: ITexture,
     var U1: Float,
     var U2: Float,
     var V1: Float,
