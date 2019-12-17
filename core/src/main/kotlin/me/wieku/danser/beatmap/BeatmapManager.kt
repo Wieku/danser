@@ -112,7 +112,7 @@ object BeatmapManager {
                 var beatmap = versionsMap[it.name]
                 val wasNull = beatmap == null
 
-                if (beatmap != null && beatmap.beatmapStatistics.lastModified == it.lastModified() && beatmap.beatmapInfo.sha1 == it.sha1()) {
+                if (beatmap != null && beatmap.beatmapStatistics.lastModified == it.lastModified()) {
                     return
                 }
 
