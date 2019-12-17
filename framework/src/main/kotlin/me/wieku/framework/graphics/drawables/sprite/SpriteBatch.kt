@@ -5,6 +5,7 @@ import me.wieku.framework.graphics.shaders.Shader
 import me.wieku.framework.graphics.textures.Texture
 import me.wieku.framework.graphics.textures.TextureRegion
 import me.wieku.framework.math.rot
+import me.wieku.framework.math.vector2fRad
 import me.wieku.framework.math.view.Camera
 import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.FileType
@@ -269,8 +270,16 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
         val v1 = if (sprite.flipX) region.V2 else region.V1
         val v2 = if (sprite.flipX) region.V1 else region.V2
 
-        val halfShearX = sprite.shearX / 2
-        val halfShearY = sprite.shearY / 2
+        var halfShearX = 0f
+        var halfShearY = 0f
+
+        if (sprite.shearX != 0f) {
+            halfShearX = vector2fRad(Math.PI.toFloat() / 2 * (1 - sprite.shearX), sprite.drawSize.y / 2).x / sprite.drawSize.x / 2
+        }
+
+        if (sprite.shearY != 0f) {
+            halfShearY = vector2fRad(sprite.shearY * Math.PI.toFloat() / 2, sprite.drawSize.x / 2).y / sprite.drawSize.y / 2
+        }
 
         tmp.set(0f + halfShearX, 0f + halfShearY).mul(sprite.drawSize).sub(sprite.drawOrigin)
             .rot(sprite.rotation).add(tmp2)

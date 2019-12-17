@@ -1,10 +1,13 @@
 package me.wieku.framework.graphics.drawables.sprite
 
 import me.wieku.framework.font.BitmapFont
+import me.wieku.framework.graphics.drawables.containers.ColorContainer
 import me.wieku.framework.graphics.textures.Texture
 import me.wieku.framework.graphics.textures.TextureFormat
 import me.wieku.framework.graphics.textures.TextureRegion
+import me.wieku.framework.math.Origin
 import me.wieku.framework.utils.CPair
+import org.joml.Vector4f
 
 
 open class TextSprite(var font: BitmapFont) : Sprite() {
@@ -16,10 +19,12 @@ open class TextSprite(var font: BitmapFont) : Sprite() {
     private val internalSprite = Sprite()
     private var internalTextureRegion: TextureRegion? = null
 
+    var scaleToSize = false
+
     var fontSize = 64f
+        get() = if (scaleToSize) drawSize.y else field
         set(value) {
             field = value
-            size.set(font.getTextWidth(text).toFloat(), font.ascent.toFloat()).mul(fontScale)
             invalidate()
         }
 
@@ -28,9 +33,16 @@ open class TextSprite(var font: BitmapFont) : Sprite() {
 
     override fun dispose() {}
 
+    override fun updateDrawable() {
+        size.set(font.getTextWidth(text).toFloat(), font.ascent.toFloat()+font.descent.toFloat())
+        if (!scaleToSize) {
+            size.mul(fontScale)
+        }
+        super.updateDrawable()
+    }
+
     var text = ""
         set(value) {
-            size.set(font.getTextWidth(value).toFloat(), font.ascent.toFloat()).mul(fontScale)
             invalidate()
             field = value
         }
@@ -67,6 +79,8 @@ open class TextSprite(var font: BitmapFont) : Sprite() {
             }
 
             internalSprite.texture = internalTextureRegion
+            internalSprite.shearX = shearX
+            internalSprite.shearY = shearY
             internalSprite.drawColor.set(drawColor)
 
             batch.draw(internalSprite)

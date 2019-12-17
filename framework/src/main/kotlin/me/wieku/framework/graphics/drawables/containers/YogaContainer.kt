@@ -10,7 +10,7 @@ import org.joml.Vector4f
 import org.lwjgl.util.yoga.YGNode
 import org.lwjgl.util.yoga.YGValue
 
-open class YogaContainer(): Container() {
+open class YogaContainer() : Container() {
 
     private val yogaNode = YGNodeNewWithConfig(config)
     //private val yogaNodeWrapped = YGNode.create(yogaNode)
@@ -32,21 +32,21 @@ open class YogaContainer(): Container() {
             invalidate()
             YGNodeStyleSetFlexDirection(yogaNode, value)
         }
-    
+
     var yogaJustifyContent
         get() = YGNodeStyleGetJustifyContent(yogaNode)
         set(value) {
             invalidate()
             YGNodeStyleSetJustifyContent(yogaNode, value)
         }
-        
+
     var yogaAlignContent
         get() = YGNodeStyleGetAlignContent(yogaNode)
         set(value) {
             invalidate()
             YGNodeStyleSetAlignContent(yogaNode, value)
         }
-    
+
     var yogaAlignItems
         get() = YGNodeStyleGetAlignItems(yogaNode)
         set(value) {
@@ -60,7 +60,7 @@ open class YogaContainer(): Container() {
             invalidate()
             YGNodeStyleSetAlignSelf(yogaNode, value)
         }
-    
+
     var yogaPositionType
         get() = YGNodeStyleGetPositionType(yogaNode)
         set(value) {
@@ -432,7 +432,7 @@ open class YogaContainer(): Container() {
         }
 
 
-    constructor(inContext: YogaContainer.() -> Unit):this(){
+    constructor(inContext: YogaContainer.() -> Unit) : this() {
         inContext()
     }
 
@@ -441,8 +441,8 @@ open class YogaContainer(): Container() {
             drawable.forEach {
                 it.parent = this@YogaContainer
                 if (it is YogaContainer) {
-                    println(yogaNode.toString() + " " + it.yogaNode.toString())
-                    YGNodeInsertChild(yogaNode, it.yogaNode, yogaChildrenCount)
+                    if (!it.isRoot)
+                        YGNodeInsertChild(yogaNode, it.yogaNode, yogaChildrenCount)
                 }
                 children.add(it)
             }
@@ -456,7 +456,8 @@ open class YogaContainer(): Container() {
         }
         drawable.parent = this
         if (drawable is YogaContainer) {
-            YGNodeInsertChild(yogaNode, drawable.yogaNode, index)
+            if (!drawable.isRoot)
+                YGNodeInsertChild(yogaNode, drawable.yogaNode, index)
         }
     }
 
@@ -467,7 +468,8 @@ open class YogaContainer(): Container() {
 
         drawable.parent = null
         if (drawable is YogaContainer) {
-            YGNodeRemoveChild(yogaNode, drawable.yogaNode)
+            if (!drawable.isRoot)
+                YGNodeRemoveChild(yogaNode, drawable.yogaNode)
         }
     }
 
@@ -494,10 +496,11 @@ open class YogaContainer(): Container() {
         }
 
         if (sizeBefore != drawSize && usePercentPadding) {
-            YGNodeStyleSetPadding(yogaNode, YGEdgeLeft, drawSize.x * yogaPaddingPercent.x / 100f)
-            YGNodeStyleSetPadding(yogaNode, YGEdgeTop, drawSize.x * yogaPaddingPercent.y / 100f)
-            YGNodeStyleSetPadding(yogaNode, YGEdgeRight, drawSize.x * yogaPaddingPercent.z / 100f)
-            YGNodeStyleSetPadding(yogaNode, YGEdgeBottom, drawSize.x * yogaPaddingPercent.w / 100f)
+            val sizeBase = if (drawSize.x > drawSize.y) drawSize.y else drawSize.x
+            YGNodeStyleSetPadding(yogaNode, YGEdgeLeft, sizeBase * yogaPaddingPercent.x / 100f)
+            YGNodeStyleSetPadding(yogaNode, YGEdgeTop, sizeBase * yogaPaddingPercent.y / 100f)
+            YGNodeStyleSetPadding(yogaNode, YGEdgeRight, sizeBase * yogaPaddingPercent.z / 100f)
+            YGNodeStyleSetPadding(yogaNode, YGEdgeBottom, sizeBase * yogaPaddingPercent.w / 100f)
             recalculateLayout()
         }
     }
@@ -517,6 +520,7 @@ open class YogaContainer(): Container() {
 
     private companion object {
         private val config = YGConfigNew()
+
         init {
             YGConfigSetUseWebDefaults(config, true)
             YGConfigSetUseLegacyStretchBehaviour(config, true)
