@@ -21,7 +21,7 @@ open class Container(): Drawable() {
 
     protected val children = ArrayList<Drawable>()
 
-    fun addChild(vararg drawable: Drawable) {
+    open fun addChild(vararg drawable: Drawable) {
         children.synchronized {
             addAll(drawable)
         }
@@ -29,14 +29,14 @@ open class Container(): Drawable() {
         drawable.forEach { it.parent = this }
     }
 
-    fun insertChild(drawable: Drawable, index: Int) {
+    open fun insertChild(drawable: Drawable, index: Int) {
         children.synchronized {
             add(index, drawable)
         }
         drawable.parent = this
     }
 
-    fun removeChild(drawable: Drawable) {
+    open fun removeChild(drawable: Drawable) {
         children.synchronized {
             remove(drawable)
         }
