@@ -11,6 +11,9 @@ import me.wieku.framework.utils.CPair
 import org.joml.Vector4f
 import org.koin.core.KoinComponent
 import org.koin.core.inject
+import kotlin.math.ceil
+import kotlin.math.floor
+import kotlin.math.max
 
 
 open class TextSprite() : Sprite(), KoinComponent {
@@ -41,7 +44,9 @@ open class TextSprite() : Sprite(), KoinComponent {
         }
 
     private val fontScale: Float
-        get() = fontSize / font.defaultSize
+        get() = fontSize / (font.defaultSize)
+
+    var drawFromBottom = false
 
     override fun dispose() {}
 
@@ -61,7 +66,7 @@ open class TextSprite() : Sprite(), KoinComponent {
 
     override fun draw(batch: SpriteBatch) {
         var offset = if (text.isNotEmpty()) -Character.charCount(text.codePointAt(0)) else 0
-        var advance = 0
+        var advance = ((drawSize.x - font.getTextWidth(text).toFloat() * fontScale) / (2 * fontScale)).toInt()
         var codepointBefore = if (text.isNotEmpty()) text.codePointAt(0) else 0
         while (true) {
             offset += Character.charCount(codepointBefore)
@@ -75,7 +80,7 @@ open class TextSprite() : Sprite(), KoinComponent {
             val glyph = font.glyphs[codepoint] ?: continue
             internalSprite.drawPosition.set(
                 drawPosition.x + (advance + glyph.xOffset) * fontScale,
-                drawPosition.y + (font.ascent - glyph.height + glyph.yOffset) * fontScale
+                drawPosition.y + (font.ascent + (if (drawFromBottom) font.descent else 0) - glyph.height + glyph.yOffset) * fontScale
             )
             internalSprite.drawSize.set(glyph.width.toFloat(), glyph.height.toFloat()).mul(fontScale)
 
