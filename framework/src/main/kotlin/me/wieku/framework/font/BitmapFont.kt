@@ -3,6 +3,7 @@ package me.wieku.framework.font
 import me.wieku.framework.font.loader.FntFontLoader
 import me.wieku.framework.font.loader.IFontLoader
 import me.wieku.framework.graphics.textures.Texture
+import me.wieku.framework.graphics.textures.TextureAtlas
 import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.utils.CPair
 import java.lang.IllegalArgumentException
@@ -22,7 +23,7 @@ class BitmapFont(file: FileHandle) {
     var ascent = 0
     var descent = 0
 
-    var pages = HashMap<Int, Texture>()
+    var pages: /* = HashMap<Int, Texture>()*/TextureAtlas? = null
 
     var glyphs = HashMap<Int, Glyph>()
 

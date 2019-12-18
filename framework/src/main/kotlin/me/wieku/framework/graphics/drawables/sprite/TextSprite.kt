@@ -1,6 +1,7 @@
 package me.wieku.framework.graphics.drawables.sprite
 
 import me.wieku.framework.font.BitmapFont
+import me.wieku.framework.font.FontStore
 import me.wieku.framework.graphics.drawables.containers.ColorContainer
 import me.wieku.framework.graphics.textures.Texture
 import me.wieku.framework.graphics.textures.TextureFormat
@@ -8,11 +9,22 @@ import me.wieku.framework.graphics.textures.TextureRegion
 import me.wieku.framework.math.Origin
 import me.wieku.framework.utils.CPair
 import org.joml.Vector4f
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 
 
-open class TextSprite(var font: BitmapFont) : Sprite() {
+open class TextSprite() : Sprite(), KoinComponent {
 
-    constructor(font: BitmapFont, inContext: TextSprite.() -> Unit) : this(font) {
+    lateinit var font: BitmapFont
+    private val fontStore: FontStore by inject()
+
+    constructor(font: BitmapFont, inContext: TextSprite.() -> Unit) : this() {
+        this.font = font
+        inContext()
+    }
+
+    constructor(font: String, inContext: TextSprite.() -> Unit) : this() {
+        this.font = fontStore.getResource(font)
         inContext()
     }
 
@@ -69,13 +81,14 @@ open class TextSprite(var font: BitmapFont) : Sprite() {
 
             if (internalTextureRegion == null) {
                 internalTextureRegion =
-                    TextureRegion(font.pages[glyph.page]!!, glyph.u1, glyph.u2, glyph.v1, glyph.v2, 0)
+                    TextureRegion(font.pages!!, glyph.u1, glyph.u2, glyph.v1, glyph.v2, glyph.page)
             } else {
-                internalTextureRegion!!.baseTexture = font.pages[glyph.page]!!
+                internalTextureRegion!!.baseTexture = font.pages!!
                 internalTextureRegion!!.U1 = glyph.u1
                 internalTextureRegion!!.U2 = glyph.u2
                 internalTextureRegion!!.V1 = glyph.v1
                 internalTextureRegion!!.V2 = glyph.v2
+                internalTextureRegion!!.layer = glyph.page
             }
 
             internalSprite.texture = internalTextureRegion

@@ -215,7 +215,10 @@ class Texture: ITexture {
 
     fun setFiltering(min: TextureFilter, mag: TextureFilter) = store.setFiltering(min, mag)
 
-    fun bind(loc: Int) = store.bind(loc)
-    fun getLocation() = store.binding
+    override fun bind(location: Int) = store.bind(location)
+    override val id: Int
+        get() = store.id
+    override val location: Int
+        get() = store.binding
     override fun dispose() = store.dispose()
 }

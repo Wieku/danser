@@ -2,6 +2,7 @@ package me.wieku.framework.graphics.drawables.sprite
 
 import me.wieku.framework.graphics.buffers.*
 import me.wieku.framework.graphics.shaders.Shader
+import me.wieku.framework.graphics.textures.ITexture
 import me.wieku.framework.graphics.textures.Texture
 import me.wieku.framework.graphics.textures.TextureRegion
 import me.wieku.framework.math.rot
@@ -49,7 +50,7 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
 
     private var color: Vector4f = Vector4f(1f, 1f, 1f, 1f)
 
-    private var currentTexture: Texture? = null
+    private var currentTexture: ITexture? = null
 
     init {
         val location = "frameworkAssets/sprite"
@@ -108,9 +109,9 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
     private var preSFactor: Int = 0
     private var preDFactor: Int = 0
 
-    private fun bind(texture: Texture) {
+    private fun bind(texture: ITexture) {
         if (currentTexture != null) {
-            if (currentTexture!!.getID() == texture.getID()) {
+            if (currentTexture!!.id == texture.id) {
                 return
             }
 
@@ -118,12 +119,12 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
         }
 
         //We are assuming that textures with location higher than 0 are already bound
-        if (texture.getLocation() == 0) {
+        if (texture.location == 0) {
             texture.bind(0)
         }
 
         currentTexture = texture
-        shader.setUniform("tex", currentTexture!!.getLocation().toFloat())
+        shader.setUniform("tex", currentTexture!!.location.toFloat())
     }
 
     fun begin() {
@@ -149,10 +150,10 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
 
         currentTexture?.let {
-            if (it.getLocation() == 0) {
+            if (it.location == 0) {
                 it.bind(0)
             }
-            shader.setUniform("tex", it.getLocation().toFloat())
+            shader.setUniform("tex", it.location.toFloat())
         }
         applyMaskingInfo()
     }
