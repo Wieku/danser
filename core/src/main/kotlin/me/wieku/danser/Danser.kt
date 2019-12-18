@@ -49,6 +49,9 @@ class Danser : Game(), KoinComponent {
         screenCahe = ScreenCache()
         fontStore = FontStore()
         fontStore.addResource("Exo2", FileHandle("assets/fonts/Exo2/Exo2.fnt", FileType.Classpath))
+        fontStore.addResource("FontAwesome-Regular", FileHandle("assets/fonts/FontAwesome/FontAwesome-Regular.fnt", FileType.Classpath))
+        fontStore.addResource("FontAwesome-Solid", FileHandle("assets/fonts/FontAwesome/FontAwesome-Solid.fnt", FileType.Classpath))
+        fontStore.addResource("FontAwesome-Brands", FileHandle("assets/fonts/FontAwesome/FontAwesome-Brands.fnt", FileType.Classpath))
         textureStore = TextureStore()
 
         val danserModule = module {
