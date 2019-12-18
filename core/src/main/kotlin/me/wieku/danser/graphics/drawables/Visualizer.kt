@@ -34,9 +34,9 @@ class Visualizer() : Drawable(), KoinComponent {
     private val tempSprite: Sprite
 
     init {
-        val texture = Texture(1, 1, data = intArrayOf(0xffffffff.toInt()))
-        tempSprite = Sprite {
-            this.texture = texture.region
+        //val texture = Texture(1, 1, data = intArrayOf(0xffffffff.toInt()))
+        tempSprite = Sprite("pixel") {
+            //this.texture = texture.region
             size = Vector2f(1f, 1f)
             origin = Origin.CentreLeft
         }
@@ -93,7 +93,7 @@ class Visualizer() : Drawable(), KoinComponent {
                 tempSprite.color.w = 0.3f * drawColor.w
                 tempSprite.invalidate()
                 tempSprite.update()
-                batch.draw(tempSprite)
+                tempSprite.draw(batch)
             }
         }
     }

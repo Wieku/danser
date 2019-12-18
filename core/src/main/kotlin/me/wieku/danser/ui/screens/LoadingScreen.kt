@@ -29,23 +29,20 @@ class LoadingScreen : Screen(), KoinComponent {
 
     init {
 
-        val overlayTexture = Texture(
+        /*val overlayTexture = Texture(
             FileHandle(
                 "assets/textures/menu/coin-overlay.png",
                 FileType.Classpath
             ),
             4
-        )
+        )*/
 
-        coin = Sprite {
-            texture = overlayTexture.region
+        coin = Sprite("menu/coin-overlay.png") {
             fillMode = Scaling.Fit
             scale = Vector2f(0.66f)
         }
 
-        val font = BitmapFont(FileHandle("assets/fonts/Exo2/Exo2.fnt", FileType.Classpath))
-
-        text = TextSprite(font) {
+        text = TextSprite("Exo2") {
             text = "Loading awesomeness"
             fontSize = 32f
             anchor = Origin.Custom
@@ -55,7 +52,7 @@ class LoadingScreen : Screen(), KoinComponent {
 
         addChild(coin)
         addChild(text)
-        addChild(TextSprite(font) {
+        addChild(TextSprite("Exo2") {
             text = "Early build. Please visit github.com/Wieku/danser for more info"
             fontSize = 16f
             anchor = Origin.TopLeft

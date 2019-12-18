@@ -28,17 +28,7 @@ class SideFlashes : Container(), KoinComponent {
     private var lastProgress = 0
 
     init {
-
-        val flashTexture = Texture(
-            FileHandle(
-                "assets/textures/menu/flash.png",
-                FileType.Classpath
-            ),
-            4
-        )
-
-        flashLeft = Sprite {
-            texture = flashTexture.region
+        flashLeft = Sprite("menu/flash.png") {
             fillMode = Scaling.FillY
             size.x = 0.4f
             flipY = true
@@ -48,8 +38,7 @@ class SideFlashes : Container(), KoinComponent {
             additive = true
         }
 
-        flashRight = Sprite {
-            texture = flashTexture.region
+        flashRight = Sprite("menu/flash.png") {
             size.x = 0.4f
             fillMode = Scaling.FillY
             color.w = 0f

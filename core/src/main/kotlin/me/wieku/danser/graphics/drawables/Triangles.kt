@@ -34,13 +34,13 @@ class Triangles() : Container(), KoinComponent {
 
     private var velocity = 0f
 
-    private val triangleTexture: Texture = Texture(
+    /*private val triangleTexture: Texture = Texture(
         FileHandle(
             "assets/textures/misc/triangle.png",
             FileType.Classpath
         ),
         4
-    )
+    )*/
 
     fun addTriangles(onscreen: Boolean = false) {
         val maxTriangles = (sqrt(drawSize.x * drawSize.y) * triangleSpawnRate * spawnRate).toInt()
@@ -56,8 +56,8 @@ class Triangles() : Container(), KoinComponent {
         val position =
             Vector2f(Math.random().toFloat(), (if (onscreen) Math.random().toFloat() else 1f) * (1f + size / 2))
         val col = 0.054f + Math.random().toFloat() * (/*0.117f*/0.2f - 0.054f)
-        val sprite = Sprite {
-            texture = triangleTexture.region
+        val sprite = Sprite("misc/triangle.png") {
+            //texture = triangleTexture.region
             this.size = Vector2f(size)
             this.scale = Vector2f(1f)
             inheritScale = false

@@ -44,24 +44,10 @@ class DanserCoin : Container(), KoinComponent {
     private var lastBeatProgress = 0
 
     private val coinBottom: Container
-    private val coinFlash: ColorContainer
+    private lateinit var coinFlash: ColorContainer
     private val coinTop: Sprite
 
     init {
-
-        val overlayTexture = Texture(
-            FileHandle(
-                "assets/textures/menu/coin-overlay.png",
-                FileType.Classpath
-            ),
-            4
-        )
-
-        coinFlash = ColorContainer {
-            fillMode = Scaling.Stretch
-            color = Vector4f(1f, 1f, 1f, 0f)
-        }
-
         coinBottom = Container {
             fillMode = Scaling.Fill
             addChild(
@@ -79,20 +65,23 @@ class DanserCoin : Container(), KoinComponent {
                         }
                     )
                 },
-                Sprite {
-                    texture = overlayTexture.region
+                Sprite("menu/coin-overlay.png") {
                     fillMode = Scaling.Fit
                 },
                 CircularContainer {
                     scale = Vector2f(0.95f)
                     fillMode = Scaling.Fit
-                    addChild(coinFlash)
+                    addChild(
+                        ColorContainer {
+                            fillMode = Scaling.Stretch
+                            color = Vector4f(1f, 1f, 1f, 0f)
+                        }.also { coinFlash = it }
+                    )
                 }
             )
         }
 
-        coinTop = Sprite {
-            texture = overlayTexture.region
+        coinTop = Sprite("menu/coin-overlay.png") {
             fillMode = Scaling.FillY
             color.w = 0.3f
         }
