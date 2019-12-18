@@ -3,17 +3,19 @@ package me.wieku.framework.font.loader
 import me.wieku.framework.font.BitmapFont
 import me.wieku.framework.font.Glyph
 import me.wieku.framework.graphics.textures.Texture
+import me.wieku.framework.graphics.textures.TextureAtlas
 import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.utils.CPair
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
+import java.io.Reader
 import java.util.regex.Pattern
 import kotlin.math.abs
 
 internal class FntFontLoader : IFontLoader {
     override fun loadFont(font: BitmapFont, file: FileHandle) {
-        val reader = BufferedReader(InputStreamReader(file.inputStream()))
+        val reader = BufferedReader(InputStreamReader(file.inputStream()) as Reader)
 
         val pattern = Pattern.compile("\\s+(?=([^\"]*\"[^\"]*\")*[^\"]*\$)|[=]")
 
@@ -54,6 +56,7 @@ internal class FntFontLoader : IFontLoader {
                             "base" -> baseline = value
                             "scaleW" -> width = value
                             "scaleH" -> height = value
+                            "pages" -> font.pages = TextureAtlas(width, 4, value)
                         }
                     }
                 }
@@ -68,7 +71,7 @@ internal class FntFontLoader : IFontLoader {
                             "file" -> name = value.replace("\"", "")
                         }
                     }
-                    font.pages[page] = Texture(FileHandle(file.file.parent + File.separator + name, file.fileType), 4)
+                    font.pages?.addTexture(page.toString(), FileHandle(file.file.parent + File.separator + name, file.fileType), false)
                 }
                 "char" -> {
                     val glyph = Glyph()
