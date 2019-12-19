@@ -33,6 +33,10 @@ open class Sprite(): Drawable(), KoinComponent {
     override fun draw(batch: SpriteBatch) {
         if (texture == null && textureName != "") {
             texture = textureStore.getResourceOrLoad(textureName).region
+            if (size.x == 1f && size.y == 1f) { //we assume we want to inherit it from the texture if the size was not changed before
+                size = Vector2f(texture!!.getWidth(), texture!!.getHeight())
+                invalidate()
+            }
         }
         batch.draw(this)
     }

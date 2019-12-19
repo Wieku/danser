@@ -1,13 +1,9 @@
 package me.wieku.danser
 
-import me.wieku.danser.beatmap.*
 import me.wieku.danser.build.Build
-import me.wieku.framework.backend.WindowMode
 import me.wieku.framework.configuration.FrameworkConfig
-import me.wieku.framework.di.bindable.Bindable
-import me.wieku.framework.game.DesktopContext
+import me.wieku.framework.backend.DesktopContext
 
-import org.koin.dsl.module
 import java.io.File
 
 fun main() {

@@ -3,14 +3,12 @@ package me.wieku.danser
 import me.wieku.danser.beatmap.Beatmap
 import me.wieku.danser.ui.screens.LoadingScreen
 import me.wieku.framework.di.bindable.Bindable
-import me.wieku.framework.font.BitmapFont
 import me.wieku.framework.font.FontStore
-import me.wieku.framework.game.Game
-import me.wieku.framework.game.GameContext
+import me.wieku.framework.backend.Game
+import me.wieku.framework.backend.GameContext
 import me.wieku.framework.graphics.drawables.containers.Container
 import me.wieku.framework.graphics.drawables.sprite.SpriteBatch
 import me.wieku.framework.graphics.drawables.sprite.TextSprite
-import me.wieku.framework.graphics.textures.store.TextureAtlasStore
 import me.wieku.framework.graphics.textures.store.TextureStore
 import me.wieku.framework.gui.screen.ScreenCache
 import me.wieku.framework.math.Origin
@@ -74,6 +72,7 @@ class Danser : Game(), KoinComponent {
         fpsSprite = TextSprite("Exo2") {
             text = "0.00 ms"
             fontSize = 16f
+            drawDigitsMonospace = true
             anchor = Origin.BottomLeft
             origin = Origin.BottomLeft
         }

@@ -1,6 +1,5 @@
-package me.wieku.framework.game
+package me.wieku.framework.backend
 
-import me.wieku.framework.backend.WindowMode
 import me.wieku.framework.configuration.FrameworkConfig
 import me.wieku.framework.di.bindable.Bindable
 import me.wieku.framework.di.bindable.BindableListener

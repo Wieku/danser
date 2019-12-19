@@ -9,45 +9,32 @@ import me.wieku.framework.animation.Transform
 import me.wieku.framework.animation.TransformType
 import me.wieku.framework.di.bindable.Bindable
 import me.wieku.framework.di.bindable.BindableListener
-import me.wieku.framework.font.BitmapFont
 import me.wieku.framework.graphics.drawables.containers.BlurredContainer
 import me.wieku.framework.graphics.drawables.containers.ColorContainer
 import me.wieku.framework.graphics.drawables.containers.Container
 import me.wieku.framework.graphics.drawables.containers.YogaContainer
 import me.wieku.framework.graphics.drawables.sprite.Sprite
 import me.wieku.framework.graphics.drawables.sprite.TextSprite
-import me.wieku.framework.graphics.textures.Texture
 import me.wieku.framework.gui.screen.Screen
 import me.wieku.framework.math.Easing
 import me.wieku.framework.math.Origin
 import me.wieku.framework.math.Scaling
-import me.wieku.framework.resource.FileHandle
-import me.wieku.framework.resource.FileType
 import org.joml.Vector2f
 import org.joml.Vector4f
 import org.koin.core.KoinComponent
 import org.koin.core.inject
-import org.lwjgl.util.yoga.Yoga
 
 class MainMenu : Screen(), KoinComponent {
 
     private val beatmapBindable: Bindable<Beatmap?> by inject()
 
-    private lateinit var colorContainer: ColorContainer
-    private lateinit var coin: DanserCoin
-    private lateinit var left: Container
-    private lateinit var buttons: RightButtonsContainer
+    private var colorContainer: ColorContainer
+    private var coin: DanserCoin
+    private var left: Container
+    private var buttons: RightButtonsContainer
 
     init {
-        val bgSprite = Sprite {
-            texture = Texture(
-                FileHandle(
-                    "assets/textures/menu/backgrounds/background-1.png",
-                    FileType.Classpath
-                ),
-                4
-            ).region
-            size = Vector2f(texture!!.getWidth(), texture!!.getHeight())
+        val bgSprite = Sprite("menu/backgrounds/background-1.png") {
             fillMode = Scaling.Fill
             anchor = Origin.Centre
         }
@@ -78,9 +65,10 @@ class MainMenu : Screen(), KoinComponent {
 
         val text = TextSprite("Exo2") {
             text = "Nothing is playing"
-            fontSize = 32f
-            anchor = Origin.TopRight
-            origin = Origin.TopRight
+            scaleToSize = true
+            fillMode = Scaling.FillY
+            anchor = Origin.CentreRight
+            origin = Origin.CentreRight
         }
 
         beatmapBindable.addListener(object : BindableListener<Beatmap?> {
@@ -96,7 +84,32 @@ class MainMenu : Screen(), KoinComponent {
         })
 
         addChild(
-            text,
+            YogaContainer {
+                isRoot = true
+                origin = Origin.TopLeft
+                anchor = Origin.TopLeft
+                fillMode = Scaling.Stretch
+                scale = Vector2f(1f, 0.025f)
+                addChild(
+                    ColorContainer {
+                        fillMode = Scaling.Stretch
+                        color = Vector4f(0.2f, 0.2f, 0.2f, 1f)
+                    },
+                    YogaContainer {
+                        yogaSizePercent = Vector2f(100f)
+                        yogaPaddingPercent = Vector4f(20f)
+                        addChild(
+                            YogaContainer {
+                                yogaSizePercent = Vector2f(100f)
+                                addChild(
+                                    text
+                                )
+                            }
+                        )
+                    }
+                )
+            },
+
             SideFlashes().apply {
                 fillMode = Scaling.Stretch
             },
@@ -118,7 +131,7 @@ class MainMenu : Screen(), KoinComponent {
             left.update()
 
             buttons.position.set(coin.drawSize).mul(0.9f, 0.5f).add(coin.drawPosition)
-            buttons.size.x = drawSize.x-buttons.position.x
+            buttons.size.x = drawSize.x - buttons.position.x
             buttons.invalidate()
             buttons.update()
         }
@@ -129,7 +142,7 @@ class MainMenu : Screen(), KoinComponent {
 
         var beatmap = BeatmapManager.beatmapSets.filter {
             it.beatmaps.filter { bmap -> bmap.beatmapInfo.version == "Anto & Nuvolina's Extra" }
-            .isNotEmpty()
+                .isNotEmpty()
         }[0].beatmaps.filter { bmap -> bmap.beatmapInfo.version == "Anto & Nuvolina's Extra" }[0]
 
         beatmap.loadTrack()
@@ -172,7 +185,7 @@ class MainMenu : Screen(), KoinComponent {
         colorContainer.addTransform(
             Transform(
                 TransformType.Fade,
-                clock.currentTime+1300,
+                clock.currentTime + 1300,
                 clock.currentTime + 1800,
                 1f,
                 0f
@@ -182,7 +195,7 @@ class MainMenu : Screen(), KoinComponent {
         addTransform(
             Transform(
                 TransformType.Fade,
-                clock.currentTime+1000,
+                clock.currentTime + 1000,
                 clock.currentTime + 1300,
                 0.5f,
                 1f

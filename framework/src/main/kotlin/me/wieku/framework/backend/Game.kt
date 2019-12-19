@@ -1,4 +1,4 @@
-package me.wieku.framework.game
+package me.wieku.framework.backend
 
 import me.wieku.framework.time.FramedClock
 import me.wieku.framework.time.IFramedClock

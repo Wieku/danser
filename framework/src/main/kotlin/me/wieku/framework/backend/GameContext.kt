@@ -1,4 +1,4 @@
-package me.wieku.framework.game
+package me.wieku.framework.backend
 
 import me.wieku.framework.audio.BassSystem
 import me.wieku.framework.configuration.FrameworkConfig

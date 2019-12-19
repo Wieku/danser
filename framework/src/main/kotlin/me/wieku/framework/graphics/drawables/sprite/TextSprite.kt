@@ -11,6 +11,7 @@ import me.wieku.framework.utils.CPair
 import org.joml.Vector4f
 import org.koin.core.KoinComponent
 import org.koin.core.inject
+import java.util.regex.Pattern
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.max
@@ -35,6 +36,8 @@ open class TextSprite() : Sprite(), KoinComponent {
     private var internalTextureRegion: TextureRegion? = null
 
     var scaleToSize = false
+
+    var drawDigitsMonospace = false
 
     var fontSize = 64f
         get() = if (scaleToSize) drawSize.y else field
@@ -73,7 +76,7 @@ open class TextSprite() : Sprite(), KoinComponent {
             if (offset >= text.length) break
             val codepoint = text.codePointAt(offset)
 
-            if (offset > 0) {
+            if (offset > 0 && !(drawDigitsMonospace && (Character.isDigit(codepointBefore) && Character.isDigit(codepoint)))) {
                 advance += font.kerningTable[CPair(codepointBefore, codepoint)] ?: 0
             }
 
@@ -103,10 +106,18 @@ open class TextSprite() : Sprite(), KoinComponent {
 
             batch.draw(internalSprite)
 
-            advance += glyph.xAdvance
+            advance += if (!drawDigitsMonospace || !Character.isDigit(codepoint)) glyph.xAdvance else font.monoXAdvance
 
             codepointBefore = codepoint
         }
     }
+
+    /*private companion object {
+        val punctuation = Pattern.compile("[\\p{Punct}\\p{IsPunctuation}\\s]")
+        fun isPunctuationChar(codepoint: Int): Boolean {
+            val toText = java.lang.String.valueOf(Character.toChars(codepoint))
+            return punctuation.matcher(toText).matches()
+        }
+    }*/
 
 }
