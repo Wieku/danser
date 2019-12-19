@@ -3,6 +3,8 @@ package me.wieku.framework.backend
 import me.wieku.framework.configuration.FrameworkConfig
 import me.wieku.framework.di.bindable.Bindable
 import me.wieku.framework.di.bindable.BindableListener
+import me.wieku.framework.input.DesktopInputManager
+import me.wieku.framework.input.InputManager
 import org.joml.Vector2i
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.glfw.GLFWErrorCallback
@@ -146,12 +148,13 @@ class DesktopContext: GameContext() {
         windowHandle = glfwCreateWindow(100, 100, FrameworkConfig.windowTitle.value, 0, 0)
         setWindowMode(WindowMode.Windowed)
         setWindowMode(FrameworkConfig.windowMode.value)
+    }
+
+    override fun startGraphicsContext() {
         glfwMakeContextCurrent(windowHandle)
         setVSync(FrameworkConfig.vSync.value)
-
         GL.createCapabilities()
         glEnable(GL_MULTISAMPLE)
-
         glfwShowWindow(windowHandle)
 
         generateEventBindings()
@@ -161,6 +164,8 @@ class DesktopContext: GameContext() {
     override fun closeContext() {
         glfwDestroyWindow(windowHandle)
     }
+
+    override fun createInputManager(): InputManager = DesktopInputManager(windowHandle)
 
     override fun handleGameCycle(): Boolean {
         val shouldGetClosed = glfwWindowShouldClose(windowHandle)
