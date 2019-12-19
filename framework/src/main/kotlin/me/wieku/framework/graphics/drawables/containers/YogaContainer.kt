@@ -9,6 +9,7 @@ import org.joml.Vector2f
 import org.joml.Vector4f
 import org.lwjgl.util.yoga.YGNode
 import org.lwjgl.util.yoga.YGValue
+import kotlin.math.round
 
 open class YogaContainer() : Container() {
 
@@ -479,6 +480,10 @@ open class YogaContainer() : Container() {
         if (isRoot) {
             super.updateDrawable()
 
+            drawSize.set(round(drawSize.x), round(drawSize.y))
+            drawPosition.set(round(drawPosition.x), round(drawPosition.y))
+            drawOrigin.set(round(drawOrigin.x), round(drawOrigin.y))
+
             yogaPosition = Vector4f(drawPosition.x, drawPosition.y, 0f, 0f)
             yogaSize = Vector2f(drawSize.x, drawSize.y)
 
@@ -487,6 +492,7 @@ open class YogaContainer() : Container() {
             val layout = YGNode.create(yogaNode).layout()
 
             drawPosition.set(layout.positions(YGEdgeLeft), layout.positions(YGEdgeTop))
+
             if (parent != null) {
                 drawPosition.add(parent!!.drawPosition)
             }
@@ -523,7 +529,7 @@ open class YogaContainer() : Container() {
 
         init {
             YGConfigSetUseWebDefaults(config, true)
-            YGConfigSetUseLegacyStretchBehaviour(config, true)
+            //YGConfigSetUseLegacyStretchBehaviour(config, true)
         }
     }
 

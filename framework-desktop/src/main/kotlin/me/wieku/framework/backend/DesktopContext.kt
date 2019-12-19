@@ -13,7 +13,7 @@ import org.lwjgl.opengl.GL33.*
 
 class DesktopContext: GameContext() {
 
-    private var windowHandle: Long = 0
+    internal var windowHandle: Long = 0
 
     private val pos1 = Vector2i()
     private val pos2 = Vector2i()
@@ -116,7 +116,6 @@ class DesktopContext: GameContext() {
         glfwSetWindowSizeCallback(windowHandle) { _, width, height ->
             if (FrameworkConfig.windowMode.value != WindowMode.Maximized)
                 FrameworkConfig.windowSize.value = Vector2i(width, height)
-            handleGameCycle()
         }
 
         glfwSetWindowPosCallback(windowHandle) { _, x, y ->
@@ -124,7 +123,6 @@ class DesktopContext: GameContext() {
             pos1.set(x, y)
             if (FrameworkConfig.windowMode.value != WindowMode.Maximized)
                 FrameworkConfig.windowPosition.value = Vector2i(x, y)
-            handleGameCycle()
         }
 
         glfwSetWindowMaximizeCallback(windowHandle) { _, maximized ->
@@ -165,7 +163,7 @@ class DesktopContext: GameContext() {
         glfwDestroyWindow(windowHandle)
     }
 
-    override fun createInputManager(): InputManager = DesktopInputManager(windowHandle)
+    override fun createInputManager(): InputManager = DesktopInputManager(this)
 
     override fun handleGameCycle(): Boolean {
         val shouldGetClosed = glfwWindowShouldClose(windowHandle)
@@ -176,7 +174,6 @@ class DesktopContext: GameContext() {
 
             game!!.draw()
 
-            glfwPollEvents()
             glfwSwapBuffers(windowHandle)
         }
 

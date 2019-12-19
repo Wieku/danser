@@ -16,6 +16,7 @@ import me.wieku.framework.graphics.drawables.containers.YogaContainer
 import me.wieku.framework.graphics.drawables.sprite.Sprite
 import me.wieku.framework.graphics.drawables.sprite.TextSprite
 import me.wieku.framework.gui.screen.Screen
+import me.wieku.framework.input.InputManager
 import me.wieku.framework.math.Easing
 import me.wieku.framework.math.Origin
 import me.wieku.framework.math.Scaling
@@ -23,11 +24,15 @@ import org.joml.Vector2f
 import org.joml.Vector4f
 import org.koin.core.KoinComponent
 import org.koin.core.inject
+import kotlin.math.max
+import kotlin.math.min
 
 class MainMenu : Screen(), KoinComponent {
 
     private val beatmapBindable: Bindable<Beatmap?> by inject()
+    private val inputManager: InputManager by inject()
 
+    private var background: Container
     private var colorContainer: ColorContainer
     private var coin: DanserCoin
     private var left: Container
@@ -42,10 +47,13 @@ class MainMenu : Screen(), KoinComponent {
         addChild(
             BlurredContainer {
                 fillMode = Scaling.Stretch
+                scale = Vector2f(1.2f)
+                origin = Origin.Custom
+                customOrigin = Vector2f(0.5f, 0.5f)
                 addChild(
                     bgSprite
                 )
-            },
+            }.also { background = it },
             ColorContainer {
                 color = Vector4f(0.2f, 0.2f, 0.2f, 1f)
                 scale = Vector2f(1f, 0.12f)
@@ -123,8 +131,17 @@ class MainMenu : Screen(), KoinComponent {
     }
 
     override fun update() {
+        val pos = inputManager.getPosition()
+        val posX = -(max(0, min(pos.x, drawSize.x.toInt()))/drawSize.x - 0.5f)
+        val posY = -(max(0, min(pos.y, drawSize.y.toInt()))/drawSize.y - 0.5f)
+        background.customOrigin.set(posX/40+0.5f, posY/40+0.5f)
+        background.invalidate()
+        coin.customAnchor.set(-posX/80+0.3f, -posY/80+0.5f)
+        coin.invalidate()
+
         super.update()
-        if (wasUpdated) {
+
+        if (coin.wasUpdated) {
             left.position.set(coin.drawSize).mul(0.10f, 0.5f).add(coin.drawPosition)
             left.size.x = buttons.position.x
             left.invalidate()
