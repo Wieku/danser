@@ -12,6 +12,13 @@ class BlurredContainer() : Container() {
 
     var needsRedraw = true
 
+    var blurAmount = 0.0f
+        set(value) {
+            blur.setBlur(value, value)
+            invalidate()
+            field = value
+        }
+
     private var needsResize = true
 
     private var camera = Camera()
@@ -21,7 +28,7 @@ class BlurredContainer() : Container() {
     }
 
     init {
-        blur.setBlur(0.5f, 0.5f)
+        blur.setBlur(blurAmount, blurAmount)
     }
 
     override fun update() {
