@@ -2,7 +2,11 @@ package me.wieku.framework.graphics.drawables.containers
 
 import me.wieku.framework.graphics.drawables.Drawable
 import me.wieku.framework.graphics.drawables.sprite.SpriteBatch
+import me.wieku.framework.input.InputHandler
 import me.wieku.framework.utils.synchronized
+import org.joml.Vector2i
+import java.util.*
+import kotlin.collections.ArrayList
 
 open class Container(): Drawable() {
 
@@ -67,6 +71,15 @@ open class Container(): Drawable() {
 
     override fun dispose() {
         children.forEach { it.dispose() }
+    }
+
+    override fun buildInputQueue(cursorPosition: Vector2i, queue: ArrayDeque<InputHandler>) {
+        super.buildInputQueue(cursorPosition, queue)
+        children.synchronized {
+            forEach {
+                it.buildInputQueue(cursorPosition, queue)
+            }
+        }
     }
 
 }

@@ -10,6 +10,12 @@ class DesktopInputManager(private val glfwContext: DesktopContext): InputManager
     private val xBuff = doubleArrayOf(0.0)
     private val yBuff = doubleArrayOf(0.0)
 
+    init {
+        glfwSetCursorPosCallback(glfwContext.windowHandle) { _, x, y ->
+            updatePosition(x.toInt(), y.toInt())
+        }
+    }
+
     override fun getPosition(): Vector2i {
         glfwGetCursorPos(glfwContext.windowHandle, xBuff, yBuff)
         return tempVector2i.set(xBuff[0].toInt(), yBuff[0].toInt())

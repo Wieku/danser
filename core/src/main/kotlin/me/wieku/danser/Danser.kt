@@ -11,6 +11,7 @@ import me.wieku.framework.graphics.drawables.sprite.SpriteBatch
 import me.wieku.framework.graphics.drawables.sprite.TextSprite
 import me.wieku.framework.graphics.textures.store.TextureStore
 import me.wieku.framework.gui.screen.ScreenCache
+import me.wieku.framework.input.InputManager
 import me.wieku.framework.math.Origin
 import me.wieku.framework.math.view.Camera
 import me.wieku.framework.resource.FileHandle
@@ -24,6 +25,8 @@ import org.koin.core.inject
 import org.koin.dsl.module
 
 class Danser : Game(), KoinComponent {
+
+    private val inputManager: InputManager by inject()
 
     lateinit var batch: SpriteBatch
     val bindable = Bindable<Beatmap?>(null)
@@ -66,6 +69,8 @@ class Danser : Game(), KoinComponent {
             size = Vector2f(1920f, 1080f)
             origin = Origin.TopLeft
         }
+
+        inputManager.inputHandler = mainContainer
 
         mainContainer.addChild(screenCahe)
 

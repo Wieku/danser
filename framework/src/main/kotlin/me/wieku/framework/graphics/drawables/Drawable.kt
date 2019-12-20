@@ -3,19 +3,21 @@ package me.wieku.framework.graphics.drawables
 import me.wieku.framework.animation.Transform
 import me.wieku.framework.animation.TransformType
 import me.wieku.framework.graphics.drawables.sprite.SpriteBatch
+import me.wieku.framework.input.InputHandler
 import me.wieku.framework.math.Origin
 import me.wieku.framework.math.Scaling
 import me.wieku.framework.time.IFramedClock
 import me.wieku.framework.utils.Disposable
 import me.wieku.framework.utils.synchronized
 import org.joml.Vector2f
+import org.joml.Vector2i
 import org.joml.Vector4f
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import kotlin.math.max
 import kotlin.math.min
 
-abstract class Drawable() : Disposable, KoinComponent {
+abstract class Drawable() : InputHandler(), Disposable, KoinComponent {
 
     val clock: IFramedClock by inject()
 
@@ -126,6 +128,11 @@ abstract class Drawable() : Disposable, KoinComponent {
 
     fun canBeDeleted(): Boolean {
         return !drawForever && clock.currentTime >= endTime
+    }
+
+    override fun isCursorIn(cursorPosition: Vector2i): Boolean {
+        return (cursorPosition.x >= drawPosition.x && cursorPosition.x < drawPosition.x + drawSize.x) &&
+                (cursorPosition.y >= drawPosition.y && cursorPosition.y < drawPosition.y + drawSize.y)
     }
 
     fun update(time: Float) {
