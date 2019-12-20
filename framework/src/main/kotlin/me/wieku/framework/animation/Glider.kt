@@ -6,8 +6,6 @@ import java.util.*
 class Glider(var value: Float) {
     private val eventQueue = ArrayDeque<GliderEvent>()
 
-    var easing: Easing = Easing.Linear
-
     private var lastTime = 0f
 
     fun update(time: Float) {
@@ -17,7 +15,7 @@ class Glider(var value: Float) {
             val event = eventQueue.peekFirst()
             if (time < event.startTime) break
 
-            value = event.startValue + easing.func((time-event.startTime)/(event.endTime-event.startTime)) * (event.endValue - event.startValue)
+            value = event.startValue + event.easing.func((time-event.startTime)/(event.endTime-event.startTime)) * (event.endValue - event.startValue)
 
             if (time >= event.endTime) {
                 eventQueue.pop()
@@ -26,13 +24,13 @@ class Glider(var value: Float) {
 
     }
 
-    fun addEvent(startTime: Float, endTime: Float, startValue: Float, endValue: Float) {
-        eventQueue.push(GliderEvent(startTime, endTime, startValue, endValue))
+    fun addEvent(startTime: Float, endTime: Float, startValue: Float, endValue: Float, easing: Easing = Easing.Linear) {
+        eventQueue.add(GliderEvent(startTime, endTime, startValue, endValue, easing))
     }
 
-    fun addEvent(endTime: Float, endValue: Float) {
+    fun addEvent(endTime: Float, endValue: Float, easing: Easing = Easing.Linear) {
         eventQueue.clear()
-        eventQueue.push(GliderEvent(lastTime, endTime, value, endValue))
+        eventQueue.add(GliderEvent(lastTime, endTime, value, endValue, easing))
     }
 
 }

@@ -87,6 +87,8 @@ open class TextSprite() : Sprite(), KoinComponent {
             )
             internalSprite.drawSize.set(glyph.width.toFloat(), glyph.height.toFloat()).mul(fontScale)
 
+            internalSprite.drawOrigin.set(internalSprite.drawSize).mul(1/2f)
+
             if (internalTextureRegion == null) {
                 internalTextureRegion =
                     TextureRegion(font.pages!!, glyph.u1, glyph.u2, glyph.v1, glyph.v2, glyph.page)
@@ -102,6 +104,7 @@ open class TextSprite() : Sprite(), KoinComponent {
             internalSprite.texture = internalTextureRegion
             internalSprite.shearX = shearX
             internalSprite.shearY = shearY
+            internalSprite.rotation = rotation
             internalSprite.drawColor.set(drawColor)
 
             batch.draw(internalSprite)
