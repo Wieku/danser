@@ -2,6 +2,7 @@ package me.wieku.danser.ui.screens
 
 import me.wieku.danser.beatmap.Beatmap
 import me.wieku.danser.beatmap.BeatmapManager
+import me.wieku.danser.beatmap.TrackManager
 import me.wieku.danser.graphics.drawables.DanserCoin
 import me.wieku.danser.graphics.drawables.SideFlashes
 import me.wieku.danser.ui.mainmenu.RightButtonsContainer
@@ -134,6 +135,7 @@ class MainMenu : Screen(), KoinComponent {
     }
 
     override fun update() {
+        TrackManager.update()
         val pos = inputManager.getPosition()
         val posX = (max(0, min(pos.x, drawSize.x.toInt()))/drawSize.x - 0.5f)
         val posY = (max(0, min(pos.y, drawSize.y.toInt()))/drawSize.y - 0.5f)
@@ -165,7 +167,9 @@ class MainMenu : Screen(), KoinComponent {
     override fun onEnter(previous: Screen?) {
         super.onEnter(previous)
 
-        var beatmap = BeatmapManager.beatmapSets.filter {
+        TrackManager.start()
+
+        /*var beatmap = BeatmapManager.beatmapSets.filter {
             it.beatmaps.filter { bmap -> bmap.beatmapInfo.version == "Anto & Nuvolina's Extra" }
                 .isNotEmpty()
         }[0].beatmaps.filter { bmap -> bmap.beatmapInfo.version == "Anto & Nuvolina's Extra" }[0]
@@ -175,7 +179,7 @@ class MainMenu : Screen(), KoinComponent {
         beatmap.getTrack().play(0.1f)
         beatmap.getTrack().setPosition(beatmap.beatmapMetadata.previewTime.toFloat() / 1000 - 1.3f)
 
-        beatmapBindable.value = beatmap
+        beatmapBindable.value = beatmap*/
 
         coin.addTransform(
             Transform(
