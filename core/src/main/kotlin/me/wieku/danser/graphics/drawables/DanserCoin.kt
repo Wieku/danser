@@ -174,7 +174,7 @@ class DanserCoin : Container(), KoinComponent {
         return circularContainer.isCursorIn(cursorPosition)
     }
 
-    override fun OnHover(e: HoverEvent): Boolean {
+    override fun onHover(e: HoverEvent): Boolean {
         coinInflate.addEvent(
             clock.currentTime,
             clock.currentTime+200f,
@@ -185,7 +185,7 @@ class DanserCoin : Container(), KoinComponent {
         return true
     }
 
-    override fun OnHoverLost(e: HoverLostEvent): Boolean {
+    override fun onHoverLost(e: HoverLostEvent): Boolean {
         coinInflate.addEvent(
             clock.currentTime,
             clock.currentTime+200f,
@@ -193,7 +193,7 @@ class DanserCoin : Container(), KoinComponent {
             1f,
             Easing.OutQuad
         )
-        return super.OnHoverLost(e)
+        return super.onHoverLost(e)
     }
 
     override fun dispose() {}

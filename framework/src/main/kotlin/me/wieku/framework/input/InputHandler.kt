@@ -1,8 +1,6 @@
 package me.wieku.framework.input
 
-import me.wieku.framework.input.event.HoverEvent
-import me.wieku.framework.input.event.HoverLostEvent
-import me.wieku.framework.input.event.InputEvent
+import me.wieku.framework.input.event.*
 import org.joml.Vector2i
 import java.util.*
 
@@ -18,16 +16,25 @@ abstract class InputHandler {
 
     open fun trigger(e: InputEvent): Boolean {
         when(e) {
-            is HoverEvent -> return OnHover(e)
-            is HoverLostEvent -> return OnHoverLost(e)
+            is HoverEvent -> return onHover(e)
+            is HoverLostEvent -> return onHoverLost(e)
+            is MouseDownEvent -> return onMouseDown(e)
+            is MouseUpEvent -> return onMouseUp(e)
+            is ClickEvent -> return onClick(e)
         }
         return false
     }
 
     var isHovered = false
 
-    open fun OnHover(e: HoverEvent) = false
+    open fun onHover(e: HoverEvent) = false
 
-    open fun OnHoverLost(e: HoverLostEvent) = false
+    open fun onHoverLost(e: HoverLostEvent) = false
+
+    open fun onMouseDown(e: MouseDownEvent) = false
+
+    open fun onMouseUp(e: MouseUpEvent) = false
+
+    open fun onClick(e: ClickEvent) = false
 
 }

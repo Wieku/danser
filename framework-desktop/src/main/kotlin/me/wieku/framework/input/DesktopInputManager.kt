@@ -14,6 +14,10 @@ class DesktopInputManager(private val glfwContext: DesktopContext): InputManager
         glfwSetCursorPosCallback(glfwContext.windowHandle) { _, x, y ->
             updatePosition(x.toInt(), y.toInt())
         }
+
+        glfwSetMouseButtonCallback(glfwContext.windowHandle) { _, button, action, _ ->
+            updateCursorAction(MouseButton.values()[button], InputAction.values()[action])
+        }
     }
 
     override fun getPosition(): Vector2i {

@@ -24,7 +24,6 @@ import org.joml.Vector2f
 import org.joml.Vector4f
 import org.koin.core.KoinComponent
 import org.koin.core.inject
-import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
@@ -165,9 +164,9 @@ class MainMenu : Screen(), KoinComponent {
         super.onEnter(previous)
 
         var beatmap = BeatmapManager.beatmapSets.filter {
-            it.beatmaps.filter { bmap -> bmap.beatmapInfo.version == "Anto & Nuvolina's Extra" }
+            it.beatmaps.filter { bmap -> bmap.beatmapInfo.version == "DominiGG's Iceless"/*"Anto & Nuvolina's Extra"*/ }
                 .isNotEmpty()
-        }[0].beatmaps.filter { bmap -> bmap.beatmapInfo.version == "Anto & Nuvolina's Extra" }[0]
+        }[0].beatmaps.filter { bmap -> bmap.beatmapInfo.version == "DominiGG's Iceless"/*"Anto & Nuvolina's Extra"*/ }[0]
 
         beatmap.loadTrack()
 

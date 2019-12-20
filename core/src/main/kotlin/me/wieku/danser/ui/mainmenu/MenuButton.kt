@@ -10,6 +10,7 @@ import me.wieku.framework.graphics.drawables.Drawable
 import me.wieku.framework.graphics.drawables.containers.ColorContainer
 import me.wieku.framework.graphics.drawables.containers.YogaContainer
 import me.wieku.framework.graphics.drawables.sprite.TextSprite
+import me.wieku.framework.input.event.ClickEvent
 import me.wieku.framework.input.event.HoverEvent
 import me.wieku.framework.input.event.HoverLostEvent
 import me.wieku.framework.math.Easing
@@ -26,7 +27,7 @@ import org.lwjgl.util.yoga.Yoga
 import kotlin.math.floor
 import kotlin.math.max
 
-class MenuButton(text: String, icon: String, font: String, color: Vector4f, private val isFirst: Boolean = false): YogaContainer(), KoinComponent {
+class MenuButton(private val text: String, icon: String, font: String, color: Vector4f, private val isFirst: Boolean = false): YogaContainer(), KoinComponent {
 
     private lateinit var iconDrawable: Drawable
     private val beatmapBindable: Bindable<Beatmap?> by inject()
@@ -96,7 +97,7 @@ class MenuButton(text: String, icon: String, font: String, color: Vector4f, priv
                                 yogaSizePercent = Vector2f(100f)
                                 addChild(
                                     TextSprite("Exo2") {
-                                        this.text = text
+                                        this.text = this@MenuButton.text
                                         scaleToSize = true
                                         origin = Origin.Centre
                                         fillMode = Scaling.Fit
@@ -166,12 +167,12 @@ class MenuButton(text: String, icon: String, font: String, color: Vector4f, priv
         container.size.set(drawSize.x*(1f-vector2fRad(Math.PI.toFloat()/2*(1-0.2f), drawSize.y/2).x/drawSize.x), drawSize.y)
     }
 
-    override fun OnHover(e: HoverEvent): Boolean {
+    override fun onHover(e: HoverEvent): Boolean {
         glider.addEvent(clock.currentTime+300f, if(isFirst) 2.1f else 1.8f, Easing.OutElastic)
         return false
     }
 
-    override fun OnHoverLost(e: HoverLostEvent): Boolean {
+    override fun onHoverLost(e: HoverLostEvent): Boolean {
         glider.addEvent(clock.currentTime+300f, if(isFirst) 1.5f else 1.2f, Easing.OutElastic)
         iconDrawable.transforms.clear()
         iconDrawable.addTransform(
@@ -184,6 +185,11 @@ class MenuButton(text: String, icon: String, font: String, color: Vector4f, priv
             )
         )
         return false
+    }
+
+    override fun onClick(e: ClickEvent): Boolean {
+        println("Clicked $text")
+        return super.onClick(e)
     }
 
 }
