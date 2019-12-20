@@ -37,8 +37,9 @@ class MenuButton(private val text: String, icon: String, font: String, color: Ve
     private var lastProgress = 0
 
     private val container: YogaContainer
+    private val flash: ColorContainer
 
-    private var lastAR = if(isFirst) 1.5f else 1.2f
+    private var lastAR = if(isFirst) 1.6f else 1.2f
     private val glider = Glider(lastAR)
     private val jGlider = Glider(0f)
 
@@ -54,6 +55,11 @@ class MenuButton(private val text: String, icon: String, font: String, color: Ve
                 shearX = 0.2f
                 this.color = color
             },
+            ColorContainer {
+                fillMode = Scaling.Stretch
+                shearX = 0.2f
+                this.color.w = 0f
+            }.also { flash = it },
             YogaContainer {
                 fillMode = Scaling.None
                 isRoot = true
@@ -77,6 +83,8 @@ class MenuButton(private val text: String, icon: String, font: String, color: Ve
                                     TextSprite(font) {
                                         this.text = icon
                                         scaleToSize = true
+                                        drawShadow = true
+                                        shadowOffset = Vector2f(0f, 0.1f)
                                         origin = Origin.Centre
                                         anchor = Origin.Custom
                                         customAnchor = Vector2f(0.5f)
@@ -98,6 +106,8 @@ class MenuButton(private val text: String, icon: String, font: String, color: Ve
                                 addChild(
                                     TextSprite("Exo2") {
                                         this.text = this@MenuButton.text
+                                        drawShadow = true
+                                        shadowOffset = Vector2f(0f, 0.1f)
                                         scaleToSize = true
                                         origin = Origin.Centre
                                         fillMode = Scaling.Fit
@@ -131,6 +141,15 @@ class MenuButton(private val text: String, icon: String, font: String, color: Ve
 
             if (progress > lastProgress) {
                 if (isHovered) {
+                    flash.addTransform(
+                        Transform(
+                            TransformType.Fade,
+                            clock.currentTime,
+                            clock.currentTime + beatLength,
+                            0.25f,
+                            0f
+                        )
+                    )
                     iconDrawable.addTransform(
                         Transform(
                             TransformType.Rotate,
@@ -168,12 +187,12 @@ class MenuButton(private val text: String, icon: String, font: String, color: Ve
     }
 
     override fun onHover(e: HoverEvent): Boolean {
-        glider.addEvent(clock.currentTime+300f, if(isFirst) 2.1f else 1.8f, Easing.OutElastic)
+        glider.addEvent(clock.currentTime+300f, if(isFirst) 2.2f else 1.8f, Easing.OutElastic)
         return false
     }
 
     override fun onHoverLost(e: HoverLostEvent): Boolean {
-        glider.addEvent(clock.currentTime+300f, if(isFirst) 1.5f else 1.2f, Easing.OutElastic)
+        glider.addEvent(clock.currentTime+300f, if(isFirst) 1.6f else 1.2f, Easing.OutElastic)
         iconDrawable.transforms.clear()
         iconDrawable.addTransform(
             Transform(

@@ -77,6 +77,8 @@ class Danser : Game(), KoinComponent {
         fpsSprite = TextSprite("Exo2") {
             text = "0.00 ms"
             fontSize = 16f
+            drawShadow = true
+            shadowOffset = Vector2f(0f, 0.15f)
             drawDigitsMonospace = true
             anchor = Origin.BottomLeft
             origin = Origin.BottomLeft

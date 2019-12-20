@@ -75,6 +75,8 @@ class MainMenu : Screen(), KoinComponent {
         val text = TextSprite("Exo2") {
             text = "Nothing is playing"
             scaleToSize = true
+            drawShadow = true
+            shadowOffset = Vector2f(0.15f, 0.15f)
             fillMode = Scaling.FillY
             anchor = Origin.CentreRight
             origin = Origin.CentreRight
@@ -164,9 +166,9 @@ class MainMenu : Screen(), KoinComponent {
         super.onEnter(previous)
 
         var beatmap = BeatmapManager.beatmapSets.filter {
-            it.beatmaps.filter { bmap -> bmap.beatmapInfo.version == "DominiGG's Iceless"/*"Anto & Nuvolina's Extra"*/ }
+            it.beatmaps.filter { bmap -> bmap.beatmapInfo.version == "Anto & Nuvolina's Extra" }
                 .isNotEmpty()
-        }[0].beatmaps.filter { bmap -> bmap.beatmapInfo.version == "DominiGG's Iceless"/*"Anto & Nuvolina's Extra"*/ }[0]
+        }[0].beatmaps.filter { bmap -> bmap.beatmapInfo.version == "Anto & Nuvolina's Extra" }[0]
 
         beatmap.loadTrack()
 

@@ -8,6 +8,7 @@ import me.wieku.framework.graphics.textures.TextureFormat
 import me.wieku.framework.graphics.textures.TextureRegion
 import me.wieku.framework.math.Origin
 import me.wieku.framework.utils.CPair
+import org.joml.Vector2f
 import org.joml.Vector4f
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -50,6 +51,11 @@ open class TextSprite() : Sprite(), KoinComponent {
         get() = fontSize / (font.defaultSize)
 
     var drawFromBottom = false
+
+    var drawShadow = false
+    var shadowOffset = Vector2f(0f)
+    private var shadowDrawOffset = Vector2f(0f)
+    var shadowColor: Vector4f = Vector4f(0f, 0f, 0f, 0.2f)
 
     override fun dispose() {}
 
@@ -105,8 +111,18 @@ open class TextSprite() : Sprite(), KoinComponent {
             internalSprite.shearX = shearX
             internalSprite.shearY = shearY
             internalSprite.rotation = rotation
-            internalSprite.drawColor.set(drawColor)
 
+            if (drawShadow) {
+                shadowDrawOffset.set(shadowOffset).mul(fontSize)
+                internalSprite.drawPosition.add(shadowDrawOffset)
+                internalSprite.drawOrigin.sub(shadowDrawOffset)
+                internalSprite.drawColor.set(shadowColor)
+                batch.draw(internalSprite)
+                internalSprite.drawPosition.sub(shadowDrawOffset)
+                internalSprite.drawOrigin.add(shadowDrawOffset)
+            }
+
+            internalSprite.drawColor.set(drawColor)
             batch.draw(internalSprite)
 
             advance += if (!drawDigitsMonospace || !Character.isDigit(codepoint)) glyph.xAdvance else font.monoXAdvance

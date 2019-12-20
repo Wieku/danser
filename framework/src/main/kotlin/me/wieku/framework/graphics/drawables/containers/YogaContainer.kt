@@ -20,6 +20,8 @@ open class YogaContainer() : Container() {
 
     var isRoot = false
 
+    //region Yoga Variables
+
     var yogaDirection
         get() = YGNodeStyleGetDirection(yogaNode)
         set(value) {
@@ -432,6 +434,7 @@ open class YogaContainer() : Container() {
             YGNodeStyleSetAspectRatio(yogaNode, value)
         }
 
+    //endregion
 
     constructor(inContext: YogaContainer.() -> Unit) : this() {
         inContext()
