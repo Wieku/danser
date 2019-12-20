@@ -25,9 +25,15 @@ abstract class InputManager {
         updateHover()
     }
 
+    var lastHoverHolder: InputHandler? = null
+
+    var hoverHolder: InputHandler? = null
+
     private fun updateHover() {
         //println("hover update")
         inputHandler?.let { inputHandler ->
+            lastHoverHolder = hoverHolder
+            hoverHolder = null
             inputQueue.clear()
             inputHandler.buildInputQueue(pos, inputQueue)
 
@@ -35,16 +41,24 @@ abstract class InputManager {
             lastHovered.addAll(hovered)
             hovered.clear()
 
-            inputQueue.forEach { handler ->
-                hovered.add(handler)
-                lastHovered.remove(handler)
+            run loop@{
+                inputQueue.forEach { handler ->
+                    hovered.add(handler)
+                    lastHovered.remove(handler)
 
-                if (!handler.isHovered) {
-                    handler.isHovered = true
-                    if (handler.trigger(HoverEvent(pos))) {
-                        return@forEach
+                    if (handler === lastHoverHolder) {
+                        hoverHolder = lastHoverHolder
+                        return@loop
                     }
 
+                    if (!handler.isHovered) {
+                        handler.isHovered = true
+                        if (handler.trigger(HoverEvent(pos))) {
+                            hoverHolder = handler
+                            return@loop
+                        }
+
+                    }
                 }
             }
 

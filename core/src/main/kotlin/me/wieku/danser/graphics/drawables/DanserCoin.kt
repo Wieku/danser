@@ -1,6 +1,7 @@
 package me.wieku.danser.graphics.drawables
 
 import me.wieku.danser.beatmap.Beatmap
+import me.wieku.framework.animation.Glider
 import me.wieku.framework.animation.Transform
 import me.wieku.framework.animation.TransformType
 import me.wieku.framework.di.bindable.Bindable
@@ -8,13 +9,13 @@ import me.wieku.framework.graphics.drawables.containers.CircularContainer
 import me.wieku.framework.graphics.drawables.containers.ColorContainer
 import me.wieku.framework.graphics.drawables.containers.Container
 import me.wieku.framework.graphics.drawables.sprite.Sprite
-import me.wieku.framework.graphics.textures.Texture
+import me.wieku.framework.input.event.HoverEvent
+import me.wieku.framework.input.event.HoverLostEvent
 import me.wieku.framework.math.Easing
 import me.wieku.framework.math.Easings
 import me.wieku.framework.math.Scaling
-import me.wieku.framework.resource.FileHandle
-import me.wieku.framework.resource.FileType
 import org.joml.Vector2f
+import org.joml.Vector2i
 import org.joml.Vector4f
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -43,7 +44,10 @@ class DanserCoin : Container(), KoinComponent {
     private var lastBeatStart = 0f
     private var lastBeatProgress = 0
 
+    private val coinInflate = Glider(1f)
+
     private val coinBottom: Container
+    private lateinit var circularContainer: CircularContainer
     private lateinit var coinFlash: ColorContainer
     private val coinTop: Sprite
 
@@ -64,7 +68,7 @@ class DanserCoin : Container(), KoinComponent {
                             spawnRate = 0.25f
                         }
                     )
-                },
+                }.also { circularContainer = it },
                 Sprite("menu/coin-overlay.png") {
                     fillMode = Scaling.Fit
                 },
@@ -159,8 +163,37 @@ class DanserCoin : Container(), KoinComponent {
         coinBottom.scale.set(1.05f - Easings.OutQuad(progress * 0.05f))
         coinTop.scale.set(1.05f + Easings.OutQuad(progress * 0.03f))
 
+        coinInflate.update(clock.currentTime)
+        scale.mul(coinInflate.value)
         invalidate()
         super.update()
+        scale.mul(1f/coinInflate.value)
+    }
+
+    override fun isCursorIn(cursorPosition: Vector2i): Boolean {
+        return circularContainer.isCursorIn(cursorPosition)
+    }
+
+    override fun OnHover(e: HoverEvent): Boolean {
+        coinInflate.addEvent(
+            clock.currentTime,
+            clock.currentTime+200f,
+            1f,
+            1.25f,
+            Easing.OutQuad
+        )
+        return true
+    }
+
+    override fun OnHoverLost(e: HoverLostEvent): Boolean {
+        coinInflate.addEvent(
+            clock.currentTime,
+            clock.currentTime+200f,
+            1.25f,
+            1f,
+            Easing.OutQuad
+        )
+        return super.OnHoverLost(e)
     }
 
     override fun dispose() {}
