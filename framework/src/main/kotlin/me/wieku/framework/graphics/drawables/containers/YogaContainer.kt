@@ -115,7 +115,7 @@ open class YogaContainer() : Container() {
 
     var yogaFlexBasis: Float
         get() {
-            val ygVal = YGValue.create()
+            val ygVal = YGValue.malloc()
             val value = YGNodeStyleGetFlexBasis(yogaNode, ygVal).value()
             ygVal.free()
             return value
@@ -137,7 +137,7 @@ open class YogaContainer() : Container() {
 
     var yogaPosition: Vector4f
         get() {
-            val ygVal = YGValue.create()
+            val ygVal = YGValue.malloc()
             val value = Vector4f()
             value.x = YGNodeStyleGetPosition(yogaNode, YGEdgeLeft, ygVal).value()
             value.y = YGNodeStyleGetPosition(yogaNode, YGEdgeTop, ygVal).value()
@@ -166,7 +166,7 @@ open class YogaContainer() : Container() {
 
     var yogaMargin: Vector4f
         get() {
-            val ygVal = YGValue.create()
+            val ygVal = YGValue.malloc()
             val value = Vector4f()
             value.x = YGNodeStyleGetMargin(yogaNode, YGEdgeLeft, ygVal).value()
             value.y = YGNodeStyleGetMargin(yogaNode, YGEdgeTop, ygVal).value()
@@ -205,7 +205,7 @@ open class YogaContainer() : Container() {
 
     var yogaPadding: Vector4f
         get() {
-            val ygVal = YGValue.create()
+            val ygVal = YGValue.malloc()
             val value = Vector4f()
             value.x = YGNodeStyleGetPadding(yogaNode, YGEdgeLeft, ygVal).value()
             value.y = YGNodeStyleGetPadding(yogaNode, YGEdgeTop, ygVal).value()
@@ -238,7 +238,7 @@ open class YogaContainer() : Container() {
 
     var yogaBorder: Vector4f
         get() {
-            val ygVal = YGValue.create()
+            val ygVal = YGValue.malloc()
             val value = Vector4f()
             value.x = YGNodeStyleGetBorder(yogaNode, YGEdgeLeft)
             value.y = YGNodeStyleGetBorder(yogaNode, YGEdgeTop)
@@ -257,7 +257,7 @@ open class YogaContainer() : Container() {
 
     var yogaWidth: Float
         get() {
-            val ygVal = YGValue.create()
+            val ygVal = YGValue.malloc()
             val value = YGNodeStyleGetWidth(yogaNode, ygVal).value()
             ygVal.free()
             return value
@@ -281,7 +281,7 @@ open class YogaContainer() : Container() {
 
     var yogaHeight: Float
         get() {
-            val ygVal = YGValue.create()
+            val ygVal = YGValue.malloc()
             val value = YGNodeStyleGetHeight(yogaNode, ygVal).value()
             ygVal.free()
             return value
@@ -324,7 +324,7 @@ open class YogaContainer() : Container() {
 
     var yogaMinWidth: Float
         get() {
-            val ygVal = YGValue.create()
+            val ygVal = YGValue.malloc()
             val value = YGNodeStyleGetMinWidth(yogaNode, ygVal).value()
             ygVal.free()
             return value
@@ -343,7 +343,7 @@ open class YogaContainer() : Container() {
 
     var yogaMinHeight: Float
         get() {
-            val ygVal = YGValue.create()
+            val ygVal = YGValue.malloc()
             val value = YGNodeStyleGetMinHeight(yogaNode, ygVal).value()
             ygVal.free()
             return value
@@ -376,7 +376,7 @@ open class YogaContainer() : Container() {
 
     var yogaMaxWidth: Float
         get() {
-            val ygVal = YGValue.create()
+            val ygVal = YGValue.malloc()
             val value = YGNodeStyleGetMaxWidth(yogaNode, ygVal).value()
             ygVal.free()
             return value
@@ -395,7 +395,7 @@ open class YogaContainer() : Container() {
 
     var yogaMaxHeight: Float
         get() {
-            val ygVal = YGValue.create()
+            val ygVal = YGValue.malloc()
             val value = YGNodeStyleGetMaxHeight(yogaNode, ygVal).value()
             ygVal.free()
             return value
