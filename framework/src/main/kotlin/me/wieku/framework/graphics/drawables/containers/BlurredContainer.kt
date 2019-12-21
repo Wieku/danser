@@ -5,7 +5,7 @@ import me.wieku.framework.graphics.drawables.sprite.SpriteBatch
 import me.wieku.framework.graphics.effects.BlurEffect
 import me.wieku.framework.math.view.Camera
 
-class BlurredContainer() : Container() {
+open class BlurredContainer() : Container() {
 
     private val blur = BlurEffect(1920, 1080)
     private val tempSprite = Sprite()

@@ -5,7 +5,7 @@ import me.wieku.framework.graphics.textures.Texture
 import me.wieku.framework.graphics.textures.TextureFormat
 import me.wieku.framework.math.Scaling
 
-class ColorContainer() : Container() {
+open class ColorContainer() : Container() {
 
     private val sprite: Sprite
 

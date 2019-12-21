@@ -9,7 +9,7 @@ import org.koin.core.inject
 import kotlin.math.max
 import kotlin.math.min
 
-class ParallaxContainer() : Container(), KoinComponent {
+open class ParallaxContainer() : Container(), KoinComponent {
 
     private val lastPos = Vector2i(-65535)
     private val inputManager: InputManager by inject()
