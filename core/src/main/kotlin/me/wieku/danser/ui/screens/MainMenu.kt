@@ -1,7 +1,6 @@
 package me.wieku.danser.ui.screens
 
 import me.wieku.danser.beatmap.Beatmap
-import me.wieku.danser.beatmap.BeatmapManager
 import me.wieku.danser.beatmap.TrackManager
 import me.wieku.danser.graphics.drawables.DanserCoin
 import me.wieku.danser.graphics.drawables.SideFlashes
@@ -10,10 +9,7 @@ import me.wieku.framework.animation.Transform
 import me.wieku.framework.animation.TransformType
 import me.wieku.framework.di.bindable.Bindable
 import me.wieku.framework.di.bindable.BindableListener
-import me.wieku.framework.graphics.drawables.containers.BlurredContainer
-import me.wieku.framework.graphics.drawables.containers.ColorContainer
-import me.wieku.framework.graphics.drawables.containers.Container
-import me.wieku.framework.graphics.drawables.containers.YogaContainer
+import me.wieku.framework.graphics.drawables.containers.*
 import me.wieku.framework.graphics.drawables.sprite.Sprite
 import me.wieku.framework.graphics.drawables.sprite.TextSprite
 import me.wieku.framework.gui.screen.Screen
@@ -25,19 +21,16 @@ import org.joml.Vector2f
 import org.joml.Vector4f
 import org.koin.core.KoinComponent
 import org.koin.core.inject
-import kotlin.math.max
-import kotlin.math.min
 
 class MainMenu : Screen(), KoinComponent {
 
     private val beatmapBindable: Bindable<Beatmap?> by inject()
     private val inputManager: InputManager by inject()
 
-    private var background: BlurredContainer
     private var colorContainer: ColorContainer
-    private var coin: DanserCoin
-    private var left: Container
-    private var buttons: RightButtonsContainer
+    private lateinit var coin: DanserCoin
+    private lateinit var left: Container
+    private lateinit var buttons: RightButtonsContainer
 
     init {
         val bgSprite = Sprite("menu/backgrounds/background-1.png") {
@@ -46,31 +39,44 @@ class MainMenu : Screen(), KoinComponent {
         }
 
         addChild(
-            BlurredContainer {
+            ParallaxContainer {
+                parallaxAmount = 1f/40
                 fillMode = Scaling.Stretch
-                scale = Vector2f(1.2f)
-                blurAmount = 0.3f
-                anchor = Origin.Custom
-                customAnchor = Vector2f(0.5f, 0.5f)
                 addChild(
-                    bgSprite
+                    BlurredContainer {
+                        fillMode = Scaling.Stretch
+                        scale = Vector2f(1.2f)
+                        blurAmount = 0.3f
+                        anchor = Origin.Custom
+                        customAnchor = Vector2f(0.5f, 0.5f)
+                        addChild(
+                            bgSprite
+                        )
+                    }/*.also { background = it }*/
                 )
-            }.also { background = it },
-            ColorContainer {
-                color = Vector4f(0.2f, 0.2f, 0.2f, 1f)
-                scale = Vector2f(1f, 0.12f)
-                fillMode = Scaling.StretchY
-                origin = Origin.CentreRight
-                anchor = Origin.None
-            }.also { left = it },
-            RightButtonsContainer().also { buttons = it },
-            DanserCoin().apply {
-                scale = Vector2f(0.6f)
-                anchor = Origin.Custom
-                customAnchor = Vector2f(0.3f, 0.5f)
-                fillMode = Scaling.Fit
-                inheritColor = false
-            }.also { coin = it }
+            },
+            ParallaxContainer {
+                parallaxAmount = 1f/80
+                fillMode = Scaling.Stretch
+
+                addChild(
+                    ColorContainer {
+                        color = Vector4f(0.2f, 0.2f, 0.2f, 1f)
+                        scale = Vector2f(1f, 0.12f)
+                        fillMode = Scaling.StretchY
+                        origin = Origin.CentreRight
+                        anchor = Origin.None
+                    }.also { left = it },
+                    RightButtonsContainer().also { buttons = it },
+                    DanserCoin().apply {
+                        scale = Vector2f(0.6f)
+                        anchor = Origin.Custom
+                        customAnchor = Vector2f(0.3f, 0.5f)
+                        fillMode = Scaling.Fit
+                        inheritColor = false
+                    }.also { coin = it }
+                )
+            }
         )
 
         val text = TextSprite("Exo2") {
@@ -136,21 +142,9 @@ class MainMenu : Screen(), KoinComponent {
 
     override fun update() {
         TrackManager.update()
-        val pos = inputManager.getPosition()
-        val posX = (max(0, min(pos.x, drawSize.x.toInt()))/drawSize.x - 0.5f)
-        val posY = (max(0, min(pos.y, drawSize.y.toInt()))/drawSize.y - 0.5f)
-        coin.customAnchor.set(posX/80+0.3f, posY/80+0.5f)
-        coin.invalidate()
-
-        background.customAnchor.set(posX/40+0.5f, posY/40+0.5f)
-        //background.blurAmount = 0.2f + 0.6f * Vector2f(abs(posX), abs(posY)).length()
-        background.invalidate()
 
         super.update()
 
-        background.drawPosition.add(background.drawOrigin)
-
-        background.drawPosition.sub(background.drawOrigin)
         if (coin.wasUpdated) {
             left.position.set(coin.drawSize).mul(0.10f, 0.5f).add(coin.drawPosition)
             left.size.x = buttons.position.x
@@ -168,18 +162,6 @@ class MainMenu : Screen(), KoinComponent {
         super.onEnter(previous)
 
         TrackManager.start()
-
-        /*var beatmap = BeatmapManager.beatmapSets.filter {
-            it.beatmaps.filter { bmap -> bmap.beatmapInfo.version == "Anto & Nuvolina's Extra" }
-                .isNotEmpty()
-        }[0].beatmaps.filter { bmap -> bmap.beatmapInfo.version == "Anto & Nuvolina's Extra" }[0]
-
-        beatmap.loadTrack()
-
-        beatmap.getTrack().play(0.1f)
-        beatmap.getTrack().setPosition(beatmap.beatmapMetadata.previewTime.toFloat() / 1000 - 1.3f)
-
-        beatmapBindable.value = beatmap*/
 
         coin.addTransform(
             Transform(
