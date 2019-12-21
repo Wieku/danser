@@ -8,6 +8,7 @@ abstract class Game: Disposable {
 
     var updateClock: IFramedClock = FramedClock()
     var graphicsClock: IFramedClock = FramedClock()
+    var inputClock: IFramedClock = FramedClock()
 
     abstract fun setup()
     abstract fun update()

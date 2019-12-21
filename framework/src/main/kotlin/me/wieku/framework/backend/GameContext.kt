@@ -115,6 +115,7 @@ abstract class GameContext {
             while (keepRunning) {
                 inputManager.update()
                 inputLimiter.sync()
+                game.inputClock.updateClock()
             }
         } catch (e: Throwable) {
             println("*** Uncaught exception in input thread! ***")
