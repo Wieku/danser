@@ -60,7 +60,7 @@ open class TextSprite() : Sprite(), KoinComponent {
     override fun dispose() {}
 
     override fun updateDrawable() {
-        size.set(font.getTextWidth(text).toFloat(), font.ascent.toFloat()+font.descent.toFloat())
+        size.set(font.getTextWidth(text, drawDigitsMonospace).toFloat(), font.ascent.toFloat()+font.descent.toFloat())
         if (!scaleToSize) {
             size.mul(fontScale)
         }
@@ -75,14 +75,14 @@ open class TextSprite() : Sprite(), KoinComponent {
 
     override fun draw(batch: SpriteBatch) {
         var offset = if (text.isNotEmpty()) -Character.charCount(text.codePointAt(0)) else 0
-        var advance = ((drawSize.x - font.getTextWidth(text).toFloat() * fontScale) / (2 * fontScale)).toInt()
+        var advance = ((drawSize.x - font.getTextWidth(text, drawDigitsMonospace).toFloat() * fontScale) / (2 * fontScale)).toInt()
         var codepointBefore = if (text.isNotEmpty()) text.codePointAt(0) else 0
         while (true) {
             offset += Character.charCount(codepointBefore)
             if (offset >= text.length) break
             val codepoint = text.codePointAt(offset)
 
-            if (offset > 0 && !(drawDigitsMonospace && (Character.isDigit(codepointBefore) && Character.isDigit(codepoint)))) {
+            if (offset > 0 && !(drawDigitsMonospace && (Character.isDigit(codepointBefore) || Character.isDigit(codepoint)))) {
                 advance += font.kerningTable[CPair(codepointBefore, codepoint)] ?: 0
             }
 

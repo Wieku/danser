@@ -69,7 +69,7 @@ class BitmapFont(file: FileHandle) {
             if (offset >= text.length) break
             val codepoint = text.codePointAt(offset)
 
-            if (offset > 0 && !isMonospace) {
+            if (offset > 0 && !(isMonospace && (Character.isDigit(codepointBefore) || Character.isDigit(codepoint)))) {
                 advance += kerningTable[CPair(codepointBefore, codepoint)] ?: 0
             }
 
