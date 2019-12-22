@@ -4,6 +4,7 @@ import me.wieku.danser.beatmap.Beatmap
 import me.wieku.danser.beatmap.TrackManager
 import me.wieku.danser.graphics.drawables.DanserCoin
 import me.wieku.danser.graphics.drawables.SideFlashes
+import me.wieku.danser.ui.common.MenuBackground
 import me.wieku.danser.ui.mainmenu.ButtonSystem
 import me.wieku.danser.ui.mainmenu.RightButtonsContainer
 import me.wieku.framework.animation.Transform
@@ -31,27 +32,11 @@ class MainMenu : Screen(), KoinComponent {
     private var colorContainer: ColorContainer
 
     init {
-        val bgSprite = Sprite("menu/backgrounds/background-1.png") {
-            fillMode = Scaling.Fill
-            anchor = Origin.Centre
-        }
 
         addChild(
-            ParallaxContainer {
+            MenuBackground {
                 parallaxAmount = 1f/40
                 fillMode = Scaling.Stretch
-                addChild(
-                    BlurredContainer {
-                        fillMode = Scaling.Stretch
-                        scale = Vector2f(1.2f)
-                        blurAmount = 0.3f
-                        anchor = Origin.Custom
-                        customAnchor = Vector2f(0.5f, 0.5f)
-                        addChild(
-                            bgSprite
-                        )
-                    }/*.also { background = it }*/
-                )
             },
             ButtonSystem {
                 fillMode = Scaling.Stretch

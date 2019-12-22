@@ -40,9 +40,9 @@ open class ParallaxContainer() : Container(), KoinComponent {
     }
 
     override fun updateDrawable() {
-        scale.mul(1f + parallaxAmount)
+        scale.mul(1f + parallaxAmount*2)
         super.updateDrawable()
-        scale.mul(1f / (1f + parallaxAmount))
+        scale.mul(1f / (1f + parallaxAmount*2))
         wasUpdatedOnce = true
     }
 
