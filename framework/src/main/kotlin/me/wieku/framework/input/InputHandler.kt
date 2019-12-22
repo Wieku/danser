@@ -27,6 +27,8 @@ abstract class InputHandler {
 
     var isHovered = false
 
+    var action: (() -> Unit)? = null
+
     open fun onHover(e: HoverEvent) = false
 
     open fun onHoverLost(e: HoverLostEvent) = false
@@ -35,6 +37,9 @@ abstract class InputHandler {
 
     open fun onMouseUp(e: MouseUpEvent) = false
 
-    open fun onClick(e: ClickEvent) = false
+    open fun onClick(e: ClickEvent): Boolean {
+        action?.let { it() }
+        return false
+    }
 
 }
