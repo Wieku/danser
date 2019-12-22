@@ -117,6 +117,7 @@ open class TextSprite() : Sprite(), KoinComponent {
                 internalSprite.drawPosition.add(shadowDrawOffset)
                 internalSprite.drawOrigin.sub(shadowDrawOffset)
                 internalSprite.drawColor.set(shadowColor)
+                internalSprite.drawColor.w *= drawColor.w
                 batch.draw(internalSprite)
                 internalSprite.drawPosition.sub(shadowDrawOffset)
                 internalSprite.drawOrigin.add(shadowDrawOffset)

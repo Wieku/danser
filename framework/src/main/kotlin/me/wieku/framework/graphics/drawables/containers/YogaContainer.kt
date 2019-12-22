@@ -512,6 +512,13 @@ open class YogaContainer() : Container() {
             YGNodeStyleSetPadding(yogaNode, YGEdgeBottom, sizeBase * yogaPaddingPercent.w / 100f)
             recalculateLayout()
         }
+
+        drawColor.set(color)
+        if (inheritColor) {
+            parent?.let {
+                drawColor.mul(it.drawColor)
+            }
+        }
     }
 
     private fun recalculateLayout() {
