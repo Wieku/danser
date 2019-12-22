@@ -4,6 +4,7 @@ import me.wieku.danser.beatmap.Beatmap
 import me.wieku.danser.beatmap.TrackManager
 import me.wieku.danser.graphics.drawables.DanserCoin
 import me.wieku.danser.graphics.drawables.SideFlashes
+import me.wieku.danser.ui.mainmenu.ButtonSystem
 import me.wieku.danser.ui.mainmenu.RightButtonsContainer
 import me.wieku.framework.animation.Transform
 import me.wieku.framework.animation.TransformType
@@ -24,13 +25,10 @@ import org.koin.core.inject
 
 class MainMenu : Screen(), KoinComponent {
 
+    private var buttonSystem: ButtonSystem
     private val beatmapBindable: Bindable<Beatmap?> by inject()
-    private val inputManager: InputManager by inject()
 
     private var colorContainer: ColorContainer
-    private lateinit var coin: DanserCoin
-    private lateinit var left: Container
-    private lateinit var buttons: RightButtonsContainer
 
     init {
         val bgSprite = Sprite("menu/backgrounds/background-1.png") {
@@ -55,28 +53,9 @@ class MainMenu : Screen(), KoinComponent {
                     }/*.also { background = it }*/
                 )
             },
-            ParallaxContainer {
-                parallaxAmount = 1f/80
+            ButtonSystem {
                 fillMode = Scaling.Stretch
-
-                addChild(
-                    ColorContainer {
-                        color = Vector4f(0.2f, 0.2f, 0.2f, 1f)
-                        scale = Vector2f(1f, 0.12f)
-                        fillMode = Scaling.StretchY
-                        origin = Origin.CentreRight
-                        anchor = Origin.None
-                    }.also { left = it },
-                    RightButtonsContainer().also { buttons = it },
-                    DanserCoin().apply {
-                        scale = Vector2f(0.6f)
-                        anchor = Origin.Custom
-                        customAnchor = Vector2f(0.3f, 0.5f)
-                        fillMode = Scaling.Fit
-                        inheritColor = false
-                    }.also { coin = it }
-                )
-            }
+            }.also { buttonSystem = it }
         )
 
         val text = TextSprite("Exo2") {
@@ -145,17 +124,6 @@ class MainMenu : Screen(), KoinComponent {
 
         super.update()
 
-        if (coin.wasUpdated) {
-            left.position.set(coin.drawSize).mul(0.10f, 0.5f).add(coin.drawPosition)
-            left.size.x = buttons.position.x
-            left.invalidate()
-            left.update()
-
-            buttons.position.set(coin.drawSize).mul(0.9f, 0.5f).add(coin.drawPosition)
-            buttons.size.x = drawSize.x - buttons.position.x
-            buttons.invalidate()
-            buttons.update()
-        }
     }
 
     override fun onEnter(previous: Screen?) {
@@ -163,35 +131,7 @@ class MainMenu : Screen(), KoinComponent {
 
         TrackManager.start()
 
-        coin.addTransform(
-            Transform(
-                TransformType.Color4,
-                clock.currentTime,
-                clock.currentTime + 1300,
-                Vector4f(0f),
-                Vector4f(1f)
-            )
-        )
-        coin.addTransform(
-            Transform(
-                TransformType.Scale,
-                clock.currentTime,
-                clock.currentTime + 1000,
-                2.5f,
-                1.5f,
-                Easing.Linear
-            )
-        )
-        coin.addTransform(
-            Transform(
-                TransformType.Scale,
-                clock.currentTime + 1000,
-                clock.currentTime + 1300,
-                1.5f,
-                0.35f,
-                Easing.OutBack
-            )
-        )
+        buttonSystem.beginIntroSequence()
 
         colorContainer.addTransform(
             Transform(

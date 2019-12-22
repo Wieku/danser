@@ -39,12 +39,13 @@ class MenuButton(private val text: String, icon: String, font: String, color: Ve
     private val container: YogaContainer
     private val flash: ColorContainer
 
-    private var lastAR = if(isFirst) 1.6f else 1.2f
-    private val glider = Glider(lastAR)
+    private var lastAR = 0.01f
+    private val glider = Glider(0.01f)
     private val jGlider = Glider(0f)
 
-    init {
+    private var armed = false
 
+    init {
         yogaAspectRatio = glider.value
         yogaFlexShrink = 0f
         yogaPaddingPercent = Vector4f(0f)
@@ -120,6 +121,7 @@ class MenuButton(private val text: String, icon: String, font: String, color: Ve
             }.also { container = it }
 
         )
+
     }
 
     override fun update() {
@@ -187,11 +189,13 @@ class MenuButton(private val text: String, icon: String, font: String, color: Ve
     }
 
     override fun onHover(e: HoverEvent): Boolean {
+        if (!armed) return false
         glider.addEvent(clock.currentTime+300f, if(isFirst) 2.2f else 1.8f, Easing.OutElastic)
         return false
     }
 
     override fun onHoverLost(e: HoverLostEvent): Boolean {
+        if (!armed) return false
         glider.addEvent(clock.currentTime+300f, if(isFirst) 1.6f else 1.2f, Easing.OutElastic)
         iconDrawable.transforms.clear()
         iconDrawable.addTransform(
@@ -204,6 +208,25 @@ class MenuButton(private val text: String, icon: String, font: String, color: Ve
             )
         )
         return false
+    }
+
+    fun show(clicked: Boolean) {
+        armed = clicked
+        addTransform(
+            Transform(
+                TransformType.Fade,
+                clock.currentTime,
+                clock.currentTime + 300f,
+                if (clicked) 0f else 1f,
+                if (clicked) 1f else 0f,
+                Easing.OutQuad
+            )
+        )
+        if (clicked) {
+            glider.addEvent(clock.currentTime+300f, if(isFirst) 1.6f else 1.2f, Easing.OutQuad)
+        } else {
+            glider.addEvent(clock.currentTime+300f, 0.01f, Easing.OutQuad)
+        }
     }
 
     override fun onClick(e: ClickEvent): Boolean {

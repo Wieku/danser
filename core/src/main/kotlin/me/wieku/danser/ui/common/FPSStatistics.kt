@@ -18,6 +18,7 @@ class FPSStatistics(private val game: Game) : YogaContainer() {
     private val drawCounter = FpsCounter()
 
     private var deltaSum = 0f
+    private var deltaSum1 = 0f
 
     constructor(game: Game, inContext: FPSStatistics.() -> Unit) : this(game) {
         inContext()
@@ -43,15 +44,20 @@ class FPSStatistics(private val game: Game) : YogaContainer() {
 
     override fun update() {
         deltaSum += game.updateClock.time.frameTime
+        deltaSum1 += game.updateClock.time.frameTime
+
+        if (deltaSum1 >= 1000f/60) {
+            inputCounter.putSample(game.inputClock.time.frameTime)
+            updateCounter.putSample(game.updateClock.time.frameTime)
+            drawCounter.putSample(game.graphicsClock.time.frameTime)
+
+            deltaSum1 -= 1000f/60
+        }
 
         if (deltaSum >= 50f) {
-            inputCounter.putSample(game.inputClock.time.frameTime)
+
             inputRow.data = format.format(inputCounter.fps.toInt(), inputCounter.frameTime)
-
-            updateCounter.putSample(game.updateClock.time.frameTime)
             updateRow.data = format.format(updateCounter.fps.toInt(), updateCounter.frameTime)
-
-            drawCounter.putSample(game.graphicsClock.time.frameTime)
             drawRow.data = format.format(drawCounter.fps.toInt(), drawCounter.frameTime)
 
             invalidate()
