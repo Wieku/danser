@@ -46,8 +46,8 @@ class RightButtonsContainer : YogaContainer() {
                     it.addTransform(
                         Transform(
                             TransformType.ScaleVector,
-                            clock.currentTime,
-                            clock.currentTime + 300f,
+                            clock.currentTime + if (clicked) 100f else 0f,
+                            clock.currentTime + 400f,
                             Vector2f(1f, if (clicked) 0f else 1f),
                             Vector2f(1f, if (clicked) 1f else 0f),
                             Easing.InOutQuad
@@ -56,8 +56,8 @@ class RightButtonsContainer : YogaContainer() {
                     it.addTransform(
                         Transform(
                             TransformType.Fade,
-                            clock.currentTime,
-                            clock.currentTime + 300f,
+                            clock.currentTime + if (clicked) 100f else 0f,
+                            clock.currentTime + 400f,
                             if (clicked) 0f else 1f,
                             if (clicked) 1f else 0f,
                             Easing.InOutQuad

@@ -28,7 +28,7 @@ class ButtonSystem() : ParallaxContainer() {
     }
 
     init {
-        parallaxAmount = 1f / 60
+        parallaxAmount = 1f / 80
         addChild(
             ColorContainer {
                 color = Vector4f(0.2f, 0.2f, 0.2f, 1f)
@@ -55,8 +55,8 @@ class ButtonSystem() : ParallaxContainer() {
         left.addTransform(
             Transform(
                 TransformType.ScaleVector,
-                clock.currentTime,
-                clock.currentTime+300f,
+                clock.currentTime + if (clicked) 100f else 0f,
+                clock.currentTime + 400f,
                 Vector2f(1f, if(clicked) 0f else 0.12f),
                 Vector2f(1f, if(clicked) 0.12f else 0f),
                 Easing.InOutQuad
@@ -65,25 +65,25 @@ class ButtonSystem() : ParallaxContainer() {
         left.addTransform(
             Transform(
                 TransformType.Fade,
-                clock.currentTime,
-                clock.currentTime+300f,
+                clock.currentTime + if (clicked) 100f else 0f,
+                clock.currentTime+400f,
                 if(clicked) 0f else 1f,
                 if(clicked) 1f else 0f,
-                Easing.InOutQuad
+                Easing.InOutQuint
             )
         )
 
         buttons.show(clicked)
 
-        coinPos.addEvent(clock.currentTime+300f, if(clicked) 0.3f else 0.5f, Easing.InOutQuad)
+        coinPos.addEvent(clock.currentTime+400f, if(clicked) 0.3f else 0.5f, Easing.InOutQuad)
         coin.addTransform(
             Transform(
                 TransformType.Scale,
                 clock.currentTime,
-                clock.currentTime+300f,
+                clock.currentTime + if (clicked) 300f else 400f,
                 if(clicked) 0.6f else 0.35f,
                 if(clicked) 0.35f else 0.6f,
-                Easing.InOutQuad
+                Easing.InOutQuint
             )
         )
     }

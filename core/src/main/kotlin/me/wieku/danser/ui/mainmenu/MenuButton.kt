@@ -215,17 +215,17 @@ class MenuButton(private val text: String, icon: String, font: String, color: Ve
         addTransform(
             Transform(
                 TransformType.Fade,
-                clock.currentTime,
-                clock.currentTime + 300f,
+                clock.currentTime + if (clicked) 100f else 0f,
+                clock.currentTime + if (clicked) 400f else 200f,
                 if (clicked) 0f else 1f,
                 if (clicked) 1f else 0f,
                 Easing.OutQuad
             )
         )
         if (clicked) {
-            glider.addEvent(clock.currentTime+300f, if(isFirst) 1.6f else 1.2f, Easing.OutQuad)
+            glider.addEvent(clock.currentTime+400f, if(isFirst) 1.6f else 1.2f, Easing.OutQuad)
         } else {
-            glider.addEvent(clock.currentTime+300f, 0.01f, Easing.OutQuad)
+            glider.addEvent(clock.currentTime+400f, 0.01f, Easing.OutQuad)
         }
     }
 
