@@ -164,10 +164,15 @@ class DanserCoin : Container(), KoinComponent {
         coinTop.scale.set(1.05f + Easings.OutQuad(progress * 0.03f))
 
         coinInflate.update(clock.currentTime)
-        scale.mul(coinInflate.value)
         invalidate()
         super.update()
-        scale.mul(1f/coinInflate.value)
+    }
+
+    override fun updateDrawable() {
+        val inflate = coinInflate.value
+        scale.mul(inflate)
+        super.updateDrawable()
+        scale.mul(1f/inflate)
     }
 
     override fun isCursorIn(cursorPosition: Vector2i): Boolean {

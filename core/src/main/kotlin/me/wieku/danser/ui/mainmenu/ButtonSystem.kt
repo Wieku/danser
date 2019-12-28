@@ -81,8 +81,8 @@ class ButtonSystem() : ParallaxContainer() {
                 TransformType.Scale,
                 clock.currentTime,
                 clock.currentTime + if (clicked) 300f else 400f,
-                if(clicked) 0.6f else 0.35f,
-                if(clicked) 0.35f else 0.6f,
+                if(clicked) 0.5f else 0.3f,
+                if(clicked) 0.3f else 0.5f,
                 Easing.InOutQuint
             )
         )
@@ -133,7 +133,7 @@ class ButtonSystem() : ParallaxContainer() {
                 clock.currentTime + 1000,
                 clock.currentTime + 1300,
                 1.5f,
-                0.6f,
+                0.5f,
                 Easing.OutBack
             )
         )
