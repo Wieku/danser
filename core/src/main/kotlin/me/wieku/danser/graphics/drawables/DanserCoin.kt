@@ -181,9 +181,7 @@ class DanserCoin : Container(), KoinComponent {
 
     override fun onHover(e: HoverEvent): Boolean {
         coinInflate.addEvent(
-            clock.currentTime,
             clock.currentTime+200f,
-            1f,
             1.25f,
             Easing.OutQuad
         )
@@ -192,9 +190,7 @@ class DanserCoin : Container(), KoinComponent {
 
     override fun onHoverLost(e: HoverLostEvent): Boolean {
         coinInflate.addEvent(
-            clock.currentTime,
             clock.currentTime+200f,
-            1.25f,
             1f,
             Easing.OutQuad
         )
