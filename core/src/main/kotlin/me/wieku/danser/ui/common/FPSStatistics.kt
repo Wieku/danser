@@ -1,13 +1,18 @@
 package me.wieku.danser.ui.common
 
 import me.wieku.framework.backend.Game
+import me.wieku.framework.backend.GameContext
 import me.wieku.framework.graphics.drawables.containers.YogaContainer
 import me.wieku.framework.utils.FpsCounter
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 import org.lwjgl.util.yoga.Yoga
 
-class FPSStatistics(private val game: Game) : YogaContainer() {
+class FPSStatistics(private val game: Game) : YogaContainer(), KoinComponent {
 
-    private val format = "%dfps (%.2fms)"
+    private val gameContext: GameContext by inject()
+
+    private val format = "%dfps (%.2fms) %shz"
 
     private val inputRow: StatisticsRow
     private val updateRow: StatisticsRow
@@ -56,9 +61,9 @@ class FPSStatistics(private val game: Game) : YogaContainer() {
 
         if (deltaSum >= 50f) {
 
-            inputRow.data = format.format(inputCounter.fps.toInt(), inputCounter.frameTime)
-            updateRow.data = format.format(updateCounter.fps.toInt(), updateCounter.frameTime)
-            drawRow.data = format.format(drawCounter.fps.toInt(), drawCounter.frameTime)
+            inputRow.data = format.format(inputCounter.fps.toInt(), inputCounter.frameTime, if (gameContext.inputLimiter.fps > 0) gameContext.inputLimiter.fps.toString() else "\u221E")
+            updateRow.data = format.format(updateCounter.fps.toInt(), updateCounter.frameTime, if (gameContext.updateLimiter.fps > 0) gameContext.updateLimiter.fps.toString() else "\u221E")
+            drawRow.data = format.format(drawCounter.fps.toInt(), drawCounter.frameTime, if (gameContext.fpsLimiter.fps > 0) gameContext.fpsLimiter.fps.toString() else "\u221E")
 
             invalidate()
 

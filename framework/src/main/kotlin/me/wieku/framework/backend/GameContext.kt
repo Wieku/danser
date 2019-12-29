@@ -26,11 +26,11 @@ abstract class GameContext {
 
     val contextSize = Vector2i(0, 0)
 
-    private val updateLimiter = FpsLimiter()
+    val updateLimiter = FpsLimiter()
 
-    protected val fpsLimiter = FpsLimiter()
+    val fpsLimiter = FpsLimiter()
 
-    protected val inputLimiter = FpsLimiter(1000)
+    val inputLimiter = FpsLimiter(1000)
 
     protected abstract fun startContext()
 
