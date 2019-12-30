@@ -23,6 +23,9 @@ class ButtonSystem() : ParallaxContainer() {
     private var left: Container
     private var buttons: RightButtonsContainer
 
+    private var introFinish = 0f
+    private var introFinished = false
+
     constructor(inContext: ButtonSystem.() -> Unit) : this() {
         inContext()
     }
@@ -89,6 +92,10 @@ class ButtonSystem() : ParallaxContainer() {
     }
 
     override fun update() {
+        if (!introFinished && clock.currentTime >= introFinish) {
+            coin.introFinished()
+            introFinished = true
+        }
         coinPos.update(clock.currentTime)
         coin.customAnchor.set(coinPos.value, 0.5f)
 
@@ -137,6 +144,8 @@ class ButtonSystem() : ParallaxContainer() {
                 Easing.OutBack
             )
         )
+
+        introFinish = clock.currentTime + 1300
     }
 
 }

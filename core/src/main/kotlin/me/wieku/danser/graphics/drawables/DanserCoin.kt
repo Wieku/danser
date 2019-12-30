@@ -47,6 +47,7 @@ class DanserCoin : Container(), KoinComponent {
     private val coinInflate = Glider(1f)
 
     private val coinBottom: Container
+    private lateinit var triangles: Triangles
     private lateinit var circularContainer: CircularContainer
     private lateinit var coinFlash: ColorContainer
     private val coinTop: Sprite
@@ -66,7 +67,11 @@ class DanserCoin : Container(), KoinComponent {
                         Triangles {
                             fillMode = Scaling.Fit
                             spawnRate = 0.25f
-                        }
+                            speedMultiplier = 0.33f
+                            spawnEnabled = false
+                            colorDark = Vector4f(0.054f, 0.054f, 0.054f, 1f)
+                            colorLight = Vector4f(0.2f, 0.2f, 0.2f, 1f)
+                        }.also { triangles = it }
                     )
                 }.also { circularContainer = it },
                 Sprite("menu/coin-overlay.png") {
@@ -173,6 +178,10 @@ class DanserCoin : Container(), KoinComponent {
         scale.mul(inflate)
         super.updateDrawable()
         scale.mul(1f/inflate)
+    }
+
+    fun introFinished() {
+        triangles.spawnEnabled = true
     }
 
     override fun isCursorIn(cursorPosition: Vector2i): Boolean {

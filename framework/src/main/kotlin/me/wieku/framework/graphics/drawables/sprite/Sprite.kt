@@ -12,17 +12,22 @@ import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.util.*
 
-open class Sprite(): Drawable(), KoinComponent {
+open class Sprite() : Drawable(), KoinComponent {
 
     private var textureName = ""
     private val textureStore: TextureStore by inject()
 
-    constructor(inContext: Sprite.() -> Unit):this(){
+    var customSize = false
+
+    constructor(inContext: Sprite.() -> Unit) : this() {
         inContext()
     }
 
-    constructor(textureName: String, inContext: Sprite.() -> Unit):this(){
+    constructor(textureName: String) : this() {
         this.textureName = textureName
+    }
+
+    constructor(textureName: String, inContext: Sprite.() -> Unit) : this(textureName) {
         inContext()
     }
 
@@ -33,7 +38,7 @@ open class Sprite(): Drawable(), KoinComponent {
     override fun draw(batch: SpriteBatch) {
         if (texture == null && textureName != "") {
             texture = textureStore.getResourceOrLoad(textureName).region
-            if (size.x == 1f && size.y == 1f) { //we assume we want to inherit it from the texture if the size was not changed before
+            if (!customSize) {
                 size = Vector2f(texture!!.getWidth(), texture!!.getHeight())
                 invalidate()
             }

@@ -29,6 +29,7 @@ class SideFlashes : Container(), KoinComponent {
 
     init {
         flashLeft = Sprite("menu/flash.png") {
+            customSize = true
             fillMode = Scaling.FillY
             size.x = 0.4f
             flipY = true
@@ -39,6 +40,7 @@ class SideFlashes : Container(), KoinComponent {
         }
 
         flashRight = Sprite("menu/flash.png") {
+            customSize = true
             size.x = 0.4f
             fillMode = Scaling.FillY
             color.w = 0f
@@ -98,7 +100,6 @@ class SideFlashes : Container(), KoinComponent {
             lastProgress++
         }
 
-        //invalidate()
         super.update()
     }
 
