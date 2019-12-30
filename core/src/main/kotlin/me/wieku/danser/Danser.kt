@@ -1,6 +1,7 @@
 package me.wieku.danser
 
 import me.wieku.danser.beatmap.Beatmap
+import me.wieku.danser.graphics.drawables.CursorWithTrail
 import me.wieku.danser.ui.common.FPSStatistics
 import me.wieku.danser.ui.screens.LoadingScreen
 import me.wieku.framework.di.bindable.Bindable
@@ -82,6 +83,8 @@ class Danser : Game(), KoinComponent {
                 origin = Origin.BottomRight
             }
         )
+
+        mainContainer.addChild(CursorWithTrail())
 
         camera.setViewportF(0, 0, 1920, 1080, true)
         camera.update()
