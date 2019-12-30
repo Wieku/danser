@@ -7,6 +7,7 @@ import me.wieku.framework.graphics.drawables.sprite.Sprite
 import me.wieku.framework.graphics.drawables.sprite.SpriteBatch
 import me.wieku.framework.graphics.textures.Texture
 import me.wieku.framework.math.Origin
+import me.wieku.framework.math.rot
 import me.wieku.framework.math.vector2fRad
 import org.joml.Vector2f
 import org.koin.core.KoinComponent
@@ -15,7 +16,7 @@ import kotlin.math.min
 
 class Visualizer() : Drawable(), KoinComponent {
 
-    constructor(inContext: Visualizer.() -> Unit):this(){
+    constructor(inContext: Visualizer.() -> Unit) : this() {
         inContext()
     }
 
@@ -24,24 +25,15 @@ class Visualizer() : Drawable(), KoinComponent {
     private var deltaSum = 0f
 
     private val bars = 200
-    private val barLength = 600f
     private val baseDecay = 0.0024f
     private val jumpSize = 5
 
     private var jumpCounter = 0
     private var amplitudes = FloatArray(bars)
 
-    private val tempSprite: Sprite
+    var barScale = 1f
 
-    init {
-        //val texture = Texture(1, 1, data = intArrayOf(0xffffffff.toInt()))
-        tempSprite = Sprite("pixel") {
-            //this.texture = texture.region
-            size = Vector2f(1f, 1f)
-            origin = Origin.CentreLeft
-        }
-    }
-
+    private val tempSprite: Sprite = Sprite("pixel")
 
     override fun update() {
         super.update()
@@ -80,19 +72,26 @@ class Visualizer() : Drawable(), KoinComponent {
 
     }
 
+    private val tempPos = Vector2f(0f)
+
     override fun draw(batch: SpriteBatch) {
-        val pos = Vector2f(drawPosition).add(drawOrigin)
+        tempPos.set(drawPosition).add(drawOrigin)
+
+        val barWidth = (2 * Math.PI.toFloat() * drawSize.y / 2) / bars.toFloat()
+        val cutoff = drawSize.y * 1.5f * barScale
+
         for (i in 0 until 5) {
             amplitudes.forEachIndexed { j, v ->
-                if (v < 1 / /* min(*/drawSize.y*1.5f/*, barLength)*/) return@forEachIndexed
+                if (v < 1 / cutoff) return@forEachIndexed
+
                 val rotation = (i / 5.0f + j / bars.toFloat()) * 2 * Math.PI.toFloat()
-                val position = vector2fRad(rotation, drawSize.y / 2).add(pos)
-                tempSprite.position = position
+
+                tempSprite.drawPosition.set(drawSize.y / 2, 0f).rot(rotation).add(tempPos).sub(0f, barWidth / 2)
+                tempSprite.drawOrigin.set(0f, 0.5f)
                 tempSprite.rotation = rotation
-                tempSprite.scale = Vector2f(v * /*min(drawSize.y*1.5f, barLength)*/drawSize.y*1.5f, (2 * Math.PI.toFloat() * drawSize.y / 2) / bars.toFloat())
-                tempSprite.color.w = 0.3f * drawColor.w
-                tempSprite.invalidate()
-                tempSprite.update()
+                tempSprite.drawSize.set(v * drawSize.y * 1.5f * barScale, barWidth)
+                tempSprite.drawColor.w = 0.3f * drawColor.w
+
                 tempSprite.draw(batch)
             }
         }
