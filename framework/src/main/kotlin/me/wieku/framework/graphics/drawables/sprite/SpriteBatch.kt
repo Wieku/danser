@@ -257,6 +257,8 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
 
         if (sprite.texture == null) return
 
+        if (sprite.drawColor.w < 0.01f) return
+
         val region = sprite.texture!!
 
         bind(region.getTexture())
