@@ -1,6 +1,7 @@
 package me.wieku.framework.input
 
 import me.wieku.framework.input.event.*
+import org.joml.Vector2f
 import org.joml.Vector2i
 import java.util.*
 import kotlin.collections.ArrayList
@@ -8,22 +9,26 @@ import kotlin.collections.ArrayList
 abstract class InputManager {
 
     private val pos = Vector2i()
+    private val posF = Vector2f()
 
     var inputHandler: InputHandler? = null
 
     var inputQueue = ArrayDeque<InputHandler>()
 
-    abstract fun getPosition(): Vector2i
+    fun getPosition() = pos
 
-    fun updatePosition(x: Int, y: Int) {
-        pos.set(x, y)
+    fun getPositionF() = posF
+
+    fun updatePosition(x: Float, y: Float) {
+        posF.set(x, y)
+        pos.set(x.toInt(), y.toInt())
         updateHover()
     }
 
-    var toRelease = ArrayList<InputHandler>()
-    var pressed = ArrayList<InputHandler>()
-    var lastPressHolder: InputHandler? = null
-    var pressHolder: InputHandler? = null
+    private var toRelease = ArrayList<InputHandler>()
+    private var pressed = ArrayList<InputHandler>()
+    private var lastPressHolder: InputHandler? = null
+    private var pressHolder: InputHandler? = null
 
     fun updateCursorAction(mouseButton: MouseButton, inputAction: InputAction) {
 
