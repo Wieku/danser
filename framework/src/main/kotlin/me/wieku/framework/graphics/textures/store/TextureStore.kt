@@ -13,6 +13,6 @@ class TextureStore: ResourceStore<Texture>() {
     }
 
     override fun loadResource(file: FileHandle): Texture {
-        return Texture(file)
+        return Texture(file, 4)
     }
 }

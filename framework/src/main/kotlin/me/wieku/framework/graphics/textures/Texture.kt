@@ -129,7 +129,7 @@ class Texture: ITexture {
             this.width = ww
             this.height = hh
             this.mipmaps = if(mipmaps < 1) 1 else mipmaps
-            this.store = TextureStore(1, ww, hh)
+            this.store = TextureStore(1, ww, hh, this.mipmaps)
             setData(image!!)
 
         }
