@@ -154,6 +154,7 @@ class DesktopContext: GameContext() {
         GL.createCapabilities()
         glEnable(GL_MULTISAMPLE)
         glfwShowWindow(windowHandle)
+        glfwSetInputMode(windowHandle, GLFW_CURSOR, GLFW_CURSOR_HIDDEN)
 
         generateEventBindings()
         generateGLFWCallbacks()
