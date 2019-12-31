@@ -31,6 +31,7 @@ class Triangles() : Container(), KoinComponent {
     var baseVelocity = 0.1f
     var spawnRate = 1f
     var spawnEnabled = true
+    var startOnScreen = true
     var speedMultiplier = 1f
 
     private var velocity = 0f
@@ -72,14 +73,16 @@ class Triangles() : Container(), KoinComponent {
     override fun update() {
 
         if (spawnEnabled)
-            addTriangles(children.size == 0)
-
-        val fft = beatmapBindable.value!!.getTrack().fftData
+            addTriangles(children.size == 0 && startOnScreen)
 
         var boost = 0f
 
-        for (i in 0 until bars) {
-            boost += 2 * fft[i] * (bars - i).toFloat() / bars.toFloat()
+        beatmapBindable.value?.let {
+            val fft = it.getTrack().fftData
+
+            for (i in 0 until bars) {
+                boost += 2 * fft[i] * (bars - i).toFloat() / bars.toFloat()
+            }
         }
 
         velocity = max(velocity, min(boost * 0.15f, 0.6f) * speedMultiplier)

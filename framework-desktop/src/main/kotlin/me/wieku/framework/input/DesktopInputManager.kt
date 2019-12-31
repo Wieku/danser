@@ -3,7 +3,7 @@ package me.wieku.framework.input
 import me.wieku.framework.backend.DesktopContext
 import org.lwjgl.glfw.GLFW.*
 
-class DesktopInputManager(private val glfwContext: DesktopContext): InputManager() {
+class DesktopInputManager(private val glfwContext: DesktopContext) : InputManager() {
 
     private val xBuff = doubleArrayOf(0.0)
     private val yBuff = doubleArrayOf(0.0)
@@ -16,7 +16,6 @@ class DesktopInputManager(private val glfwContext: DesktopContext): InputManager
 
     override fun update() {
         glfwPollEvents()
-        getPosition()
         glfwGetCursorPos(glfwContext.windowHandle, xBuff, yBuff)
         updatePosition(xBuff[0].toFloat(), yBuff[0].toFloat())
     }
