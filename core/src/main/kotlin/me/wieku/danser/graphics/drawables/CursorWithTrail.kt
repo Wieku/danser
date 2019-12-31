@@ -43,7 +43,7 @@ class CursorWithTrail : Drawable(), KoinComponent {
     private val points = ArrayList<Vector2f>((trailMaxLength * trailDensity).toInt())
 
     private val currentPosition = Vector2f()
-    private val lastPosition = Vector2f()
+    private val lastPosition = Vector2f(Float.NaN)
 
     private var removeCounter = 0f
 
@@ -110,6 +110,8 @@ class CursorWithTrail : Drawable(), KoinComponent {
         var dirtyLocal = false
 
         currentPosition.set(inputManager.getPositionF())
+
+        if (lastPosition.x.isNaN()) lastPosition.set(currentPosition)
 
         val distance = currentPosition.distance(lastPosition)
 
