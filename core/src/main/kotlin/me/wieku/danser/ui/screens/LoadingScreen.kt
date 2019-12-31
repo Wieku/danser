@@ -117,8 +117,9 @@ class LoadingScreen : Screen(), KoinComponent {
         super.onExit(next)
 
         triangles.baseVelocity = 3f
+        triangles.spawnEnabled = false
 
-        triangleSpeed.addEvent(clock.currentTime + 500, 10f, Easing.OutQuad)
+        triangleSpeed.addEvent(clock.currentTime + 500, 5f, Easing.OutQuad)
 
         addTransform(
             Transform(
