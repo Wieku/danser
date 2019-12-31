@@ -9,6 +9,7 @@ import me.wieku.framework.graphics.drawables.containers.CircularContainer
 import me.wieku.framework.graphics.drawables.containers.ColorContainer
 import me.wieku.framework.graphics.drawables.containers.Container
 import me.wieku.framework.graphics.drawables.sprite.Sprite
+import me.wieku.framework.input.event.ClickEvent
 import me.wieku.framework.input.event.HoverEvent
 import me.wieku.framework.input.event.HoverLostEvent
 import me.wieku.framework.math.Easing
@@ -44,8 +45,11 @@ class DanserCoin : Container(), KoinComponent {
     private var lastBeatStart = 0f
     private var lastBeatProgress = 0
 
+    private var clickedState = false
+
     private val coinInflate = Glider(1f)
 
+    private val ripples: Ripples
     private val coinBottom: Container
     private lateinit var triangles: Triangles
     private lateinit var circularContainer: CircularContainer
@@ -100,6 +104,9 @@ class DanserCoin : Container(), KoinComponent {
                 fillMode = Scaling.Fit
                 scale = Vector2f(0.95f)
             },
+            Ripples {
+                fillMode = Scaling.Fit
+            }.also { ripples = it },
             coinBottom,
             coinTop
         )
@@ -182,10 +189,17 @@ class DanserCoin : Container(), KoinComponent {
 
     fun introFinished() {
         triangles.spawnEnabled = true
+        ripples.generateRipples = true
     }
 
     override fun isCursorIn(cursorPosition: Vector2i): Boolean {
         return circularContainer.isCursorIn(cursorPosition)
+    }
+
+    override fun onClick(e: ClickEvent): Boolean {
+        clickedState = !clickedState
+        ripples.generateRipples = !clickedState
+        return super.onClick(e)
     }
 
     override fun onHover(e: HoverEvent): Boolean {

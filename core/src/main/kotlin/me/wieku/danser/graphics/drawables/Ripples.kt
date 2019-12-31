@@ -28,6 +28,8 @@ class Ripples() : Container(), KoinComponent {
     private var lastBeatStart = 0f
     private var lastProgress = 0
 
+    var generateRipples = false
+
     private val rippleTexture: Texture = Texture(
         FileHandle(
             "assets/textures/menu/coin-wave.png",
@@ -79,7 +81,8 @@ class Ripples() : Container(), KoinComponent {
         val progress = floor(bProg).toInt()
 
         if (progress > lastProgress) {
-            addRipple()
+            if (generateRipples)
+                addRipple()
             lastProgress++
         }
 
