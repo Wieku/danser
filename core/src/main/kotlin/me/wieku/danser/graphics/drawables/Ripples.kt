@@ -6,19 +6,15 @@ import me.wieku.framework.animation.TransformType
 import me.wieku.framework.di.bindable.Bindable
 import me.wieku.framework.graphics.drawables.containers.Container
 import me.wieku.framework.graphics.drawables.sprite.Sprite
-import me.wieku.framework.graphics.textures.Texture
 import me.wieku.framework.math.Easing
 import me.wieku.framework.math.Scaling
-import me.wieku.framework.resource.FileHandle
-import me.wieku.framework.resource.FileType
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import kotlin.math.floor
-import kotlin.math.max
 
 class Ripples() : Container(), KoinComponent {
 
-    constructor(inContext: Ripples.() -> Unit):this(){
+    constructor(inContext: Ripples.() -> Unit) : this() {
         inContext()
     }
 
@@ -30,37 +26,34 @@ class Ripples() : Container(), KoinComponent {
 
     var generateRipples = false
 
-    private val rippleTexture: Texture = Texture(
-        FileHandle(
-            "assets/textures/menu/coin-wave.png",
-            FileType.Classpath
-        ),
-        4
-    )
-
     private fun addRipple() {
-        val sprite = Sprite {
-            texture = rippleTexture.region
+        val sprite = Sprite("menu/coin-wave.png") {
             fillMode = Scaling.Fit
             drawForever = false
         }
-        sprite.addTransform(Transform(
-            TransformType.Fade,
-            clock.currentTime,
-            clock.currentTime + 1000,
-            0.5f,
-            0f,
-            Easing.OutQuad
-        ), false)
-        sprite.addTransform(Transform(
-            TransformType.Scale,
-            clock.currentTime,
-            clock.currentTime + 1000,
-            1f,
-            1.4f,
-            Easing.OutQuad
-        ), false)
-        sprite.adjustTimesToTransformations()
+
+        sprite.addTransform(
+            Transform(
+                TransformType.Fade,
+                clock.currentTime,
+                clock.currentTime + 1000,
+                0.5f,
+                0f,
+                Easing.OutQuad
+            )
+        )
+
+        sprite.addTransform(
+            Transform(
+                TransformType.Scale,
+                clock.currentTime,
+                clock.currentTime + 1000,
+                1f,
+                1.4f,
+                Easing.OutQuad
+            )
+        )
+
         addChild(sprite)
     }
 
@@ -76,7 +69,6 @@ class Ripples() : Container(), KoinComponent {
             lastBeatStart = timingPoint.time.toFloat()
         }
 
-        val beatLength = max(300f, lastBeatLength)
         val bProg = ((bTime - lastBeatStart) / lastBeatLength)
         val progress = floor(bProg).toInt()
 
