@@ -2,21 +2,16 @@ package me.wieku.danser.ui.screens
 
 import me.wieku.danser.beatmap.Beatmap
 import me.wieku.danser.beatmap.TrackManager
-import me.wieku.danser.graphics.drawables.DanserCoin
 import me.wieku.danser.graphics.drawables.SideFlashes
-import me.wieku.danser.ui.common.MenuBackground
+import me.wieku.danser.ui.common.background.MenuBackground
 import me.wieku.danser.ui.mainmenu.ButtonSystem
-import me.wieku.danser.ui.mainmenu.RightButtonsContainer
 import me.wieku.framework.animation.Transform
 import me.wieku.framework.animation.TransformType
 import me.wieku.framework.di.bindable.Bindable
 import me.wieku.framework.di.bindable.BindableListener
 import me.wieku.framework.graphics.drawables.containers.*
-import me.wieku.framework.graphics.drawables.sprite.Sprite
 import me.wieku.framework.graphics.drawables.sprite.TextSprite
 import me.wieku.framework.gui.screen.Screen
-import me.wieku.framework.input.InputManager
-import me.wieku.framework.math.Easing
 import me.wieku.framework.math.Origin
 import me.wieku.framework.math.Scaling
 import org.joml.Vector2f
@@ -35,7 +30,7 @@ class MainMenu : Screen(), KoinComponent {
 
         addChild(
             MenuBackground {
-                parallaxAmount = 1f/40
+                parallaxAmount = 1f / 40
                 fillMode = Scaling.Stretch
             },
             ButtonSystem {

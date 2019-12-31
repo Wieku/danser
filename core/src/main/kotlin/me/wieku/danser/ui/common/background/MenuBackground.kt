@@ -1,4 +1,4 @@
-package me.wieku.danser.ui.common
+package me.wieku.danser.ui.common.background
 
 import me.wieku.danser.beatmap.Beatmap
 import me.wieku.framework.animation.Transform
@@ -25,7 +25,7 @@ class MenuBackground(): ParallaxContainer(), KoinComponent {
 
     val defaultBackground: Sprite
 
-    private lateinit var blurred: BlurredContainer
+    private lateinit var wrapper: BackgroundWrapper
 
     var fileTextureHandle: FileHandle? = null
 
@@ -55,10 +55,12 @@ class MenuBackground(): ParallaxContainer(), KoinComponent {
                 customAnchor = Vector2f(0.5f, 0.5f)
                 color.w = 0.9f
                 addChild(
-                    defaultBackground
+                    BackgroundWrapper().also { wrapper = it }
                 )
-            }.also { blurred = it }
+            }
         )
+
+        wrapper.addChild(defaultBackground)
 
         beatmapBindable.addListener(object : BindableListener<Beatmap?> {
             override fun valueChanged(bindable: Bindable<Beatmap?>) {
@@ -93,18 +95,7 @@ class MenuBackground(): ParallaxContainer(), KoinComponent {
                                 1f
                             )
                         )
-                        blurred.addChild(currentBackground!!)
-                    } else {
-                        currentBackground = defaultBackground
-                        currentBackground!!.addTransform(
-                            Transform(
-                                TransformType.Fade,
-                                clock.currentTime,
-                                clock.currentTime + 500f,
-                                0f,
-                                1f
-                            )
-                        )
+                        wrapper.addChild(currentBackground!!)
                     }
                 }
             }
