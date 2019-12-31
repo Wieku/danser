@@ -3,6 +3,7 @@ package me.wieku.danser.ui.screens
 import me.wieku.danser.beatmap.Beatmap
 import me.wieku.danser.beatmap.TrackManager
 import me.wieku.danser.graphics.drawables.SideFlashes
+import me.wieku.danser.graphics.drawables.Triangles
 import me.wieku.danser.ui.common.background.MenuBackground
 import me.wieku.danser.ui.mainmenu.ButtonSystem
 import me.wieku.framework.animation.Transform
@@ -12,6 +13,9 @@ import me.wieku.framework.di.bindable.BindableListener
 import me.wieku.framework.graphics.drawables.containers.*
 import me.wieku.framework.graphics.drawables.sprite.TextSprite
 import me.wieku.framework.gui.screen.Screen
+import me.wieku.framework.input.MouseButton
+import me.wieku.framework.input.event.ClickEvent
+import me.wieku.framework.input.event.MouseUpEvent
 import me.wieku.framework.math.Origin
 import me.wieku.framework.math.Scaling
 import org.joml.Vector2f
@@ -67,10 +71,19 @@ class MainMenu : Screen(), KoinComponent {
                 anchor = Origin.TopLeft
                 fillMode = Scaling.Stretch
                 scale = Vector2f(1f, 0.04f)
+                useScissor = true
                 addChild(
                     ColorContainer {
                         fillMode = Scaling.Stretch
                         color = Vector4f(0.2f, 0.2f, 0.2f, 1f)
+                    },
+                    Triangles {
+                      fillMode = Scaling.Stretch
+                        minSize = 1f
+                        maxSize = 2f
+                        spawnRate = 2f
+                        colorDark = Vector4f(0.054f, 0.054f, 0.054f, 1f)
+                        colorLight = Vector4f(0.2f, 0.2f, 0.2f, 1f)
                     },
                     YogaContainer {
                         yogaSizePercent = Vector2f(100f)
@@ -134,5 +147,14 @@ class MainMenu : Screen(), KoinComponent {
         )
     }
 
+    override fun onMouseUp(e: MouseUpEvent): Boolean {
+        when(e.button) {
+            MouseButton.ButtonForward -> TrackManager.forward()
+            MouseButton.ButtonBack -> TrackManager.backwards()
+            else -> {}
+        }
+
+        return super.onMouseUp(e)
+    }
 
 }
