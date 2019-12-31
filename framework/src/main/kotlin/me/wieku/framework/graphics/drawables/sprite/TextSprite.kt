@@ -75,7 +75,7 @@ open class TextSprite() : Sprite(), KoinComponent {
 
     override fun draw(batch: SpriteBatch) {
         var offset = if (text.isNotEmpty()) -Character.charCount(text.codePointAt(0)) else 0
-        var advance = ((drawSize.x - font.getTextWidth(text, drawDigitsMonospace).toFloat() * fontScale) / (2 * fontScale)).toInt()
+        var advance = drawOrigin.x - ((drawOrigin.x/drawSize.x) * (font.getTextWidth(text, drawDigitsMonospace).toFloat() * fontScale)).toInt()
         var codepointBefore = if (text.isNotEmpty()) text.codePointAt(0) else 0
         while (true) {
             offset += Character.charCount(codepointBefore)

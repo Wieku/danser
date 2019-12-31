@@ -108,7 +108,7 @@ class Texture: ITexture {
             if (!stbi_info_from_memory(imageBuffer, w, h, comp)) {
                 throw RuntimeException("Failed to read image information: " + stbi_failure_reason())
             } else {
-                System.out.println("OK with reason: " + stbi_failure_reason())
+                System.out.println("Texture ${file.file.name} loaded")
             }
 
 
