@@ -33,4 +33,8 @@ class Glider(var value: Float) {
         eventQueue.add(GliderEvent(lastTime, endTime, value, endValue, easing))
     }
 
+    fun reset() {
+        eventQueue.clear()
+    }
+
 }

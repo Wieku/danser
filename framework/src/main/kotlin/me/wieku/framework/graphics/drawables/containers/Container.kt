@@ -10,7 +10,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.round
 
-open class Container(): Drawable() {
+open class Container() : Drawable() {
 
     protected val maskInfo = MaskingInfo()
 
@@ -25,7 +25,7 @@ open class Container(): Drawable() {
         }
         set(value) {}
 
-    constructor(inContext: Container.() -> Unit):this(){
+    constructor(inContext: Container.() -> Unit) : this() {
         inContext()
     }
 
@@ -61,9 +61,12 @@ open class Container(): Drawable() {
 
     override fun update() {
         super.update()
+
         children.synchronized {
-            forEach { it.update() }
-            removeIf { it.canBeDeleted() }
+            removeIf {
+                it.update()
+                it.canBeDeleted()
+            }
         }
     }
 

@@ -1,9 +1,11 @@
 package me.wieku.danser.ui.common
 
+import me.wieku.framework.animation.Glider
 import me.wieku.framework.graphics.drawables.containers.ColorContainer
 import me.wieku.framework.graphics.drawables.containers.RoundedEdgeContainer
 import me.wieku.framework.graphics.drawables.containers.YogaContainer
 import me.wieku.framework.graphics.drawables.sprite.TextSprite
+import me.wieku.framework.math.Easing
 import me.wieku.framework.math.Origin
 import me.wieku.framework.math.Scaling
 import org.joml.Vector2f
@@ -16,7 +18,9 @@ class StatisticsRow() : YogaContainer() {
     private lateinit var dataText: TextSprite
     private lateinit var textContainer: YogaContainer
 
-    private var lastWidth = 0f
+    private var lastWidth = 100f
+    private var targetWidth = 100f
+    private var widthGlider = Glider(100f)
 
     var type: String
         get() = typeText.text
@@ -81,6 +85,7 @@ class StatisticsRow() : YogaContainer() {
                         )
                     },
                     YogaContainer {
+                        yogaWidth = 100f
                         addChild(
                             TextSprite("Exo2") {
                                 scaleToSize = true
@@ -98,9 +103,25 @@ class StatisticsRow() : YogaContainer() {
     }
 
     override fun update() {
-        if (lastWidth != dataText.drawSize.x) {
-            textContainer.yogaWidth = dataText.drawSize.x
-            lastWidth = dataText.drawSize.x
+
+        if (targetWidth != dataText.drawSize.x) {
+
+            if (targetWidth > dataText.drawSize.x) {
+                widthGlider.addEvent(clock.currentTime + 1000, clock.currentTime+1500, targetWidth, dataText.drawSize.x, Easing.OutQuad)
+            } else {
+                widthGlider.reset()
+                widthGlider.value = dataText.drawSize.x
+            }
+
+            targetWidth = dataText.drawSize.x
+        }
+
+        widthGlider.update(clock.currentTime)
+
+        if (widthGlider.value != lastWidth) {
+            lastWidth = widthGlider.value
+            textContainer.yogaWidth = lastWidth
+
             invalidate()
         }
 
