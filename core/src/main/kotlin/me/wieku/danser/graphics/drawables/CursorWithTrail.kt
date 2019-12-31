@@ -13,6 +13,7 @@ import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.FileType
 import me.wieku.framework.utils.synchronized
 import org.joml.Vector2f
+import org.joml.Vector4f
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import org.lwjgl.opengl.GL33
@@ -22,9 +23,19 @@ import kotlin.math.floor
 
 class CursorWithTrail : Drawable(), KoinComponent {
 
+    //region TODO: Move those values to settings
+
     private val trailDensity = 1f
     private val trailRemoveSpeed = 1f
     private val trailMaxLength = 2000
+    private val trailColor1 = Vector4f(0f, 0f, 0.8f, 1f)
+    private val trailColor2 = Vector4f(0f, 1f, 1f, 1f)
+    private val cursorSize = 30f
+    private val innerSizeMult = 0.75f
+    private val innerTrailMult = 0.9f
+    private val trailEndScale = 0.1f
+
+    //endregion
 
     private val inputManager: InputManager by inject()
     private val textureStore: TextureStore by inject()
@@ -36,7 +47,7 @@ class CursorWithTrail : Drawable(), KoinComponent {
 
     private var removeCounter = 0f
 
-    private val tempCursor = Sprite("cursor/cursor.png") {}
+    private val tempCursor = Sprite("cursor/cursortrail.png") {}
     private val tempCursorTop = Sprite("cursor/cursor-top.png") {}
 
     private val cursorShader: Shader
@@ -45,7 +56,8 @@ class CursorWithTrail : Drawable(), KoinComponent {
     private val helperBuffer = MemoryUtil.memAllocFloat(16)
 
     private var dirty = false
-    private val pointsRaw = MemoryUtil.memAllocFloat((trailMaxLength * trailDensity).toInt() * 2)
+    private val pointsRaw = MemoryUtil.memAllocFloat((trailMaxLength * trailDensity).toInt() * 2 * 2)
+    private val attribsRaw = MemoryUtil.memAllocFloat(12)
     private var pointsNum = 0
 
     init {
@@ -69,8 +81,16 @@ class CursorWithTrail : Drawable(), KoinComponent {
         )
 
         cursorVAO.addVBO(
-            "points", (trailMaxLength / trailDensity).toInt(), 1, arrayOf(
+            "points", (trailMaxLength / trailDensity).toInt()*2, 1, arrayOf(
                 VertexAttribute("in_mid", VertexAttributeType.Vec2, 0)
+            )
+        )
+
+        cursorVAO.addVBO(
+            "attribs", 12, 1, arrayOf(
+                VertexAttribute("in_color", VertexAttributeType.Vec4, 0),
+                VertexAttribute("in_scale", VertexAttributeType.GlFloat, 0),
+                VertexAttribute("in_lengthScale", VertexAttributeType.GlFloat, 0)
             )
         )
 
@@ -145,6 +165,27 @@ class CursorWithTrail : Drawable(), KoinComponent {
                     pointsRaw.put(it.y)
                 }
 
+                points.forEach {
+                    pointsRaw.put(it.x)
+                    pointsRaw.put(it.y)
+                }
+
+                attribsRaw.clear()
+
+                attribsRaw.put(trailColor1.x)
+                attribsRaw.put(trailColor1.y)
+                attribsRaw.put(trailColor1.z)
+                attribsRaw.put(trailColor1.w)
+                attribsRaw.put(cursorSize)
+                attribsRaw.put(1f)
+
+                attribsRaw.put(trailColor2.x)
+                attribsRaw.put(trailColor2.y)
+                attribsRaw.put(trailColor2.z)
+                attribsRaw.put(trailColor2.w)
+                attribsRaw.put(cursorSize * innerSizeMult)
+                attribsRaw.put(innerTrailMult)
+
                 dirty = true
             }
         }
@@ -152,9 +193,26 @@ class CursorWithTrail : Drawable(), KoinComponent {
     }
 
     override fun draw(batch: SpriteBatch) {
+        var tempOv = cursorSize
+
+        tempCursor.drawPosition.set(currentPosition).sub(tempOv / 2, tempOv / 2)
+        tempCursor.drawSize.set(tempOv)
+        tempCursor.drawOrigin.set(tempOv / 2)
+        tempCursor.drawColor.set(trailColor1)
+        tempCursor.draw(batch)
+
+        tempOv *= innerSizeMult
+
+        tempCursor.drawPosition.set(currentPosition).sub(tempOv / 2, tempOv / 2)
+        tempCursor.drawSize.set(tempOv)
+        tempCursor.drawOrigin.set(tempOv / 2)
+        tempCursor.drawColor.set(trailColor2)
+        tempCursor.draw(batch)
+
         batch.end()
         GL33.glEnable(GL33.GL_BLEND)
-        GL33.glBlendFunc(GL33.GL_ONE, GL33.GL_ONE_MINUS_SRC_ALPHA)
+        GL33.glBlendEquation(GL33.GL_ADD)
+        GL33.glBlendFuncSeparate(GL33.GL_SRC_ALPHA, GL33.GL_ONE_MINUS_SRC_ALPHA, GL33.GL_ONE, GL33.GL_ONE_MINUS_SRC_ALPHA)
 
         val texture = textureStore.getResourceOrLoad("cursor/cursortrail.png")
         texture.bind(0)
@@ -163,8 +221,16 @@ class CursorWithTrail : Drawable(), KoinComponent {
         pointsRaw.synchronized {
             if (dirty) {
                 pointsRaw.flip()
-                pointsNum = pointsRaw.limit() / 2
                 cursorVAO.setData("points", pointsRaw)
+
+                pointsNum = pointsRaw.limit() / 4
+
+                attribsRaw.flip()
+                cursorVAO.setData("attribs", attribsRaw)
+
+                if (pointsNum > 0)
+                    cursorVAO.changeVBODivisor("attribs", pointsNum)
+
                 dirty = false
             }
         }
@@ -173,32 +239,28 @@ class CursorWithTrail : Drawable(), KoinComponent {
         helperBuffer.clear()
         cursorShader.setUniform("proj", batch.camera.projectionView.get(helperBuffer))
         cursorShader.setUniform("tex", 0f)
-        cursorShader.setUniform("col_tint", 0.8f, 0f, 0.8f, 1f)
         cursorShader.setUniform("points", pointsNum.toFloat())
-        cursorShader.setUniform("scale", 30f)
-        cursorShader.setUniform("endScale", 0.4f)
+        cursorShader.setUniform("endScale", trailEndScale)
 
         cursorVAO.draw(
-            toInstance = pointsNum
+            toInstance = pointsNum * 2
         )
 
         cursorShader.unbind()
         cursorVAO.unbind()
 
         batch.begin()
-        tempCursor.drawPosition.set(currentPosition).sub(15f, 15f)
-        tempCursor.drawSize.set(30f)
-        tempCursor.drawOrigin.set(15f)
-        tempCursor.drawColor.set(0.8f, 0f, 0.8f, 1f)
-        tempCursor.draw(batch)
 
-        tempCursorTop.drawPosition.set(currentPosition).sub(15f, 15f)
-        tempCursorTop.drawSize.set(30f)
-        tempCursorTop.drawOrigin.set(15f)
+        tempOv = cursorSize
+
+        tempCursorTop.drawPosition.set(currentPosition).sub(tempOv / 2, tempOv / 2)
+        tempCursorTop.drawSize.set(tempOv)
+        tempCursorTop.drawOrigin.set(tempOv / 2)
         tempCursorTop.draw(batch)
     }
 
     override fun dispose() {
         MemoryUtil.memFree(pointsRaw)
+        MemoryUtil.memFree(attribsRaw)
     }
 }
