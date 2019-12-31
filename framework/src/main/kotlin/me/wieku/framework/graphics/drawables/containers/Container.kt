@@ -63,8 +63,6 @@ open class Container(): Drawable() {
         super.update()
         children.synchronized {
             forEach { it.update() }
-        }
-        children.synchronized {
             removeIf { it.canBeDeleted() }
         }
     }

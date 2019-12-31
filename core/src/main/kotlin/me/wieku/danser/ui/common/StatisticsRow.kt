@@ -16,6 +16,8 @@ class StatisticsRow() : YogaContainer() {
     private lateinit var dataText: TextSprite
     private lateinit var textContainer: YogaContainer
 
+    private var lastWidth = 0f
+
     var type: String
         get() = typeText.text
         set(value) {
@@ -96,8 +98,9 @@ class StatisticsRow() : YogaContainer() {
     }
 
     override fun update() {
-        if (textContainer.yogaWidth != dataText.drawSize.x) {
+        if (lastWidth != dataText.drawSize.x) {
             textContainer.yogaWidth = dataText.drawSize.x
+            lastWidth = dataText.drawSize.x
             invalidate()
         }
 
