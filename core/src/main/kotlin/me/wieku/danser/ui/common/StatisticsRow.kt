@@ -56,6 +56,8 @@ class StatisticsRow() : YogaContainer() {
                                 fillMode = Scaling.FillY
                                 anchor = Origin.CentreRight
                                 origin = Origin.CentreRight
+                                drawShadow = true
+                                shadowOffset = Vector2f(0f, 0.1f)
                             }.also { typeText = it }
                         )
                     }
