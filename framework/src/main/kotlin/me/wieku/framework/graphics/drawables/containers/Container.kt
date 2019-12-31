@@ -3,12 +3,18 @@ package me.wieku.framework.graphics.drawables.containers
 import me.wieku.framework.graphics.drawables.Drawable
 import me.wieku.framework.graphics.drawables.sprite.SpriteBatch
 import me.wieku.framework.input.InputHandler
+import me.wieku.framework.utils.MaskingInfo
 import me.wieku.framework.utils.synchronized
 import org.joml.Vector2i
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.math.round
 
 open class Container(): Drawable() {
+
+    protected val maskInfo = MaskingInfo()
+
+    var useScissor = false
 
     override var wasUpdated: Boolean
         get() {
@@ -63,9 +69,24 @@ open class Container(): Drawable() {
         }
     }
 
+    override fun updateDrawable() {
+        super.updateDrawable()
+        maskInfo.rect.set(drawPosition.x, drawPosition.y, drawPosition.x+ round(drawSize.x), round(drawPosition.y + drawSize.y))
+    }
+
     override fun draw(batch: SpriteBatch) {
+        val scissorUsed = useScissor
+
+        if (scissorUsed) {
+            batch.pushMaskingInfo(maskInfo)
+        }
+
         children.synchronized {
             forEach { it.draw(batch) }
+        }
+
+        if (scissorUsed) {
+            batch.popMaskingInfo()
         }
     }
 

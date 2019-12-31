@@ -9,8 +9,9 @@ uniform sampler2DArray tex;
 
 out vec4 color;
 
-uniform vec4 maskRect;
+uniform vec4 g_MaskRect;
 uniform float g_CornerRadius;
+uniform float g_UseMask;
 
 vec2 max3(vec2 a, vec2 b, vec2 c)
 {
@@ -19,8 +20,8 @@ vec2 max3(vec2 a, vec2 b, vec2 c)
 
 float distanceFromRoundedRect()
 {
-	vec2 topLeftOffset = maskRect.xy - maskCoord;
-	vec2 bottomRightOffset = maskCoord - maskRect.zw;
+	vec2 topLeftOffset = g_MaskRect.xy - maskCoord;
+	vec2 bottomRightOffset = maskCoord - g_MaskRect.zw;
 
 	vec2 distanceFromShrunkRect = max3(vec2(0.0), bottomRightOffset + vec2(g_CornerRadius), topLeftOffset + vec2(g_CornerRadius));
 	return length(distanceFromShrunkRect);
@@ -29,7 +30,7 @@ float distanceFromRoundedRect()
 
 void main()
 {
-	float dist = g_CornerRadius == 0.0 ? 0.0 : distanceFromRoundedRect();
+	float dist = g_UseMask == 0.0 ? 0.0 : distanceFromRoundedRect();
     vec4 in_color = texture(tex, tex_coord);
 	color = in_color*col_tint;
 

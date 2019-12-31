@@ -316,11 +316,13 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
         flush()
         val inf: MaskingInfo? = info ?: maskingStack.peek()
         if (inf != null) {
-            shader.setUniform("maskRect", inf.rect.x, inf.rect.y, inf.rect.z, inf.rect.w)
+            shader.setUniform("g_MaskRect", inf.rect.x, inf.rect.y, inf.rect.z, inf.rect.w)
             shader.setUniform("g_CornerRadius", inf.radius)
+            shader.setUniform("g_UseMask", 1f)
         } else {
-            shader.setUniform("maskRect", 0f, 0f, 1f, 1f)
+            shader.setUniform("g_MaskRect", 0f, 0f, 1f, 1f)
             shader.setUniform("g_CornerRadius", 0f)
+            shader.setUniform("g_UseMask", 0f)
         }
     }
 

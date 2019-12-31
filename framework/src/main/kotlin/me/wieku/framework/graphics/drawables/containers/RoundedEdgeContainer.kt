@@ -8,9 +8,11 @@ import kotlin.math.min
 
 open class RoundedEdgeContainer(): Container() {
 
-    private val maskInfo = MaskingInfo()
-
     var radius = 0f
+
+    init {
+        useScissor = true
+    }
 
     constructor(inContext: RoundedEdgeContainer.() -> Unit):this(){
         inContext()
@@ -18,7 +20,6 @@ open class RoundedEdgeContainer(): Container() {
 
     override fun update() {
         super.update()
-        maskInfo.rect.set(drawPosition.x, drawPosition.y, drawPosition.x+drawSize.x, drawPosition.y + drawSize.y)
         maskInfo.radius = min(drawSize.x, drawSize.y) * radius / 2
     }
 
