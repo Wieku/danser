@@ -39,6 +39,8 @@ class VertexArrayObject : Disposable {
 
                 val location = shader.attributes[it.attributeName]!!.location
 
+                it.location = location
+
                 glVertexAttribPointer(
                     location,
                     it.attributeType.size / 4,
@@ -71,6 +73,23 @@ class VertexArrayObject : Disposable {
         )
 
         vboMap[name] = holder
+    }
+
+    fun changeVBODivisor(name: String, divisor: Int) {
+        check(vboMap.containsKey(name)) { "VBO with that name does not exist" }
+
+        val holder = vboMap[name]!!
+
+        holder.divisor = divisor
+
+        holder.vbo.bind()
+
+        holder.attributes.forEach {
+            glVertexAttribDivisor(it.location, holder.divisor)
+        }
+
+        holder.vbo.unbind()
+
     }
 
     fun setData(vboName: String, data: FloatArray) {
