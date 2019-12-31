@@ -64,6 +64,7 @@ object TrackManager: KoinComponent {
     }
 
     private fun startBeatmap(beatmap: Beatmap, startAtPreview: Boolean = false, previewOffset: Float = 0f) {
+        bindableBeatmap.value?.getTrack()?.stop()
         beatmap.loadTrack()
         beatmap.getTrack().play()
         if (startAtPreview) {
