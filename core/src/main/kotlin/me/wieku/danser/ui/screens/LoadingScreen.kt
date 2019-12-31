@@ -8,6 +8,8 @@ import me.wieku.framework.animation.Transform
 import me.wieku.framework.animation.TransformType
 import me.wieku.framework.di.bindable.Bindable
 import me.wieku.framework.font.BitmapFont
+import me.wieku.framework.graphics.drawables.containers.CircularContainer
+import me.wieku.framework.graphics.drawables.containers.ColorContainer
 import me.wieku.framework.graphics.drawables.sprite.Sprite
 import me.wieku.framework.graphics.drawables.sprite.TextSprite
 import me.wieku.framework.graphics.textures.Texture
@@ -42,6 +44,16 @@ class LoadingScreen : Screen(), KoinComponent {
                 colorDark = Vector4f(0.054f, 0.054f, 0.054f, 0.5f)
                 colorLight = Vector4f(0.4f, 0.4f, 0.4f, 0.5f)
             }.also { triangles = it },
+            CircularContainer {
+                fillMode = Scaling.Fit
+                scale = Vector2f(0.63f)
+                addChild(
+                    ColorContainer {
+                        fillMode = Scaling.Stretch
+                        color = Vector4f(0f, 0f, 0f, 0.6f)
+                    }
+                )
+            },
             Sprite("menu/coin-overlay.png") {
                 fillMode = Scaling.Fit
                 scale = Vector2f(0.66f)
