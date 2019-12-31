@@ -96,6 +96,24 @@ class MenuBackground(): ParallaxContainer(), KoinComponent {
                             )
                         )
                         wrapper.addChild(currentBackground!!)
+                    } else {
+                        if (oldBackground === defaultBackground) {
+                            oldBackground!!.transforms.clear()
+                            oldBackground!!.drawForever = true
+                        } else {
+                            currentBackground = defaultBackground
+                            currentBackground!!.drawForever = true
+                            currentBackground!!.addTransform(
+                                Transform(
+                                    TransformType.Fade,
+                                    clock.currentTime,
+                                    clock.currentTime + 500f,
+                                    0f,
+                                    1f
+                                )
+                            )
+                            wrapper.addChild(currentBackground!!)
+                        }
                     }
                 }
             }
