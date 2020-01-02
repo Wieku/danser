@@ -4,6 +4,8 @@ import me.wieku.danser.beatmap.Beatmap
 import me.wieku.framework.animation.Glider
 import me.wieku.framework.animation.Transform
 import me.wieku.framework.animation.TransformType
+import me.wieku.framework.audio.Sample
+import me.wieku.framework.audio.SampleStore
 import me.wieku.framework.di.bindable.Bindable
 import me.wieku.framework.graphics.drawables.containers.CircularContainer
 import me.wieku.framework.graphics.drawables.containers.ColorContainer
@@ -15,6 +17,8 @@ import me.wieku.framework.input.event.HoverLostEvent
 import me.wieku.framework.math.Easing
 import me.wieku.framework.math.Easings
 import me.wieku.framework.math.Scaling
+import me.wieku.framework.resource.FileHandle
+import me.wieku.framework.resource.FileType
 import org.joml.Vector2f
 import org.joml.Vector2i
 import org.joml.Vector4f
@@ -27,7 +31,8 @@ import kotlin.math.pow
 
 class DanserCoin : Container(), KoinComponent {
 
-    val beatmapBindable: Bindable<Beatmap?> by inject()
+    private val beatmapBindable: Bindable<Beatmap?> by inject()
+    private val sampleStore: SampleStore by inject()
 
     private val defaultBeatLength = 500f
 
@@ -147,7 +152,7 @@ class DanserCoin : Container(), KoinComponent {
         val b1Prog = ((bTime - lastBeatStart) / lastBeatLength)
         val progress1 = floor(b1Prog).toInt()
 
-        if (progress1 > lastBeatProgress) {
+        if (progress1 != lastBeatProgress) {
             if (timingPoint.kiai) {
                 coinFlash.addTransform(
                     Transform(
@@ -161,7 +166,11 @@ class DanserCoin : Container(), KoinComponent {
                 )
             }
 
-            lastBeatProgress++
+            if (triangles.spawnEnabled && isHovered) {
+                sampleStore.getResourceOrLoad("menu/heartbeat.mp3").play()
+            }
+
+            lastBeatProgress = progress1
         }
 
         val vprog = if (beatmapBindable.value!!.getTrack().isRunning) 1f - ((volume - volumeAverage) / 0.5f) else 1f
@@ -209,6 +218,7 @@ class DanserCoin : Container(), KoinComponent {
     }
 
     override fun onClick(e: ClickEvent): Boolean {
+        sampleStore.getResourceOrLoad("menu/menuhit1.wav").play()
         clickedState = !clickedState
         ripples.generateRipples = !clickedState
         return super.onClick(e)

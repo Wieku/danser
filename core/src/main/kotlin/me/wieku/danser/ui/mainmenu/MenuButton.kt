@@ -4,6 +4,7 @@ import me.wieku.danser.beatmap.Beatmap
 import me.wieku.framework.animation.Glider
 import me.wieku.framework.animation.Transform
 import me.wieku.framework.animation.TransformType
+import me.wieku.framework.audio.SampleStore
 import me.wieku.framework.di.bindable.Bindable
 import me.wieku.framework.font.BitmapFont
 import me.wieku.framework.graphics.drawables.Drawable
@@ -31,6 +32,8 @@ class MenuButton(private val text: String, icon: String, font: String, color: Ve
 
     private lateinit var iconDrawable: Drawable
     private val beatmapBindable: Bindable<Beatmap?> by inject()
+    private val sampleStore: SampleStore by inject()
+
 
     private var lastBeatLength = 0f
     private var lastBeatStart = 0f
@@ -50,6 +53,9 @@ class MenuButton(private val text: String, icon: String, font: String, color: Ve
         yogaFlexShrink = 0f
         yogaPaddingPercent = Vector4f(0f)
         yogaFlexDirection = Yoga.YGFlexDirectionColumn
+
+        this.color.w = 0f
+
         addChild(
             ColorContainer {
                 fillMode = Scaling.Stretch
@@ -137,7 +143,6 @@ class MenuButton(private val text: String, icon: String, font: String, color: Ve
                 lastBeatStart = timingPoint.time.toFloat()
             }
 
-            val beatLength = max(300f, lastBeatLength)
             val bProg = ((bTime - lastBeatStart) / lastBeatLength)
             val progress = floor(bProg).toInt()
 
@@ -147,7 +152,7 @@ class MenuButton(private val text: String, icon: String, font: String, color: Ve
                         Transform(
                             TransformType.Fade,
                             clock.currentTime,
-                            clock.currentTime + beatLength,
+                            clock.currentTime + lastBeatLength,
                             0.25f,
                             0f
                         )
@@ -156,13 +161,13 @@ class MenuButton(private val text: String, icon: String, font: String, color: Ve
                         Transform(
                             TransformType.Rotate,
                             clock.currentTime,
-                            clock.currentTime + beatLength,
+                            clock.currentTime + lastBeatLength,
                             if (progress%2==0) 0.2f else -0.2f,
                             if (progress%2==0) -0.2f else 0.2f
                         )
                     )
-                    jGlider.addEvent(clock.currentTime , clock.currentTime + beatLength/2, 0f, 0.3f, Easing.OutQuad)
-                    jGlider.addEvent(clock.currentTime+ beatLength/2 , clock.currentTime + beatLength, 0.3f, 0f, Easing.InQuad)
+                    jGlider.addEvent(clock.currentTime , clock.currentTime + lastBeatLength/2, 0f, 0.3f, Easing.OutQuad)
+                    jGlider.addEvent(clock.currentTime+ lastBeatLength/2 , clock.currentTime + lastBeatLength, 0.3f, 0f, Easing.InQuad)
                 }
                 lastProgress++
             }
@@ -190,6 +195,7 @@ class MenuButton(private val text: String, icon: String, font: String, color: Ve
 
     override fun onHover(e: HoverEvent): Boolean {
         if (!armed) return false
+        sampleStore.getResourceOrLoad("menu/menuclick.wav").play()
         glider.addEvent(clock.currentTime+300f, if(isFirst) 2.2f else 1.8f, Easing.OutElastic)
         return false
     }

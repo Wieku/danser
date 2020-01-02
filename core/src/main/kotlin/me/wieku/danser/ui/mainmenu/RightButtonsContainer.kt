@@ -27,7 +27,7 @@ class RightButtonsContainer : YogaContainer() {
                 scale = Vector2f(1f, 0f)
                 color = Vector4f(0.2f, 0.2f, 0.2f, 0f)
             },
-            MenuButton("play", "\uf144", "FontAwesome-Regular", Vector4f(65f, 17f, 158f, 255f).mul(1 / 255f), true),
+            MenuButton("danse!", "\uf144", "FontAwesome-Regular", Vector4f(65f, 17f, 158f, 255f).mul(1 / 255f), true),
             MenuButton(
                 "download",
                 "\uf358",

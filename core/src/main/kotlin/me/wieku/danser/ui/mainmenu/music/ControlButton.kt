@@ -2,17 +2,23 @@ package me.wieku.danser.ui.mainmenu.music
 
 import me.wieku.framework.animation.Transform
 import me.wieku.framework.animation.TransformType
+import me.wieku.framework.audio.SampleStore
 import me.wieku.framework.graphics.drawables.containers.ColorContainer
 import me.wieku.framework.graphics.drawables.containers.YogaContainer
 import me.wieku.framework.graphics.drawables.sprite.TextSprite
+import me.wieku.framework.input.event.ClickEvent
 import me.wieku.framework.input.event.HoverEvent
 import me.wieku.framework.input.event.HoverLostEvent
 import me.wieku.framework.math.Easing
 import me.wieku.framework.math.Scaling
 import org.joml.Vector2f
 import org.joml.Vector4f
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 
-class ControlButton(_icon: String): YogaContainer() {
+class ControlButton(_icon: String): YogaContainer(), KoinComponent {
+
+    private val sampleStore: SampleStore by inject()
 
     private lateinit var highlight: ColorContainer
     private lateinit var text: TextSprite
@@ -49,7 +55,13 @@ class ControlButton(_icon: String): YogaContainer() {
         inContext()
     }
 
+    override fun onClick(e: ClickEvent): Boolean {
+        sampleStore.getResourceOrLoad("menu/menuhit.wav").play()
+        return super.onClick(e)
+    }
+
     override fun onHover(e: HoverEvent): Boolean {
+        sampleStore.getResourceOrLoad("menu/menuclick.wav").play()
         highlight.addTransform(
             Transform(
                 TransformType.Fade,

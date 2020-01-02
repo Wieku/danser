@@ -4,6 +4,7 @@ import me.wieku.danser.beatmap.Beatmap
 import me.wieku.danser.graphics.drawables.CursorWithTrail
 import me.wieku.danser.ui.common.FPSStatistics
 import me.wieku.danser.ui.screens.LoadingScreen
+import me.wieku.framework.audio.SampleStore
 import me.wieku.framework.di.bindable.Bindable
 import me.wieku.framework.font.FontStore
 import me.wieku.framework.backend.Game
@@ -62,6 +63,7 @@ class Danser : Game(), KoinComponent {
             single { screenCache }
             single { textureStore }
             single { fontStore }
+            single { SampleStore() }
         }
 
         loadKoinModules(danserModule)
