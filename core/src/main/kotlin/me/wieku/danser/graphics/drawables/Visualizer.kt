@@ -38,22 +38,27 @@ class Visualizer() : Drawable(), KoinComponent {
     override fun update() {
         super.update()
 
-        val bTime = (beatmapBindable.value!!.getTrack().getPosition() * 1000).toLong()
-
-        val timingPoint = beatmapBindable.value!!.timing.getPointAt(bTime)
-
         deltaSum += clock.time.frameTime
 
         var decay = clock.time.frameTime * baseDecay
 
         if (deltaSum >= 50f) {
 
-            val fft = beatmapBindable.value!!.getTrack().fftData
+            beatmapBindable.value?.let {
 
-            for (i in 0 until bars) {
-                val value = fft[(i + jumpCounter) % bars] * if (timingPoint.kiai) 1f else 0.5f
-                if (value > amplitudes[i]) {
-                    amplitudes[i] = value
+                val bTime = (beatmapBindable.value!!.getTrack().getPosition() * 1000).toLong()
+
+                val timingPoint = beatmapBindable.value!!.timing.getPointAt(bTime)
+
+                if (it.getTrack().isRunning) {
+                    val fft = it.getTrack().fftData
+
+                    for (i in 0 until bars) {
+                        val value = fft[(i + jumpCounter) % bars] * if (timingPoint.kiai) 1f else 0.5f
+                        if (value > amplitudes[i]) {
+                            amplitudes[i] = value
+                        }
+                    }
                 }
             }
 

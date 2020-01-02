@@ -65,7 +65,7 @@ class DanserCoin : Container(), KoinComponent {
                     scale = Vector2f(0.95f)
                 },
                 CircularContainer {
-                    scale = Vector2f(0.95f)
+                    scale = Vector2f(0f)
                     fillMode = Scaling.Fit
                     addChild(
                         ColorContainer {
@@ -185,6 +185,18 @@ class DanserCoin : Container(), KoinComponent {
         scale.mul(inflate)
         super.updateDrawable()
         scale.mul(1f/inflate)
+    }
+
+    fun introBegin() {
+        circularContainer.addTransform(
+            Transform(
+                TransformType.Scale,
+                clock.currentTime+600,
+                clock.currentTime+1300f,
+                0f,
+                0.95f
+            )
+        )
     }
 
     fun introFinished() {

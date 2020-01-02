@@ -145,6 +145,7 @@ class ButtonSystem() : ParallaxContainer() {
             )
         )
 
+        coin.introBegin()
         introFinish = clock.currentTime + 1300
     }
 
