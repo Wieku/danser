@@ -1,5 +1,6 @@
 package me.wieku.danser.graphics.drawables
 
+import me.wieku.framework.animation.Glider
 import me.wieku.framework.animation.Transform
 import me.wieku.framework.animation.TransformType
 import me.wieku.framework.graphics.buffers.VertexArrayObject
@@ -15,6 +16,7 @@ import me.wieku.framework.input.InputManager
 import me.wieku.framework.input.MouseButton
 import me.wieku.framework.input.event.ClickEvent
 import me.wieku.framework.input.event.MouseDownEvent
+import me.wieku.framework.input.event.MouseUpEvent
 import me.wieku.framework.math.Easing
 import me.wieku.framework.math.Origin
 import me.wieku.framework.math.Scaling
@@ -69,6 +71,8 @@ class CursorWithTrail : Container(), KoinComponent {
     private val attribsRaw = MemoryUtil.memAllocFloat(12)
     private var pointsNum = 0
 
+    private val cursorInflate = Glider(1f)
+
     init {
 
         fillMode = Scaling.Stretch
@@ -119,7 +123,11 @@ class CursorWithTrail : Container(), KoinComponent {
     override fun update() {
         super.update()
 
-        var dirtyLocal = false
+        val before = cursorInflate.value
+
+        cursorInflate.update(clock.currentTime)
+
+        var dirtyLocal = cursorInflate.value != before
 
         currentPosition.set(inputManager.getPositionF())
 
@@ -190,14 +198,14 @@ class CursorWithTrail : Container(), KoinComponent {
                 attribsRaw.put(trailColor1.y)
                 attribsRaw.put(trailColor1.z)
                 attribsRaw.put(trailColor1.w)
-                attribsRaw.put(cursorSize)
+                attribsRaw.put(cursorSize * cursorInflate.value)
                 attribsRaw.put(1f)
 
                 attribsRaw.put(trailColor2.x)
                 attribsRaw.put(trailColor2.y)
                 attribsRaw.put(trailColor2.z)
                 attribsRaw.put(trailColor2.w)
-                attribsRaw.put(cursorSize * innerSizeMult)
+                attribsRaw.put(cursorSize * innerSizeMult * cursorInflate.value)
                 attribsRaw.put(innerTrailMult)
 
                 dirty = true
@@ -208,7 +216,10 @@ class CursorWithTrail : Container(), KoinComponent {
 
     override fun draw(batch: SpriteBatch) {
         super.draw(batch)
-        var tempOv = cursorSize
+
+        val inflated = cursorSize * cursorInflate.value
+
+        var tempOv = inflated
 
         tempCursor.drawPosition.set(currentPosition).sub(tempOv / 2, tempOv / 2)
         tempCursor.drawSize.set(tempOv)
@@ -271,7 +282,7 @@ class CursorWithTrail : Container(), KoinComponent {
 
         batch.begin()
 
-        tempOv = cursorSize
+        tempOv = inflated
 
         tempCursorTop.drawPosition.set(currentPosition).sub(tempOv / 2, tempOv / 2)
         tempCursorTop.drawSize.set(tempOv)
@@ -281,6 +292,7 @@ class CursorWithTrail : Container(), KoinComponent {
 
     override fun onMouseDown(e: MouseDownEvent): Boolean {
         if (e.button == MouseButton.ButtonLeft || e.button == MouseButton.ButtonRight) {
+            cursorInflate.addEvent(clock.currentTime + 100, 1.3f)
             addChild(
                 Sprite("cursor/ripple.png") {
                     fillMode = Scaling.Fit
@@ -300,6 +312,11 @@ class CursorWithTrail : Container(), KoinComponent {
         }
 
         return super.onMouseDown(e)
+    }
+
+    override fun onMouseUp(e: MouseUpEvent): Boolean {
+        cursorInflate.addEvent(clock.currentTime + 100, 1f)
+        return super.onMouseUp(e)
     }
 
     override fun dispose() {
