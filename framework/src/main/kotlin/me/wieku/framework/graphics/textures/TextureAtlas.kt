@@ -123,10 +123,10 @@ class TextureAtlas(_size: Int, _mipmaps: Int = 1, layers: Int = 1, private val f
                 emptySpaces[layer]?.removeAt(j)
                 emptySpaces[layer]?.add(rect1)
                 emptySpaces[layer]?.add(rect2)
-                
+
                 glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, smallest.x, smallest.y, layer, width, height, 1, format.format, format.type, data)
                 glGenerateMipmap(GL_TEXTURE_2D_ARRAY)
-                
+
                 val region = TextureRegion( this, (smallest.x+0.5f)/store.width, 0f, (smallest.y+0.5f)/store.height, 0f, layer)
                 region.U2 = region.U1 + (width-1).toFloat()/store.width
                 region.V2 = region.V1 + (height-1).toFloat()/store.height

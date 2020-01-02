@@ -63,7 +63,7 @@ abstract class Drawable() : InputHandler(), Disposable, KoinComponent {
     var flipY = false
 
     var rotation = 0f
-    
+
     var additive = false
 
     var shearX = 0f

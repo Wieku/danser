@@ -6,7 +6,7 @@ import org.joml.Vector2i
 
 object FrameworkConfig: Config<FrameworkConfig.FrameworkConfigProperties>(FrameworkConfigProperties::class) {
     override val configFile: String = "framework.ini"
-    
+
     val windowPosition = BindableVector2i(Vector2i(40, 40))
 
     val windowSize = BindableVector2i(Vector2i(1280, 720))
@@ -55,7 +55,7 @@ object FrameworkConfig: Config<FrameworkConfig.FrameworkConfigProperties>(Framew
         addProperty(FrameworkConfigProperties.MusicVolume, musicVolume)
         addProperty(FrameworkConfigProperties.EffectsVolume, effectsVolume)
     }
-    
+
     enum class FrameworkConfigProperties {
         WindowPosition,
         WindowSize,

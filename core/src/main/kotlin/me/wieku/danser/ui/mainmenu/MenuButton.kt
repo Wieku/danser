@@ -143,7 +143,7 @@ class MenuButton(private val text: String, icon: String, font: String, color: Ve
                 lastBeatStart = timingPoint.time.toFloat()
             }
 
-            val bProg = ((bTime - lastBeatStart) / lastBeatLength)
+            val bProg = (bTime - lastBeatStart) / lastBeatLength
             val progress = floor(bProg).toInt()
 
             if (progress > lastProgress) {
@@ -172,8 +172,6 @@ class MenuButton(private val text: String, icon: String, font: String, color: Ve
                 lastProgress++
             }
         }
-
-
 
         glider.update(clock.currentTime)
         jGlider.update(clock.currentTime)

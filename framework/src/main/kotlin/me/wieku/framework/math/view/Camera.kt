@@ -101,7 +101,6 @@ class Camera {
         view.identity().translate(position.x, position.y, 0f).rotateZ(rotation).scale(scale.x, scale.y, 1f)
             .translate(origin.x, origin.y, 0f)
     }
-    
 
     fun update() {
         if (viewDirty) {
