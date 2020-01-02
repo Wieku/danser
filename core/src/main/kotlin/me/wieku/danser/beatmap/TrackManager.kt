@@ -23,11 +23,6 @@ object TrackManager: KoinComponent {
         var beatmap = Beatmap("cYsmix - Peer Gynt (Wieku) [Danser Intro].osu")
         BeatmapParser().parse(FileHandle("assets/beatmaps/cYsmix - Peer Gynt/cYsmix - Peer Gynt (Wieku) [Danser Intro].osu", FileType.Classpath), beatmap)
 
-        playlistHistory.add(BeatmapManager.beatmapSets.filter {
-            it.beatmaps.filter { bmap -> bmap.beatmapInfo.version == "EXTRA AR10" }
-                .isNotEmpty()
-        }[0])
-
         startBeatmap(beatmap, true, -1300f)
         volumeGlider.addEvent(time, time + 1300f, 0f, 1f)
     }
