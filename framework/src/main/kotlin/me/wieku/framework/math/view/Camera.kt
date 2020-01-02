@@ -9,29 +9,36 @@ class Camera {
     private var screenRect = Rectanglef()
     var projection = Matrix4f()
         private set
+
     var view = Matrix4f()
         private set
+
     var projectionView = Matrix4f()
         private set
+
     var invProjectionView = Matrix4f()
         private set
 
     var viewDirty = true
+
     var origin = Vector2f()
         set(value) {
             viewDirty = true
             field = value
         }
+
     var position = Vector2f()
         set(value) {
             viewDirty = true
             field = value
         }
+
     var rotation = 0f
         set(value) {
             viewDirty = true
             field = value
         }
+
     var scale = Vector2f(1f, 1f)
         set(value) {
             viewDirty = true
@@ -54,9 +61,9 @@ class Camera {
         }
 
         if (yDown) {
-            projection.identity().ortho((screenRect.minX), (screenRect.maxX), (screenRect.minY), (screenRect.maxY), 1f, -1f)
+            projection.identity().ortho(screenRect.minX, screenRect.maxX, screenRect.minY, screenRect.maxY, 1f, -1f)
         } else {
-            projection.identity().ortho((screenRect.minX), (screenRect.maxX), (screenRect.minY), (screenRect.maxY), -1f, 1f)
+            projection.identity().ortho(screenRect.minX, screenRect.maxX, screenRect.minY, screenRect.maxY, -1f, 1f)
         }
 
         //rebuildCache = true
@@ -81,11 +88,11 @@ class Camera {
 
     fun setViewportF(x: Int, y: Int, width: Int, height: Int, yDown: Boolean = true) {
         screenRect.minX = x.toFloat()
-        screenRect.maxX = width.toFloat()+x.toFloat()
+        screenRect.maxX = width.toFloat() + x.toFloat()
         screenRect.minY = if (yDown) height.toFloat()+y.toFloat() else y.toFloat()
-        screenRect.maxY = if (yDown) y.toFloat() else height.toFloat()+y.toFloat()
+        screenRect.maxY = if (yDown) y.toFloat() else height.toFloat() + y.toFloat()
 
-        projection.identity().ortho((screenRect.minX), (screenRect.maxX), (screenRect.minY), (screenRect.maxY), -1f, 1f)
+        projection.identity().ortho(screenRect.minX, screenRect.maxX, screenRect.minY, screenRect.maxY, -1f, 1f)
         //rebuildCache = true
         viewDirty = true
     }

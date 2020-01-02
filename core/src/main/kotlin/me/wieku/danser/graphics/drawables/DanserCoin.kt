@@ -136,8 +136,8 @@ class DanserCoin : Container(), KoinComponent {
         coinTop.color.w = if (timingPoint.kiai) 0.12f else 0.3f
 
         val bProg = when (beatmapBindable.value!!.getTrack().isRunning) {
-            true -> ((bTime - timingPoint.time) / timingPoint.baseBpm)
-            false -> ((clock.currentTime) / defaultBeatLength)
+            true -> (bTime - timingPoint.time) / timingPoint.baseBpm
+            false -> clock.currentTime / defaultBeatLength
         }
 
         beatProgress = bProg - floor(bProg)
@@ -149,7 +149,7 @@ class DanserCoin : Container(), KoinComponent {
         }
 
         val beatLength = max(300f, lastBeatLength)
-        val b1Prog = ((bTime - lastBeatStart) / lastBeatLength)
+        val b1Prog = (bTime - lastBeatStart) / lastBeatLength
         val progress1 = floor(b1Prog).toInt()
 
         if (progress1 != lastBeatProgress) {
@@ -173,12 +173,12 @@ class DanserCoin : Container(), KoinComponent {
             lastBeatProgress = progress1
         }
 
-        val vprog = if (beatmapBindable.value!!.getTrack().isRunning) 1f - ((volume - volumeAverage) / 0.5f) else 1f
+        val vprog = if (beatmapBindable.value!!.getTrack().isRunning) 1f - (volume - volumeAverage) / 0.5f else 1f
         val pV = min(1.0f, max(0.0f, 1.0f - (vprog * 0.5f + beatProgress * 0.5f)))
 
         val ratio = 0.5f.pow(clock.time.frameTime / 16.6666666666667f)
 
-        progress = lastProgress * ratio + (pV) * (1 - ratio)
+        progress = lastProgress * ratio + pV * (1 - ratio)
         lastProgress = progress
 
         coinBottom.scale.set(1.05f - Easings.OutQuad(progress * 0.05f))

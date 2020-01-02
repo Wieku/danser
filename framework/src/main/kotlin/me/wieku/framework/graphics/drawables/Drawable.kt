@@ -61,7 +61,7 @@ abstract class Drawable() : InputHandler(), Disposable, KoinComponent {
 
     var flipX = false
     var flipY = false
-    
+
     var rotation = 0f
     
     var additive = false
@@ -99,8 +99,6 @@ abstract class Drawable() : InputHandler(), Disposable, KoinComponent {
         }
     }
 
-    
-    
     protected open fun updateDrawable() {
         drawScale.set(scale)
         tempColor.set(color)
@@ -142,8 +140,8 @@ abstract class Drawable() : InputHandler(), Disposable, KoinComponent {
     }
 
     override fun isCursorIn(cursorPosition: Vector2i): Boolean {
-        return (cursorPosition.x >= drawPosition.x && cursorPosition.x < drawPosition.x + drawSize.x) &&
-                (cursorPosition.y >= drawPosition.y && cursorPosition.y < drawPosition.y + drawSize.y)
+        return cursorPosition.x >= drawPosition.x && cursorPosition.x < drawPosition.x + drawSize.x &&
+                cursorPosition.y >= drawPosition.y && cursorPosition.y < drawPosition.y + drawSize.y
     }
 
     fun update(time: Float) {
