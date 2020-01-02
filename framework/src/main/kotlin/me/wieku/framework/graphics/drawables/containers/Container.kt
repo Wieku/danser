@@ -61,6 +61,7 @@ open class Container() : Drawable() {
 
     override fun update() {
         super.update()
+        maskInfo.rect.set(drawPosition.x, drawPosition.y, drawPosition.x+ round(drawSize.x), round(drawPosition.y + drawSize.y))
 
         children.synchronized {
             removeIf {
@@ -68,11 +69,6 @@ open class Container() : Drawable() {
                 it.canBeDeleted()
             }
         }
-    }
-
-    override fun updateDrawable() {
-        super.updateDrawable()
-        maskInfo.rect.set(drawPosition.x, drawPosition.y, drawPosition.x+ round(drawSize.x), round(drawPosition.y + drawSize.y))
     }
 
     override fun draw(batch: SpriteBatch) {

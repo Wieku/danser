@@ -19,6 +19,12 @@ open class YogaContainer() : Container() {
         get() = children.count { it is YogaContainer }
 
     var isRoot = false
+        set(value) {
+            if (value) {
+                yogaDirection = YGDirectionLTR
+            }
+            field = value
+        }
 
     //region Yoga Variables
 
