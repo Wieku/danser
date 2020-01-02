@@ -8,6 +8,7 @@ import jouvieje.bass.utils.Pointer
 import me.wieku.framework.configuration.FrameworkConfig
 import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.FileType
+import kotlin.math.min
 
 class Sample(file: FileHandle) {
     private var mainChannel = when (file.fileType) {
@@ -39,7 +40,7 @@ class Sample(file: FileHandle) {
         BASS_ChannelSetAttribute(
             channel.asInt(),
             BASS_ATTRIB_VOL,
-            if (isAbsolute) volume else FrameworkConfig.generalVolume.value * FrameworkConfig.effectsVolume.value * volume
+            min(1f, if (isAbsolute) volume else FrameworkConfig.generalVolume.value * FrameworkConfig.effectsVolume.value * volume)
         )
         BASS_ChannelPlay(channel.asInt(), true)
     }

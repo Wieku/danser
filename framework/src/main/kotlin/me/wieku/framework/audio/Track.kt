@@ -11,9 +11,9 @@ import me.wieku.framework.resource.FileType
 import me.wieku.framework.time.IClock
 import org.lwjgl.BufferUtils
 import org.lwjgl.system.MemoryStack
-import org.lwjgl.system.MemoryUtil
 import java.io.File
 import java.lang.ref.WeakReference
+import kotlin.math.min
 
 class Track(file: FileHandle, val fftMode: FFTMode = FFTMode.FFT512) : IClock {
     private var channelStream = when (file.fileType) {
@@ -47,12 +47,6 @@ class Track(file: FileHandle, val fftMode: FFTMode = FFTMode.FFT512) : IClock {
     internal var isVolumeAbsolute = false
 
     var fftData = FloatArray(fftMode.bins)
-        private set
-
-    var peak: Float = 0.0f
-        private set
-
-    var beat: Float = 0.0f
         private set
 
     var leftChannelLevel: Float = 0.0f
@@ -101,13 +95,13 @@ class Track(file: FileHandle, val fftMode: FFTMode = FFTMode.FFT512) : IClock {
         BASS_ChannelStop(channelStream.asInt())
     }
 
-    fun setVolume(vol: Float, isAbsolute: Boolean = false) {
-        volume = vol
+    fun setVolume(volume: Float, isAbsolute: Boolean = false) {
+        this.volume = volume
         isVolumeAbsolute = isAbsolute
         BASS_ChannelSetAttribute(
             fxChannel.asInt(),
             BASS_ATTRIB.BASS_ATTRIB_VOL,
-            if (isAbsolute) vol else FrameworkConfig.generalVolume.value * FrameworkConfig.musicVolume.value * vol
+            min(1f, if (isAbsolute) this.volume else FrameworkConfig.generalVolume.value * FrameworkConfig.musicVolume.value * this.volume)
         )
     }
 
@@ -177,20 +171,6 @@ class Track(file: FileHandle, val fftMode: FFTMode = FFTMode.FFT512) : IClock {
         BASS_ChannelGetData(fxChannel.asInt(), dataBuffer, fftMode.bassInt)
 
         dataBuffer.asFloatBuffer().get(fftData)
-
-        var allPeak = 0f
-        var beatPeak = 0f
-
-        for ((i, v) in fftData.withIndex()) {
-            allPeak = Math.max(allPeak, v)
-
-            if (i in 1..4) {
-                beatPeak = Math.max(beatPeak, v)
-            }
-        }
-
-        beat = beatPeak
-        peak = allPeak
 
         val level = BASS_ChannelGetLevel(fxChannel.asInt())
 

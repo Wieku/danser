@@ -167,7 +167,7 @@ class DanserCoin : Container(), KoinComponent {
             }
 
             if (triangles.spawnEnabled && isHovered) {
-                sampleStore.getResourceOrLoad("menu/heartbeat.mp3").play()
+                sampleStore.getResourceOrLoad("menu/heartbeat.mp3").play(1.5f)
             }
 
             lastBeatProgress = progress1
