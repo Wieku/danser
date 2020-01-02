@@ -1,14 +1,23 @@
 package me.wieku.danser.graphics.drawables
 
+import me.wieku.framework.animation.Transform
+import me.wieku.framework.animation.TransformType
 import me.wieku.framework.graphics.buffers.VertexArrayObject
 import me.wieku.framework.graphics.buffers.VertexAttribute
 import me.wieku.framework.graphics.buffers.VertexAttributeType
 import me.wieku.framework.graphics.drawables.Drawable
+import me.wieku.framework.graphics.drawables.containers.Container
 import me.wieku.framework.graphics.drawables.sprite.Sprite
 import me.wieku.framework.graphics.drawables.sprite.SpriteBatch
 import me.wieku.framework.graphics.shaders.Shader
 import me.wieku.framework.graphics.textures.store.TextureStore
 import me.wieku.framework.input.InputManager
+import me.wieku.framework.input.MouseButton
+import me.wieku.framework.input.event.ClickEvent
+import me.wieku.framework.input.event.MouseDownEvent
+import me.wieku.framework.math.Easing
+import me.wieku.framework.math.Origin
+import me.wieku.framework.math.Scaling
 import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.FileType
 import me.wieku.framework.utils.synchronized
@@ -21,7 +30,7 @@ import org.lwjgl.system.MemoryUtil
 import java.util.*
 import kotlin.math.floor
 
-class CursorWithTrail : Drawable(), KoinComponent {
+class CursorWithTrail : Container(), KoinComponent {
 
     //region TODO: Move those values to settings
 
@@ -61,6 +70,9 @@ class CursorWithTrail : Drawable(), KoinComponent {
     private var pointsNum = 0
 
     init {
+
+        fillMode = Scaling.Stretch
+
         cursorVAO.addVBO(
             "default", 6, 0, arrayOf(
                 VertexAttribute("in_position", VertexAttributeType.Vec3, 0),
@@ -81,7 +93,7 @@ class CursorWithTrail : Drawable(), KoinComponent {
         )
 
         cursorVAO.addVBO(
-            "points", (trailMaxLength / trailDensity).toInt()*2, 1, arrayOf(
+            "points", (trailMaxLength / trailDensity).toInt() * 2, 1, arrayOf(
                 VertexAttribute("in_mid", VertexAttributeType.Vec2, 0)
             )
         )
@@ -195,6 +207,7 @@ class CursorWithTrail : Drawable(), KoinComponent {
     }
 
     override fun draw(batch: SpriteBatch) {
+        super.draw(batch)
         var tempOv = cursorSize
 
         tempCursor.drawPosition.set(currentPosition).sub(tempOv / 2, tempOv / 2)
@@ -214,7 +227,12 @@ class CursorWithTrail : Drawable(), KoinComponent {
         batch.end()
         GL33.glEnable(GL33.GL_BLEND)
         GL33.glBlendEquation(GL33.GL_ADD)
-        GL33.glBlendFuncSeparate(GL33.GL_SRC_ALPHA, GL33.GL_ONE_MINUS_SRC_ALPHA, GL33.GL_ONE, GL33.GL_ONE_MINUS_SRC_ALPHA)
+        GL33.glBlendFuncSeparate(
+            GL33.GL_SRC_ALPHA,
+            GL33.GL_ONE_MINUS_SRC_ALPHA,
+            GL33.GL_ONE,
+            GL33.GL_ONE_MINUS_SRC_ALPHA
+        )
 
         val texture = textureStore.getResourceOrLoad("cursor/cursortrail.png")
         texture.bind(0)
@@ -259,6 +277,29 @@ class CursorWithTrail : Drawable(), KoinComponent {
         tempCursorTop.drawSize.set(tempOv)
         tempCursorTop.drawOrigin.set(tempOv / 2)
         tempCursorTop.draw(batch)
+    }
+
+    override fun onMouseDown(e: MouseDownEvent): Boolean {
+        if (e.button == MouseButton.ButtonLeft || e.button == MouseButton.ButtonRight) {
+            addChild(
+                Sprite("cursor/ripple.png") {
+                    fillMode = Scaling.Fit
+                    scale = Vector2f(0f)
+
+                    anchor = Origin.Custom
+                    customAnchor.set(e.cursorPosition.x.toFloat(), e.cursorPosition.y.toFloat())
+                        .sub(this@CursorWithTrail.drawPosition)
+                        .mul(1f / this@CursorWithTrail.drawSize.x, 1f / this@CursorWithTrail.drawSize.y)
+
+                    drawForever = false
+
+                    addTransform(Transform(TransformType.Fade, clock.currentTime, clock.currentTime + 500, 0.5f, 0f))
+                    addTransform(Transform(TransformType.Scale, clock.currentTime, clock.currentTime + 500, 0f, 0.15f))
+                }
+            )
+        }
+
+        return super.onMouseDown(e)
     }
 
     override fun dispose() {
