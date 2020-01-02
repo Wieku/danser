@@ -78,10 +78,12 @@ class Triangles() : Container(), KoinComponent {
         var boost = 0f
 
         beatmapBindable.value?.let {
-            val fft = it.getTrack().fftData
+            if (it.getTrack().isRunning) {
+                val fft = it.getTrack().fftData
 
-            for (i in 0 until bars) {
-                boost += 2 * fft[i] * (bars - i).toFloat() / bars.toFloat()
+                for (i in 0 until bars) {
+                    boost += 2 * fft[i] * (bars - i).toFloat() / bars.toFloat()
+                }
             }
         }
 
