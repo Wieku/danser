@@ -32,6 +32,7 @@ class FileHandle(path: String, val fileType: FileType) {
                 filePath!!.toUri().toURL()
             }
             FileType.Classpath -> {
+                filePath = Paths.get(path.replace('\\', '/'))
                 FileHandle::class.java.getResource("/" + file.path.replace('\\', '/'))
             }
             FileType.Local -> {

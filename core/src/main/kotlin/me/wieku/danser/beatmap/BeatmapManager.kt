@@ -56,7 +56,7 @@ object BeatmapManager {
     fun loadBeatmaps(location: String) {
 
         File(location).listFiles { it -> it.extension == "osz" }?.forEach {
-            it.unpack()
+            FileHandle(it.absolutePath, FileType.Absolute).unpack()
         }
 
         entityManager.transactional {

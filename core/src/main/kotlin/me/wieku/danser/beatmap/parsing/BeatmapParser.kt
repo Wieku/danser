@@ -32,8 +32,8 @@ class BeatmapParser {
         }
 
         beatmap.beatmapFile = file.filePath!!.fileName.toString()
-        beatmap.beatmapInfo.md5 = file.file.md5()
-        beatmap.beatmapInfo.sha1 = file.file.sha1()
+        beatmap.beatmapInfo.md5 = file.md5()
+        beatmap.beatmapInfo.sha1 = file.sha1()
         beatmap.beatmapStatistics.lastModified = file.file.lastModified()
 
         if (beatmap.beatmapStatistics.timeAdded == 0L) {

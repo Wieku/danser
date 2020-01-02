@@ -6,10 +6,10 @@ import java.security.DigestInputStream
 import java.security.MessageDigest
 import java.util.zip.ZipFile
 
-fun File.md5() = hash("MD5")
-fun File.sha1() = hash("SHA1")
+fun FileHandle.md5() = hash("MD5")
+fun FileHandle.sha1() = hash("SHA1")
 
-fun File.hash(algorithm: String) : String {
+fun FileHandle.hash(algorithm: String) : String {
     var messageDigest = MessageDigest.getInstance(algorithm)
     var digestStream = DigestInputStream(inputStream(), messageDigest)
 
@@ -28,10 +28,10 @@ private fun bytes2Hex(bts: ByteArray): String {
     return des.toString().toLowerCase()
 }
 
-fun File.unpack(directory: String = absolutePath.substringBefore(".$extension"), removeAfter:Boolean = true) {
+fun FileHandle.unpack(directory: String = file.absolutePath.substringBefore(".${file.extension}"), removeAfter:Boolean = true) {
     File(directory).mkdirs()
-    ZipFile(this).use { zip ->
-        println("Unpacking $name")
+    ZipFile(file).use { zip ->
+        println("Unpacking ${file.name}")
         zip.entries().asSequence().forEach { entry ->
             zip.getInputStream(entry).use { inStream ->
                 File(directory + File.separator + entry.name).outputStream().use { outStream ->
@@ -42,5 +42,5 @@ fun File.unpack(directory: String = absolutePath.substringBefore(".$extension"),
     }
 
     if (removeAfter)
-        this.delete()
+        file.delete()
 }

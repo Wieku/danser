@@ -45,7 +45,7 @@ class Beatmap(
     var metadata: BeatmapMetadata? = BeatmapMetadata()
 
     var beatmapMetadata: BeatmapMetadata
-        get() = metadata ?: beatmapSet.metadata?:throw NullPointerException("Beatmap and BeatmapSet metadata are null")
+        get() = metadata ?: beatmapSet.metadata ?: throw NullPointerException("Beatmap and BeatmapSet metadata are null")
         set(value) {
             if (value == beatmapSet.metadata) {
                 metadata = null
@@ -76,18 +76,31 @@ class Beatmap(
     @Transient
     private lateinit var track: Track
 
-    fun getTrack() : Track {
+    fun getTrack(): Track {
         return track
     }
 
-    fun loadTrack() {
+    fun loadTrack(local: Boolean = false) {
         track = Track(
             FileHandle(
-                System.getenv("localappdata") + "/osu!/Songs/" + beatmapSet.directory + File.separator + beatmapMetadata.audioFile,
-                FileType.Absolute
+                if (local) {
+                    "assets/beatmaps/"
+                } else {
+                    System.getenv("localappdata") + "/osu!/Songs/"
+                } + beatmapSet.directory + File.separator + beatmapMetadata.audioFile,
+                if(local) FileType.Classpath else FileType.Absolute
             )
         )
-        BeatmapParser().parse(FileHandle(System.getenv("localappdata") + "/osu!/Songs/" + beatmapSet.directory + File.separator + beatmapFile, FileType.Absolute), this, true)
+        BeatmapParser().parse(
+            FileHandle(
+                if (local) {
+                    "assets/beatmaps/"
+                } else {
+                    System.getenv("localappdata") + "/osu!/Songs/"
+                } + beatmapSet.directory + File.separator + beatmapFile,
+                if (local) FileType.Classpath else FileType.Absolute
+            ), this, true
+        )
     }
 
 }

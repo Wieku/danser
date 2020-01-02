@@ -11,17 +11,20 @@ import me.wieku.framework.resource.FileType
 import me.wieku.framework.time.IClock
 import org.lwjgl.BufferUtils
 import org.lwjgl.system.MemoryStack
+import org.lwjgl.system.MemoryUtil
+import java.io.File
 import java.lang.ref.WeakReference
 
 class Track(file: FileHandle, val fftMode: FFTMode = FFTMode.FFT512) : IClock {
     private var channelStream = when (file.fileType) {
         FileType.Classpath -> {
-            val buffer = file.toBuffer()
+            val tmpFile = File.createTempFile("danser", "." + file.file.extension)
+            tmpFile.outputStream().use { file.inputStream().copyTo(it) }
             BASS_StreamCreateFile(
-                true,
-                buffer,
+                false,
+                tmpFile.absolutePath,
                 0,
-                buffer.limit().toLong(),
+                0,
                 BASS_STREAM.BASS_STREAM_DECODE or BASS_STREAM.BASS_STREAM_PRESCAN
             )
         }
