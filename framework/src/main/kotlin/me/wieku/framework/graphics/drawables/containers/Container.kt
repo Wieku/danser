@@ -4,20 +4,18 @@ import me.wieku.framework.graphics.drawables.Drawable
 import me.wieku.framework.graphics.drawables.sprite.SpriteBatch
 import me.wieku.framework.input.InputHandler
 import me.wieku.framework.utils.MaskingInfo
-import me.wieku.framework.utils.synchronized
 import org.joml.Vector2i
 import java.util.*
-import java.util.concurrent.locks.ReentrantLock
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.collections.ArrayList
-import kotlin.math.round
 
 open class Container() : Drawable() {
 
+    protected val children = ArrayList<Drawable>()
+    private val childrenToRemove = ArrayList<Drawable>()
+
     protected val maskInfo = MaskingInfo()
-
     var useScissor = false
-
 
     private val lock = ReentrantReadWriteLock()
     private val accessLock = lock.readLock()
@@ -36,57 +34,62 @@ open class Container() : Drawable() {
         inContext()
     }
 
-    protected val children = ArrayList<Drawable>()
-
     open fun addChild(vararg drawable: Drawable) {
         modificationLock.lock()
-        //children.synchronized {
-            children.addAll(drawable)
-        //}
 
+        children.addAll(drawable)
         drawable.forEach { it.parent = this }
+
         modificationLock.unlock()
     }
 
     open fun insertChild(drawable: Drawable, index: Int) {
         modificationLock.lock()
-        children.//synchronized {
-            add(index, drawable)
-        //}
+
+        children.add(index, drawable)
         drawable.parent = this
+
         modificationLock.unlock()
     }
 
     open fun removeChild(drawable: Drawable) {
         modificationLock.lock()
-        children.synchronized {
-            remove(drawable)
-        }
 
+        children.remove(drawable)
         drawable.parent = null
+
         modificationLock.unlock()
     }
 
     override fun invalidate() {
         super.invalidate()
+
+        accessLock.lock()
+
         children.forEach { it.invalidate() }
+
+        accessLock.unlock()
     }
 
     override fun update() {
         super.update()
-        maskInfo.rect.set(drawPosition.x, drawPosition.y, drawPosition.x+ round(drawSize.x), round(drawPosition.y + drawSize.y))
+        maskInfo.rect.set(drawPosition.x, drawPosition.y, drawPosition.x + drawSize.x, drawPosition.y + drawSize.y)
 
         accessLock.lock()
 
         children.forEach {
             it.update()
+            if (it.canBeDeleted()) {
+                childrenToRemove.add(it)
+            }
         }
 
         accessLock.unlock()
 
         modificationLock.lock()
 
-        children.removeIf { it.canBeDeleted() }
+        children.removeAll(childrenToRemove)
+        childrenToRemove.clear()
 
         modificationLock.unlock()
     }
@@ -100,9 +103,7 @@ open class Container() : Drawable() {
 
         accessLock.lock()
 
-        //children.synchronized {
-            children.forEach { it.draw(batch) }
-        //}
+        children.forEach { it.draw(batch) }
 
         accessLock.unlock()
 

@@ -19,5 +19,5 @@ data class CPair<out A, out B>(
         return first == other.first && second == other.second
     }
 
-    override fun hashCode(): Int = Objects.hash(first, second)
+    override fun hashCode(): Int = 31 * first.hashCode() + second.hashCode()
 }

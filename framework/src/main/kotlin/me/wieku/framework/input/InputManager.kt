@@ -59,7 +59,7 @@ abstract class InputManager {
                         return@loop
                     }
 
-                    if (handler.trigger(MouseDownEvent(pos, mouseButton))) {
+                    if (inputAction == InputAction.Press && handler.trigger(MouseDownEvent(pos, mouseButton))) {
                         pressHolder = handler
                         return@loop
                     }
