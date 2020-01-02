@@ -14,6 +14,7 @@ import org.joml.Vector2i
 import org.joml.Vector4f
 import org.koin.core.KoinComponent
 import org.koin.core.inject
+import java.util.concurrent.locks.ReentrantLock
 import kotlin.math.max
 import kotlin.math.min
 
@@ -31,6 +32,7 @@ abstract class Drawable() : InputHandler(), Disposable, KoinComponent {
     open var position = Vector2f()
     var fixedPosition = Vector2f()
     var drawPosition = Vector2f()
+    private var tempPosition = Vector2f()
 
     var childOffset = Vector2f()
 
@@ -41,6 +43,7 @@ abstract class Drawable() : InputHandler(), Disposable, KoinComponent {
     var origin = Origin.Centre
     var customOrigin = Vector2f()
     var drawOrigin = Vector2f()
+    private var tempOrigin = Vector2f()
 
     var inheritScale = true
     var scale = Vector2f(1f)
@@ -49,10 +52,12 @@ abstract class Drawable() : InputHandler(), Disposable, KoinComponent {
     var fillMode = Scaling.None
     var size = Vector2f(1f)
     var drawSize = Vector2f()
+    private var tempSize = Vector2f()
 
     var inheritColor = true
     var color = Vector4f(1f, 1f, 1f, 1f)
     var drawColor = Vector4f(1f, 1f, 1f, 1f)
+    private var tempColor = Vector4f(1f, 1f, 1f, 1f)
 
     var flipX = false
     var flipY = false
@@ -94,14 +99,16 @@ abstract class Drawable() : InputHandler(), Disposable, KoinComponent {
         }
     }
 
+    
+    
     protected open fun updateDrawable() {
         drawScale.set(scale)
-        drawColor.set(color)
+        tempColor.set(color)
 
         parent?.let { parent ->
 
-            drawSize.set(fillMode.apply(size.x, size.y, parent.drawSize.x, parent.drawSize.y)).mul(drawScale)
-            drawOrigin.set(if (origin == Origin.Custom) customOrigin else origin.offset).mul(drawSize)
+            tempSize.set(fillMode.apply(size.x, size.y, parent.drawSize.x, parent.drawSize.y)).mul(drawScale)
+            tempOrigin.set(if (origin == Origin.Custom) customOrigin else origin.offset).mul(tempSize)
 
             drawAnchor.set(0f)
 
@@ -110,18 +117,22 @@ abstract class Drawable() : InputHandler(), Disposable, KoinComponent {
                 drawAnchor.mul(parent.drawSize).add(parent.drawPosition).add(parent.childOffset)
             }
 
-            drawPosition.set(position).sub(drawOrigin).add(drawAnchor)
+            tempPosition.set(position).sub(tempOrigin).add(drawAnchor)
             if (inheritColor) {
-                drawColor.mul(parent.drawColor)
+                tempColor.mul(parent.drawColor)
             }
-            return
         }
 
         if (parent == null) {
-            drawSize.set(size).mul(drawScale)
-            drawOrigin.set(if (origin == Origin.Custom) customOrigin else origin.offset).mul(drawSize)
-            drawPosition.set(position).sub(drawOrigin)
+            tempSize.set(size).mul(drawScale)
+            tempOrigin.set(if (origin == Origin.Custom) customOrigin else origin.offset).mul(tempSize)
+            tempPosition.set(position).sub(tempOrigin)
         }
+
+        drawPosition.set(tempPosition)
+        drawOrigin.set(tempOrigin)
+        drawSize.set(tempSize)
+        drawColor.set(tempColor)
     }
 
     abstract fun draw(batch: SpriteBatch)

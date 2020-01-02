@@ -4,11 +4,14 @@ import me.wieku.framework.graphics.drawables.sprite.Sprite
 import me.wieku.framework.graphics.drawables.sprite.SpriteBatch
 import me.wieku.framework.graphics.effects.BlurEffect
 import me.wieku.framework.math.view.Camera
+import java.util.concurrent.locks.ReentrantLock
 
 open class BlurredContainer() : Container() {
 
     private val blur = BlurEffect(1920, 1080)
     private val tempSprite = Sprite()
+
+    private val lock = ReentrantLock()
 
     var needsRedraw = true
 
@@ -35,6 +38,7 @@ open class BlurredContainer() : Container() {
         super.update()
         camera.setViewportF(drawPosition.x.toInt(), drawPosition.y.toInt(), drawSize.x.toInt(), drawSize.y.toInt())
         camera.update()
+        lock.lock()
         if (wasUpdated) {
             needsRedraw = true
         }
@@ -42,6 +46,7 @@ open class BlurredContainer() : Container() {
             needsRedraw = true
             needsResize = true
         }
+        lock.unlock()
     }
 
     override fun updateDrawable() {
@@ -60,6 +65,7 @@ open class BlurredContainer() : Container() {
     }
 
     override fun draw(batch: SpriteBatch) {
+        lock.lock()
         if (needsResize) {
             blur.resize(drawSize.x.toInt(), drawSize.y.toInt())
             needsResize = false
@@ -78,7 +84,7 @@ open class BlurredContainer() : Container() {
             batch.camera = oldCamera
             needsRedraw = false
         }
-
+        lock.unlock()
         batch.draw(tempSprite)
     }
 
