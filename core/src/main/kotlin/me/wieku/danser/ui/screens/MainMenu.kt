@@ -48,7 +48,7 @@ class MainMenu : Screen(), KoinComponent {
     }
 
     override fun update() {
-        TrackManager.update()
+        TrackManager.update(clock.currentTime)
 
         super.update()
 
@@ -57,7 +57,7 @@ class MainMenu : Screen(), KoinComponent {
     override fun onEnter(previous: Screen?) {
         super.onEnter(previous)
 
-        TrackManager.start()
+        TrackManager.start(clock.currentTime)
 
         buttonSystem.beginIntroSequence()
 

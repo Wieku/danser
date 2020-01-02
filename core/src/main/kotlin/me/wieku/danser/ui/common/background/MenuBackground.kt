@@ -42,6 +42,7 @@ class MenuBackground(): ParallaxContainer(), KoinComponent {
 
         defaultBackground = Sprite("menu/backgrounds/background-1.png") {
             fillMode = Scaling.Fill
+            size = Vector2f(2560f, 1440f)
             anchor = Origin.Centre
         }
 
@@ -65,7 +66,7 @@ class MenuBackground(): ParallaxContainer(), KoinComponent {
         beatmapBindable.addListener(object : BindableListener<Beatmap?> {
             override fun valueChanged(bindable: Bindable<Beatmap?>) {
                 val beatmap = bindable.value!!
-                if (beatmap.beatmapInfo.version != "Anto & Nuvolina's Extra") {
+                if (beatmap.beatmapInfo.version != "Danser Intro") {
                     oldBackground = currentBackground
                     oldBackground!!.addTransform(
                         Transform(

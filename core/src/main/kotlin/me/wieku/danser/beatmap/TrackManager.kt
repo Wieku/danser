@@ -1,29 +1,39 @@
 package me.wieku.danser.beatmap
 
+import me.wieku.danser.beatmap.parsing.BeatmapParser
+import me.wieku.framework.animation.Glider
 import me.wieku.framework.di.bindable.Bindable
+import me.wieku.framework.resource.FileHandle
+import me.wieku.framework.resource.FileType
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.util.*
 
 object TrackManager: KoinComponent {
 
-    val bindableBeatmap: Bindable<Beatmap?> by inject()
+    private val bindableBeatmap: Bindable<Beatmap?> by inject()
 
-    val playlistHistory = ArrayList<BeatmapSet>()
+    private val playlistHistory = ArrayList<BeatmapSet>()
 
-    private var currentPlayIndex = 0
+    private val volumeGlider = Glider(0f)
 
-    fun start() {
-        var beatmap = BeatmapManager.beatmapSets.filter {
-            it.beatmaps.filter { bmap -> bmap.beatmapInfo.version == "Anto & Nuvolina's Extra" }
+    private var currentPlayIndex = -1
+
+    fun start(time: Float) {
+        var beatmap = Beatmap("cYsmix - Peer Gynt (Wieku) [Danser Intro].osu")
+        BeatmapParser().parse(FileHandle("assets/beatmaps/cYsmix - Peer Gynt/cYsmix - Peer Gynt (Wieku) [Danser Intro].osu", FileType.Classpath), beatmap)
+
+        playlistHistory.add(BeatmapManager.beatmapSets.filter {
+            it.beatmaps.filter { bmap -> bmap.beatmapInfo.version == "EXTRA AR10" }
                 .isNotEmpty()
-        }[0].beatmaps.filter { bmap -> bmap.beatmapInfo.version == "Anto & Nuvolina's Extra" }[0]
-        playlistHistory.add(beatmap.beatmapSet)
+        }[0])
 
         startBeatmap(beatmap, true, -1300f)
+        volumeGlider.addEvent(time, time + 1300f, 0f, 1f)
     }
 
     fun backwards() {
+        if (currentPlayIndex == -1) return
         currentPlayIndex--
         if (currentPlayIndex >=0) {
 
@@ -55,8 +65,12 @@ object TrackManager: KoinComponent {
         }
     }
 
-    fun update() {
+    fun update(time: Float) {
+
+        volumeGlider.update(time)
+
         bindableBeatmap.value?.let { beatmap ->
+            beatmap.getTrack().setVolume(volumeGlider.value)
             if (beatmap.getTrack().getPosition() >= beatmap.getTrack().getLength()) {
                 forward()
             }
@@ -65,10 +79,12 @@ object TrackManager: KoinComponent {
 
     private fun startBeatmap(beatmap: Beatmap, startAtPreview: Boolean = false, previewOffset: Float = 0f) {
         bindableBeatmap.value?.getTrack()?.stop()
-        beatmap.loadTrack()
-        beatmap.getTrack().play()
+        beatmap.loadTrack(startAtPreview)
+        beatmap.getTrack().play(volumeGlider.value)
         if (startAtPreview) {
             beatmap.getTrack().setPosition((beatmap.beatmapMetadata.previewTime.toFloat()+previewOffset) / 1000)
+        } else {
+            beatmap.getTrack().setPosition(previewOffset / 1000)
         }
 
         bindableBeatmap.value = beatmap
