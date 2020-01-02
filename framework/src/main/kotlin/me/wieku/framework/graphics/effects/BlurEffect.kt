@@ -154,7 +154,7 @@ class BlurEffect(__width: Int, __height: Int) {
 
     private fun gauss(x: Int, sigma: Float): Float {
         val factor = 0.398942f
-        return (factor * exp(-0.5f * (x * x) / (sigma * sigma))) / sigma
+        return factor * exp(-0.5f * (x * x) / (sigma * sigma)) / sigma
     }
 
     private fun kernelSize(sigma: Float): Int {

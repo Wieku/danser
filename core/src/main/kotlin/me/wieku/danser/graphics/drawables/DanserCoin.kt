@@ -193,15 +193,15 @@ class DanserCoin : Container(), KoinComponent {
         val inflate = coinInflate.value
         scale.mul(inflate)
         super.updateDrawable()
-        scale.mul(1f/inflate)
+        scale.mul(1f / inflate)
     }
 
     fun introBegin() {
         circularContainer.addTransform(
             Transform(
                 TransformType.Scale,
-                clock.currentTime+600,
-                clock.currentTime+1300f,
+                clock.currentTime + 600,
+                clock.currentTime + 1300f,
                 0f,
                 0.95f
             )
@@ -226,7 +226,7 @@ class DanserCoin : Container(), KoinComponent {
 
     override fun onHover(e: HoverEvent): Boolean {
         coinInflate.addEvent(
-            clock.currentTime+200f,
+            clock.currentTime + 200f,
             1.25f,
             Easing.OutQuad
         )
@@ -235,7 +235,7 @@ class DanserCoin : Container(), KoinComponent {
 
     override fun onHoverLost(e: HoverLostEvent): Boolean {
         coinInflate.addEvent(
-            clock.currentTime+200f,
+            clock.currentTime + 200f,
             1f,
             Easing.OutQuad
         )

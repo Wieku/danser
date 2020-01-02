@@ -55,7 +55,7 @@ class FileHandle(path: String, val fileType: FileType) {
     fun toBuffer(flip: Boolean = true): ByteBuffer {
         val bytes = fileURL.readBytes()
         val buffer = BufferUtils.createByteBuffer(bytes.size).put(bytes)
-        return if(flip) (buffer.flip() as ByteBuffer) else buffer
+        return if(flip) buffer.flip() as ByteBuffer else buffer
     }
 
     fun inputStream(): InputStream {

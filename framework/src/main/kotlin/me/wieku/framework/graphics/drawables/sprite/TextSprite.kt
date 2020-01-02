@@ -48,7 +48,7 @@ open class TextSprite() : Sprite(), KoinComponent {
         }
 
     private val fontScale: Float
-        get() = fontSize / (font.defaultSize)
+        get() = fontSize / font.defaultSize
 
     var drawFromBottom = false
 

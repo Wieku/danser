@@ -33,7 +33,7 @@ enum class Scaling {
             Fit, Fill -> {
                 val targetRatio = targetY / targetX
                 val sourceRatio = sourceY / sourceX
-                val scale = if ((this == Fit && targetRatio > sourceRatio) || (this == Fill && targetRatio < sourceRatio)) targetX / sourceX else targetY / sourceY
+                val scale = if (this == Fit && targetRatio > sourceRatio || this == Fill && targetRatio < sourceRatio) targetX / sourceX else targetY / sourceY
                 temp.x = sourceX * scale
                 temp.y = sourceY * scale
             }

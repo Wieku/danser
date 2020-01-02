@@ -115,7 +115,7 @@ class Track(file: FileHandle, val fftMode: FFTMode = FFTMode.FFT512) : IClock {
         MemoryStack.stackPush().use { stack ->
             var buf = stack.mallocFloat(1)
             BASS_ChannelGetAttribute(fxChannel.asInt(), BASS_ATTRIB.BASS_ATTRIB_VOL, buf)
-            return buf.get() / (if (isVolumeAbsolute) 1f else (FrameworkConfig.generalVolume.value * FrameworkConfig.musicVolume.value))
+            return buf.get() / if (isVolumeAbsolute) 1f else FrameworkConfig.generalVolume.value * FrameworkConfig.musicVolume.value
         }
     }
 
@@ -157,7 +157,7 @@ class Track(file: FileHandle, val fftMode: FFTMode = FFTMode.FFT512) : IClock {
                 jouvieje.bass.enumerations.BASS_ATTRIB.BASS_ATTRIB_TEMPO.asInt(),
                 buffer
             )
-            (buffer.get(0) / 100) + 1f
+            buffer.get(0) / 100 + 1f
         }
     }
 

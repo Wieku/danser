@@ -69,7 +69,7 @@ class Ripples() : Container(), KoinComponent {
             lastBeatStart = timingPoint.time.toFloat()
         }
 
-        val bProg = ((bTime - lastBeatStart) / lastBeatLength)
+        val bProg = (bTime - lastBeatStart) / lastBeatLength
         val progress = floor(bProg).toInt()
 
         if (progress != lastProgress) {

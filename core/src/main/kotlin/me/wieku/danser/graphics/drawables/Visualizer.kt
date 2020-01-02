@@ -82,7 +82,7 @@ class Visualizer() : Drawable(), KoinComponent {
     override fun draw(batch: SpriteBatch) {
         tempPos.set(drawPosition).add(drawOrigin)
 
-        val barWidth = (2 * Math.PI.toFloat() * drawSize.y / 2) / bars.toFloat()
+        val barWidth = Math.PI.toFloat() * drawSize.y / bars.toFloat()
         val cutoff = drawSize.y * 1.5f * barScale
 
         for (i in 0 until 5) {

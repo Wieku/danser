@@ -49,7 +49,7 @@ class Triangles() : Container(), KoinComponent {
     }
 
     fun addTriangle(onscreen: Boolean) {
-        val size = (minSize + (random.nextGaussian().toFloat()*0.28f+1f)/2 * (maxSize - minSize))
+        val size = minSize + (random.nextGaussian().toFloat() * 0.28f + 1f) / 2 * (maxSize - minSize)
         val position = Vector2f(random.nextFloat(), (if (onscreen) random.nextFloat() else 1f) * (1f + size / 2))
 
         insertChild(

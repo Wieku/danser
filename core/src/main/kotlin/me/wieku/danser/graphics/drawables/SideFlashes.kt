@@ -65,12 +65,12 @@ class SideFlashes : Container(), KoinComponent {
         }
 
         val beatLength = max(300f, lastBeatLength)
-        val bProg = ((bTime - lastBeatStart) / lastBeatLength)
+        val bProg = (bTime - lastBeatStart) / lastBeatLength
         val progress = floor(bProg).toInt()
 
         if (progress != lastProgress) {
 
-            if (timingPoint.kiai || timingPoint.timeSignature == 1 ||progress % timingPoint.timeSignature == 0) {
+            if (timingPoint.kiai || timingPoint.timeSignature == 1 || progress % timingPoint.timeSignature == 0) {
                 if (!timingPoint.kiai || progress % 2 == 0) {
                     flashLeft.transforms.clear()
                     flashLeft.addTransform(
