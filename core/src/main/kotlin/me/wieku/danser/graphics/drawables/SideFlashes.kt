@@ -68,7 +68,7 @@ class SideFlashes : Container(), KoinComponent {
         val bProg = ((bTime - lastBeatStart) / lastBeatLength)
         val progress = floor(bProg).toInt()
 
-        if (progress > lastProgress) {
+        if (progress != lastProgress) {
 
             if (timingPoint.kiai || timingPoint.timeSignature == 1 ||progress % timingPoint.timeSignature == 0) {
                 if (!timingPoint.kiai || progress % 2 == 0) {
@@ -97,7 +97,7 @@ class SideFlashes : Container(), KoinComponent {
                     )
                 }
             }
-            lastProgress++
+            lastProgress = progress
         }
 
         super.update()
