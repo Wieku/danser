@@ -86,7 +86,7 @@ class Visualizer() : Drawable(), KoinComponent {
 
                 val rotation = (i / 5.0f + j / bars.toFloat()) * 2 * Math.PI.toFloat()
 
-                tempSprite.drawPosition.set(drawSize.y / 2, 0f).rot(rotation).add(tempPos).sub(0f, barWidth / 2)
+                tempSprite.drawPosition.set(drawSize.y / 2, 0f).rot(rotation).add(tempPos)
                 tempSprite.drawOrigin.set(0f, 0.5f)
                 tempSprite.rotation = rotation
                 tempSprite.drawSize.set(v * drawSize.y * 1.5f * barScale, barWidth)

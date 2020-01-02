@@ -60,6 +60,10 @@ class DanserCoin : Container(), KoinComponent {
         coinBottom = Container {
             fillMode = Scaling.Fill
             addChild(
+                Visualizer {
+                    fillMode = Scaling.Fit
+                    scale = Vector2f(0.95f)
+                },
                 CircularContainer {
                     scale = Vector2f(0.95f)
                     fillMode = Scaling.Fit
@@ -100,10 +104,6 @@ class DanserCoin : Container(), KoinComponent {
         }
 
         addChild(
-            Visualizer {
-                fillMode = Scaling.Fit
-                scale = Vector2f(0.95f)
-            },
             Ripples {
                 fillMode = Scaling.Fit
             }.also { ripples = it },
