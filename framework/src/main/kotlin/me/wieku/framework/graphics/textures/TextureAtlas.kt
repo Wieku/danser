@@ -1,17 +1,12 @@
 package me.wieku.framework.graphics.textures
 
+import me.wieku.framework.graphics.pixmap.Pixmap
 import me.wieku.framework.resource.FileHandle
-import org.joml.Rectanglef
-import org.lwjgl.opengl.GL32.*
-import org.lwjgl.opengl.GL33
-import org.lwjgl.stb.STBImage.*
-import org.lwjgl.system.MemoryStack
+import org.lwjgl.opengl.GL33.*
 import org.lwjgl.system.MemoryUtil
 import java.lang.IllegalArgumentException
 import java.lang.IllegalStateException
 import java.nio.ByteBuffer
-import java.nio.FloatBuffer
-import java.nio.IntBuffer
 
 class TextureAtlas(_size: Int, _mipmaps: Int = 1, layers: Int = 1, private val format: TextureFormat = TextureFormat.RGBA): ITexture {
 
@@ -34,38 +29,17 @@ class TextureAtlas(_size: Int, _mipmaps: Int = 1, layers: Int = 1, private val f
 
     var padding: Int = 1 shl mipmaps
     private var subTextures = HashMap<String, TextureRegion>()
-    private var emptySpaces = HashMap<Int, ArrayList<Rectangle>>()
+    private var emptySpaces = HashMap<Int, MutableList<Rectangle>>()
 
     init {
         for (i in 0 until layers) {
-            emptySpaces[i] = mutableListOf<Rectangle>(Rectangle(0, 0, _size, _size)) as ArrayList<Rectangle>
+            emptySpaces[i] = mutableListOf(Rectangle(0, 0, _size, _size))
         }
     }
 
     fun addTexture(name: String, file: FileHandle, padded: Boolean = true): TextureRegion {
-        val imageBuffer = file.toBuffer()
-
-        MemoryStack.stackPush().use { stack ->
-            val w: IntBuffer = stack.mallocInt(1)
-            val h: IntBuffer = stack.mallocInt(1)
-            val comp: IntBuffer = stack.mallocInt(1)
-
-            stbi_set_flip_vertically_on_load(false)
-
-            // Use info to read image metadata without decoding the entire image.
-            // We don't need this for this demo, just testing the API.
-            if (!stbi_info_from_memory(imageBuffer, w, h, comp)) {
-                throw RuntimeException("Failed to read image information: " + stbi_failure_reason())
-            }
-
-            // Decode the image
-            var image: ByteBuffer? =
-                stbi_load_from_memory(imageBuffer, w, h, comp, 4)
-                    ?: throw RuntimeException("Failed to load image: " + stbi_failure_reason())
-
-
-            return addTexture(name, w.get(0), h.get(0), image!!, padded)
-        }
+        val pixmap = Pixmap(file)
+        return addTexture(name, pixmap.width, pixmap.height, pixmap.pixels, padded)
     }
 
     fun addTexture(name: String, width: Int, height: Int, data: ByteArray, padded: Boolean = true): TextureRegion {

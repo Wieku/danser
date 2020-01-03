@@ -1,5 +1,6 @@
 package me.wieku.framework.graphics.textures
 
+import me.wieku.framework.graphics.pixmap.Pixmap
 import me.wieku.framework.resource.FileHandle
 import org.lwjgl.opengl.GL32.*
 import org.lwjgl.stb.STBImage.*
@@ -94,45 +95,12 @@ class Texture: ITexture {
     }
 
     constructor(file: FileHandle, mipmaps: Int = 1) {
-        val imageBuffer = file.toBuffer()
-
-        MemoryStack.stackPush().use { stack ->
-            val w: IntBuffer = stack.mallocInt(1)
-            val h: IntBuffer = stack.mallocInt(1)
-            val comp: IntBuffer = stack.mallocInt(1)
-
-            stbi_set_flip_vertically_on_load(false)
-
-            // Use info to read image metadata without decoding the entire image.
-            // We don't need this for this demo, just testing the API.
-            if (!stbi_info_from_memory(imageBuffer, w, h, comp)) {
-                throw RuntimeException("Failed to read image information: " + stbi_failure_reason())
-            } else {
-                System.out.println("Texture ${file.file.name} loaded")
-            }
-
-
-            //System.out.println("Image width: " + w.get(0));
-            //System.out.println("Image height: " + h.get(0));
-            //System.out.println("Image components: " + comp.get(0));
-            //System.out.println("Image HDR: " + stbi_is_hdr_from_memory(imageBuffer))
-
-            // Decode the image
-            var image: ByteBuffer? =
-                stbi_load_from_memory(imageBuffer, w, h, comp, 4)
-                    ?: throw RuntimeException("Failed to load image: " + stbi_failure_reason())
-
-
-            var ww = w.get(0)
-            var hh = h.get(0)
-
-            this.width = ww
-            this.height = hh
-            this.mipmaps = if(mipmaps < 1) 1 else mipmaps
-            this.store = TextureStore(1, ww, hh, this.mipmaps)
-            setData(image!!)
-
-        }
+        val pixmap = Pixmap(file)
+        this.width = pixmap.width
+        this.height = pixmap.height
+        this.mipmaps = if(mipmaps < 1) 1 else mipmaps
+        this.store = TextureStore(1, this.width, this.height, this.mipmaps)
+        setData(pixmap.pixels)
     }
 
     fun setData(data: ByteArray, x: Int = 0, y: Int = 0, width: Int = this.width, height: Int = this.height) {
