@@ -51,7 +51,7 @@ class MenuBackground(): ParallaxContainer(), KoinComponent {
         addChild(
             BlurredContainer {
                 fillMode = Scaling.Stretch
-                blurAmount = 0.3f
+                blurAmount = 0.2f
                 anchor = Origin.Custom
                 customAnchor = Vector2f(0.5f, 0.5f)
                 color.w = 0.9f
