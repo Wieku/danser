@@ -34,7 +34,7 @@ class DanserCoin : Container(), KoinComponent {
     private val beatmapBindable: Bindable<Beatmap?> by inject()
     private val sampleStore: SampleStore by inject()
 
-    private val defaultBeatLength = 500f
+    private val defaultBeatLength = 1000f
 
     private var deltaSum = 0f
 
