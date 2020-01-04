@@ -41,8 +41,8 @@ class LoadingScreen : Screen(), KoinComponent {
                 fillMode = Scaling.Stretch
                 spawnRate = 0.1f
                 startOnScreen = false
-                colorDark = Vector4f(0.054f, 0.054f, 0.054f, 0.5f)
-                colorLight = Vector4f(0.4f, 0.4f, 0.4f, 0.5f)
+                colorDark = Vector4f(0.054f, 0.054f, 0.054f, 0.3f)
+                colorLight = Vector4f(0.2f, 0.2f, 0.2f, 0.3f)
             }.also { triangles = it },
             CircularContainer {
                 fillMode = Scaling.Fit
