@@ -19,11 +19,11 @@ object FrameworkConfig: Config<FrameworkConfig.FrameworkConfigProperties>(Framew
 
     val vSync = BindableBoolean(false)
 
-    val foregroundFPS = BindableInt(240)
+    val foregroundFPS = BindableInt(0)
 
     val backgroundFPS = BindableInt(60)
 
-    val updateRate = BindableInt(1000)
+    val updateRate = BindableInt(0)
 
     val updateRateBackground = BindableInt(250)
 
