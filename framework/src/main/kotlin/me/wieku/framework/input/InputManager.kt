@@ -19,10 +19,10 @@ abstract class InputManager {
 
     fun getPositionF() = posF
 
-    fun updatePosition(x: Float, y: Float) {
+    fun updatePosition(x: Float, y: Float, cursorInWindow: Boolean = true) {
         posF.set(x, y)
         pos.set(x.toInt(), y.toInt())
-        updateHover()
+        updateHover(cursorInWindow)
     }
 
     private var toRelease = ArrayList<InputHandler>()
@@ -82,7 +82,7 @@ abstract class InputManager {
     var lastHoverHolder: InputHandler? = null
     var hoverHolder: InputHandler? = null
 
-    private fun updateHover() {
+    private fun updateHover(isInWindow: Boolean = true) {
         //println("hover update")
         inputHandler?.let { inputHandler ->
             lastHoverHolder = hoverHolder
@@ -94,23 +94,25 @@ abstract class InputManager {
             lastHovered.addAll(hovered)
             hovered.clear()
 
-            run loop@{
-                inputQueue.forEach { handler ->
-                    hovered.add(handler)
-                    lastHovered.remove(handler)
+            if (isInWindow) {
+                run loop@{
+                    inputQueue.forEach { handler ->
+                        hovered.add(handler)
+                        lastHovered.remove(handler)
 
-                    if (handler === lastHoverHolder) {
-                        hoverHolder = lastHoverHolder
-                        return@loop
-                    }
-
-                    if (!handler.isHovered) {
-                        handler.isHovered = true
-                        if (handler.trigger(HoverEvent(pos))) {
-                            hoverHolder = handler
+                        if (handler === lastHoverHolder) {
+                            hoverHolder = lastHoverHolder
                             return@loop
                         }
 
+                        if (!handler.isHovered) {
+                            handler.isHovered = true
+                            if (handler.trigger(HoverEvent(pos))) {
+                                hoverHolder = handler
+                                return@loop
+                            }
+
+                        }
                     }
                 }
             }

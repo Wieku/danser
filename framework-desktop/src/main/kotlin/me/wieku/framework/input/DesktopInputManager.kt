@@ -8,16 +8,22 @@ class DesktopInputManager(private val glfwContext: DesktopContext) : InputManage
     private val xBuff = doubleArrayOf(0.0)
     private val yBuff = doubleArrayOf(0.0)
 
+    private var inWindow = true
+
     init {
         glfwSetMouseButtonCallback(glfwContext.windowHandle) { _, button, action, _ ->
             updateCursorAction(MouseButton.values()[button], InputAction.values()[action])
+        }
+
+        glfwSetCursorEnterCallback(glfwContext.windowHandle) { _, entered ->
+            inWindow = entered
         }
     }
 
     override fun update() {
         glfwPollEvents()
         glfwGetCursorPos(glfwContext.windowHandle, xBuff, yBuff)
-        updatePosition(xBuff[0].toFloat(), yBuff[0].toFloat())
+        updatePosition(xBuff[0].toFloat(), yBuff[0].toFloat(), inWindow)
     }
 
 }
