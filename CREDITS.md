@@ -18,5 +18,5 @@ Game concepts and designs are based on work by osu! developer Dean Herbert ([@pe
 
 ## Theme Song
 
-[cYsmix - Peer Grynt](https://www.newgrounds.com/audio/listen/724710).
+[cYsmix - Peer Gynt](https://www.newgrounds.com/audio/listen/724710).
 Licensed under [Creative Commons: By Attribution 3.0 License](http://creativecommons.org/licenses/by/3.0/)
