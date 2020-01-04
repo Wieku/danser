@@ -2,6 +2,7 @@ package me.wieku.danser.ui.screens
 
 import me.wieku.danser.beatmap.Beatmap
 import me.wieku.danser.beatmap.BeatmapManager
+import me.wieku.danser.graphics.drawables.Logo
 import me.wieku.danser.graphics.drawables.Triangles
 import me.wieku.framework.animation.Glider
 import me.wieku.framework.animation.Transform
@@ -44,7 +45,7 @@ class LoadingScreen : Screen(), KoinComponent {
                 colorDark = Vector4f(0.054f, 0.054f, 0.054f, 0.3f)
                 colorLight = Vector4f(0.2f, 0.2f, 0.2f, 0.3f)
             }.also { triangles = it },
-            CircularContainer {
+            /*CircularContainer {
                 fillMode = Scaling.Fit
                 scale = Vector2f(0.63f)
                 addChild(
@@ -53,10 +54,14 @@ class LoadingScreen : Screen(), KoinComponent {
                         color = Vector4f(0f, 0f, 0f, 0.6f)
                     }
                 )
-            },
-            Sprite("menu/coin-overlay.png") {
+            },*/
+            /*Sprite("menu/coin-overlay.png") {
                 fillMode = Scaling.Fit
                 scale = Vector2f(0.66f)
+            }*/
+            Logo().apply {
+                fillMode = Scaling.Fit
+                scale = Vector2f(0.75f)
             },
             TextSprite("Exo2") {
                 text = "Loading awesomeness"
@@ -107,10 +112,10 @@ class LoadingScreen : Screen(), KoinComponent {
             ), false
         )
 
-        Thread {
+        /*Thread {
             BeatmapManager.loadBeatmaps(System.getenv("localappdata") + "\\osu!\\Songs")
             stack.push(mainMenu)
-        }.start()
+        }.start()*/
     }
 
     override fun onExit(next: Screen?) {
