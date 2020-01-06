@@ -18,6 +18,10 @@ class DesktopInputManager(private val glfwContext: DesktopContext) : InputManage
         glfwSetCursorEnterCallback(glfwContext.windowHandle) { _, entered ->
             inWindow = entered
         }
+
+        glfwSetScrollCallback(glfwContext.windowHandle) { _, xoffset, yoffset ->
+            updateScroll(xoffset.toFloat(), yoffset.toFloat())
+        }
     }
 
     override fun update() {

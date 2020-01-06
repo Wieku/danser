@@ -18,6 +18,7 @@ abstract class InputHandler {
         when(e) {
             is HoverEvent -> return onHover(e)
             is HoverLostEvent -> return onHoverLost(e)
+            is ScrollEvent -> return onMouseScroll(e)
             is MouseDownEvent -> return onMouseDown(e)
             is MouseUpEvent -> return onMouseUp(e)
             is ClickEvent -> return onClick(e)
@@ -32,6 +33,8 @@ abstract class InputHandler {
     open fun onHover(e: HoverEvent) = false
 
     open fun onHoverLost(e: HoverLostEvent) = false
+
+    open fun onMouseScroll(e: ScrollEvent) = false
 
     open fun onMouseDown(e: MouseDownEvent) = false
 

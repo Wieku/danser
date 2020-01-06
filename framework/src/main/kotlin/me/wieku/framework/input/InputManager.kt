@@ -14,6 +14,7 @@ abstract class InputManager {
     var inputHandler: InputHandler? = null
 
     var inputQueue = ArrayDeque<InputHandler>()
+    var inputQueue1 = ArrayDeque<InputHandler>()
 
     fun getPosition() = pos
 
@@ -122,6 +123,25 @@ abstract class InputManager {
                 handler.trigger(HoverLostEvent(pos))
             }
 
+        }
+    }
+
+    protected fun updateScroll(xOffset: Float, yOffset: Float) {
+        val offset = Vector2f(xOffset, yOffset)
+
+        inputHandler?.let { inputHandler ->
+
+            inputQueue1.clear()
+            inputHandler.buildInputQueue(pos, inputQueue1)
+
+            run loop@{
+                inputQueue1.forEach { handler ->
+                    if (handler.trigger(ScrollEvent(pos, offset))) {
+                        hoverHolder = handler
+                        return@loop
+                    }
+                }
+            }
         }
     }
 
