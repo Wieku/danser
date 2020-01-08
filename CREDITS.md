@@ -13,7 +13,7 @@ Game concepts and designs are based on work by osu! developer Dean Herbert ([@pe
 
 ## Fonts
 
-* Uses [FontAweseome](https://fontawesome.com/) under [SIL Open Font License](http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL_web)
+* Uses [FontAwesome](https://fontawesome.com/) under [SIL Open Font License](http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL_web)
 * Uses [Exo2](https://fonts.google.com/specimen/Exo+2) under [SIL Open Font License](http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL_web)
 
 ## Theme Song
