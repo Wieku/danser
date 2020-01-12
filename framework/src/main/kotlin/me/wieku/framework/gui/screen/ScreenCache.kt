@@ -2,6 +2,7 @@ package me.wieku.framework.gui.screen
 
 import me.wieku.framework.graphics.drawables.containers.Container
 import me.wieku.framework.math.Scaling
+import me.wieku.framework.utils.synchronized
 import java.util.*
 
 class ScreenCache : Container() {
@@ -12,12 +13,14 @@ class ScreenCache : Container() {
 
     private val stack = ArrayDeque<Screen>()
 
+    private val screenChangeListeners = ArrayDeque<(previous: Screen?, next: Screen?) -> Unit>()
+
     fun push(screen: Screen) {
 
         val current = if (stack.isNotEmpty()) stack.peek() else null
 
         current?.let {
-            current.onExit(screen)
+            current.onSuspend(screen)
             current.drawForever = false
         }
 
@@ -38,9 +41,19 @@ class ScreenCache : Container() {
         }
 
         next.drawForever = true
-        next.onEnter(current)
+        next.onResume(current)
         stack.push(next)
         addChild(next)
+
+        screenChangeListeners.synchronized {
+            forEach { it(current, next) }
+        }
+    }
+
+    operator fun plusAssign(listener: (previous: Screen?, next: Screen?) -> Unit) {
+        screenChangeListeners.synchronized {
+            add(listener)
+        }
     }
 
 }

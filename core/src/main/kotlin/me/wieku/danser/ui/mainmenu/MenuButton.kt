@@ -48,6 +48,10 @@ class MenuButton(private val text: String, icon: String, font: String, color: Ve
 
     private var armed = false
 
+    constructor(text: String, icon: String, font: String, color: Vector4f, isFirst: Boolean = false, inContext: MenuButton.() -> Unit) : this(text, icon, font, color, isFirst) {
+        inContext()
+    }
+
     init {
         yogaAspectRatio = glider.value
         yogaFlexShrink = 0f

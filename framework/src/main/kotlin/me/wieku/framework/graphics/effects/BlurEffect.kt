@@ -16,13 +16,10 @@ import kotlin.math.exp
 
 class BlurEffect(__width: Int, __height: Int) {
 
-    private var blurShader: Shader = Shader(
-        FileHandle("frameworkAssets/fbopass.vsh", FileType.Classpath),
-        FileHandle("frameworkAssets/blur.fsh", FileType.Classpath)
-    )
+    private lateinit var blurShader: Shader
 
-    private var fbo1: Framebuffer
-    private var fbo2: Framebuffer
+    private lateinit var fbo1: Framebuffer
+    private lateinit var fbo2: Framebuffer
 
     private var kernelSize = Vector2f()
     private var sigma = Vector2f()
@@ -42,16 +39,22 @@ class BlurEffect(__width: Int, __height: Int) {
             resize(_width, value)
         }
 
-    var vao = VertexArrayObject()
+    private lateinit var vao: VertexArrayObject
 
     private var previousViewport = intArrayOf(0, 0, 0, 0)
 
-    init {
+    private fun initialize() {
+        blurShader = Shader(
+            FileHandle("frameworkAssets/fbopass.vsh", FileType.Classpath),
+            FileHandle("frameworkAssets/blur.fsh", FileType.Classpath)
+        )
 
         var attributes = arrayOf(
             VertexAttribute("in_position", VertexAttributeType.Vec3, 0),
             VertexAttribute("in_tex_coord", VertexAttributeType.Vec2, 1)
         )
+
+        vao = VertexArrayObject()
 
         vao.addVBO("default", 12, 0, attributes)
 
@@ -79,21 +82,26 @@ class BlurEffect(__width: Int, __height: Int) {
 
         fbo1 = Framebuffer(_width, _height)
         fbo2 = Framebuffer(_width, _height)
-        setBlur(0f, 0f)
     }
 
     fun begin() {
+        if (!::blurShader.isInitialized) {
+            initialize()
+        }
+
         fbo1.bind(true, Vector4f(0f, 0f, 0f, 0f))
         glGetIntegerv(GL_VIEWPORT, previousViewport)
         glViewport(0, 0, _width, _height)
     }
 
     fun resize(width: Int, height: Int) {
-        fbo1.dispose()
-        fbo1 = Framebuffer(width, height)
+        if (::fbo1.isInitialized) {
+            fbo1.dispose()
+            fbo1 = Framebuffer(width, height)
 
-        fbo2.dispose()
-        fbo2 = Framebuffer(width, height)
+            fbo2.dispose()
+            fbo2 = Framebuffer(width, height)
+        }
 
         _width = width
         _height = height

@@ -12,4 +12,7 @@ open class Screen : Container() {
     open fun onEnter(previous: Screen?) {}
     open fun onExit(next: Screen?) {}
 
+    open fun onResume(previous: Screen?) {}
+    open fun onSuspend(next: Screen?) {}
+
 }
