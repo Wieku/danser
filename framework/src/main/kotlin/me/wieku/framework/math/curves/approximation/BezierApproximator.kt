@@ -18,7 +18,7 @@ class BezierApproximator(private val tolerance: Float, private val points: List<
         val output = ArrayList<Vector2f>()
 
         if (count == 0) {
-            return Array(0){}
+            return Array(0) { Line(Vector2f(), Vector2f()) }
         }
 
         val toFlatten = ArrayDeque<ArrayList<Vector2f>>()
