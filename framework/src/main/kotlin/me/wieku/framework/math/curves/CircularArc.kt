@@ -5,9 +5,14 @@ import kotlin.math.*
 
 class CircularArc(point1: Vector2f, point2: Vector2f, point3: Vector2f) : Curve2d {
 
-    private var pt1 = Vector2f(point1)
-    private var pt2 = Vector2f(point2)
-    private var pt3 = Vector2f(point3)
+    var pt1 = Vector2f(point1)
+        private set
+
+    var pt2 = Vector2f(point2)
+        private set
+
+    var pt3 = Vector2f(point3)
+        private set
 
     var centre = Vector2f()
 
