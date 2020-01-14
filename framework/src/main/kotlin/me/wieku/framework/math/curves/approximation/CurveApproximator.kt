@@ -2,6 +2,6 @@ package me.wieku.framework.math.curves.approximation
 
 import me.wieku.framework.math.curves.Line
 
-interface PathApproximator {
+interface CurveApproximator {
     fun approximate(): Array<Line>
 }

@@ -6,7 +6,7 @@ import org.joml.Vector2f
 import java.util.*
 import kotlin.collections.ArrayList
 
-class BezierApproximator(private val tolerance: Float, private val points: List<Vector2f>) : PathApproximator {
+class BezierApproximator(private val tolerance: Float, private val points: List<Vector2f>) : CurveApproximator {
 
     private val toleranceSq = tolerance * tolerance
 

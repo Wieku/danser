@@ -4,7 +4,7 @@ import me.wieku.framework.math.cpy
 import me.wieku.framework.math.curves.CircularArc
 import me.wieku.framework.math.curves.Line
 
-class CircularArcApproximator(private val detail: Float, private val arc: CircularArc) : PathApproximator {
+class CircularArcApproximator(private val detail: Float, private val arc: CircularArc) : CurveApproximator {
     override fun approximate(): Array<Line> {
         if (arc.unstable) {
             return arrayOf(
