@@ -8,12 +8,20 @@ class CircularArc(point1: Vector2f, point2: Vector2f, point3: Vector2f) : Curve2
     private var pt1 = Vector2f(point1)
     private var pt2 = Vector2f(point2)
     private var pt3 = Vector2f(point3)
-    private var centre = Vector2f()
 
-    private var startAngle = 0f
-    private var totalAngle = 0f
-    private var r = 0f
-    private var dir = 0f
+    var centre = Vector2f()
+
+    var angleStart = 0f
+        private set
+
+    var totalAngle = 0f
+        private set
+
+    var radius = 0f
+        private set
+
+    var direction = 0f
+        private set
 
     var unstable = false
         private set
@@ -42,23 +50,23 @@ class CircularArc(point1: Vector2f, point2: Vector2f, point3: Vector2f) : Curve2
         val dA = Vector2f(pt1).sub(centre)
         val dC = Vector2f(pt3).sub(centre)
 
-        r = dA.length()
+        radius = dA.length()
 
-        startAngle = atan2(dA.y, dA.x)
+        angleStart = atan2(dA.y, dA.x)
         var end = atan2(dC.y, dC.x)
 
-        while (end < startAngle) {
+        while (end < angleStart) {
             end += 2 * Math.PI.toFloat()
         }
 
-        dir = 1f
-        totalAngle = end - startAngle
+        direction = 1f
+        totalAngle = end - angleStart
 
         val aToC = Vector2f(pt3).sub(pt1)
         aToC.set(aToC.y, -aToC.x)
 
         if (aToC.dot(Vector2f(pt2).sub(pt1)) < 0) {
-            dir = -dir
+            direction = -direction
             totalAngle = 2 * Math.PI.toFloat() - totalAngle
         }
     }
@@ -76,10 +84,10 @@ class CircularArc(point1: Vector2f, point2: Vector2f, point3: Vector2f) : Curve2
     override fun pointAt(t: Float): Vector2f = pointAt(t, Vector2f())
 
     override fun pointAt(t: Float, dest: Vector2f): Vector2f {
-        val rad = startAngle + dir * t * totalAngle
-        return dest.set(cos(rad) * r, sin(rad) * r)
+        val rad = angleStart + direction * t * totalAngle
+        return dest.set(cos(rad) * radius, sin(rad) * radius)
     }
 
-    override fun getLength() = r * totalAngle
+    override fun getLength() = radius * totalAngle
 
 }
