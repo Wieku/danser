@@ -34,6 +34,10 @@ class Triangles() : Container(), KoinComponent {
     var startOnScreen = true
     var speedMultiplier = 1f
 
+    var randomColors = false
+    var randomColorsAlphaLow = 1f
+    var randomColorsAlphaHigh = 1f
+
     private var velocity = 0f
 
     constructor(inContext: Triangles.() -> Unit) : this() {
@@ -62,7 +66,10 @@ class Triangles() : Container(), KoinComponent {
                 anchor = Origin.Custom
                 customAnchor = position
 
-                color = Vector4f(colorLight).sub(colorDark).mul(random.nextFloat()).add(colorDark)
+                if (randomColors)
+                    color = Vector4f(Math.random().toFloat(), Math.random().toFloat(), Math.random().toFloat(), randomColorsAlphaLow + Math.random().toFloat() * (randomColorsAlphaHigh - randomColorsAlphaLow))
+                else
+                    color = Vector4f(colorLight).sub(colorDark).mul(random.nextFloat()).add(colorDark)
 
                 flipX = random.nextBoolean()
             },

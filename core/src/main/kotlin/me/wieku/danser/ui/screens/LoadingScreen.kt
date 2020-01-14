@@ -113,7 +113,7 @@ class LoadingScreen : Screen(), KoinComponent {
         }.start()
     }
 
-    override fun onExit(next: Screen?) {
+    override fun onSuspend(next: Screen?) {
         super.onExit(next)
 
         triangles.baseVelocity = 3f

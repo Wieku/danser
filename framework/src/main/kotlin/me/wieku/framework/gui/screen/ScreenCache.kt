@@ -28,6 +28,10 @@ class ScreenCache : Container() {
         screen.onEnter(current)
         stack.push(screen)
         insertChild(screen, 0)
+
+        screenChangeListeners.synchronized {
+            forEach { it(current, screen) }
+        }
     }
 
     fun back() {

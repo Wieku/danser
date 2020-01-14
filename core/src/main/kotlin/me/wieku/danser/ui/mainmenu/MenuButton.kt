@@ -239,6 +239,7 @@ class MenuButton(private val text: String, icon: String, font: String, color: Ve
 
     override fun onClick(e: ClickEvent): Boolean {
         println("Clicked $text")
+        sampleStore.getResourceOrLoad("menu/menuhit1.wav").play()
         return super.onClick(e)
     }
 

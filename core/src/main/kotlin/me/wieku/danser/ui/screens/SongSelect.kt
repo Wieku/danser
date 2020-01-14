@@ -24,7 +24,7 @@ class SongSelect(): Screen(), KoinComponent {
             MenuBackground {
                 parallaxAmount = 1f / 40
                 fillMode = Scaling.Stretch
-                color.w = 0.3f
+                color.w = 0.6f
             }
         )
 

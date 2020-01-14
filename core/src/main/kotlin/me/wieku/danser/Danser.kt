@@ -1,9 +1,14 @@
 package me.wieku.danser
 
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import me.wieku.danser.beatmap.Beatmap
 import me.wieku.danser.graphics.drawables.CursorWithTrail
+import me.wieku.danser.graphics.drawables.Triangles
 import me.wieku.danser.ui.common.FPSStatistics
 import me.wieku.danser.ui.screens.LoadingScreen
+import me.wieku.framework.animation.Glider
 import me.wieku.framework.audio.SampleStore
 import me.wieku.framework.di.bindable.Bindable
 import me.wieku.framework.font.FontStore
@@ -14,6 +19,7 @@ import me.wieku.framework.graphics.drawables.sprite.SpriteBatch
 import me.wieku.framework.graphics.textures.store.TextureStore
 import me.wieku.framework.gui.screen.ScreenCache
 import me.wieku.framework.input.InputManager
+import me.wieku.framework.math.Easing
 import me.wieku.framework.math.Origin
 import me.wieku.framework.math.Scaling
 import me.wieku.framework.math.view.Camera
@@ -21,6 +27,7 @@ import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.FileType
 import org.joml.Vector2f
 import org.joml.Vector2i
+import org.joml.Vector4f
 import org.koin.core.KoinComponent
 import org.koin.core.context.loadKoinModules
 import org.koin.core.inject
@@ -40,6 +47,9 @@ class Danser : Game(), KoinComponent {
     private val camera = Camera()
     lateinit var mainContainer: Container
     lateinit var screenCache: ScreenCache
+    lateinit var screenChangeTriangles: Triangles
+    private val trianglesSpeed = Glider(4f)
+    private val trianglesSpawnRate = Glider(1f)
 
     lateinit var fontStore: FontStore
     lateinit var textureStore: TextureStore
@@ -91,11 +101,44 @@ class Danser : Game(), KoinComponent {
         camera.setViewportF(0, 0, 1920, 1080, true)
         camera.update()
 
+        mainContainer.addChild(
+            Triangles {
+                fillMode = Scaling.Stretch
+                startOnScreen = false
+                spawnEnabled = false
+                colorDark = Vector4f(0.054f, 0.054f, 0.054f, 1f)
+                colorLight = Vector4f(0.2f, 0.2f, 0.2f, 1f)
+                color.w = 0.5f
+                maxSize = 0.4f
+            }.also { screenChangeTriangles = it }
+        )
+
+        screenCache += { previous, next ->
+            if (previous != null && previous !is LoadingScreen) {
+                trianglesSpeed.addEvent(updateClock.currentTime, updateClock.currentTime + 200, 2f, 4f, Easing.OutQuad)
+                trianglesSpawnRate.addEvent(updateClock.currentTime, updateClock.currentTime + 100, 0.1f, 2f, Easing.OutQuad)
+                trianglesSpawnRate.addEvent(updateClock.currentTime + 100, updateClock.currentTime + 200, 2f, 0.1f, Easing.OutQuad)
+                screenChangeTriangles.spawnEnabled = true
+                GlobalScope.launch {
+                    delay(120L)
+                    screenChangeTriangles.spawnEnabled = false
+                }
+
+            }
+
+        }
+
         screenCache.push(LoadingScreen())
     }
 
     override fun update() {
         bindable.value?.getTrack()?.update()
+
+        trianglesSpeed.update(updateClock.currentTime)
+        trianglesSpawnRate.update(updateClock.currentTime)
+
+        screenChangeTriangles.baseVelocity = trianglesSpeed.value
+        screenChangeTriangles.spawnRate = trianglesSpawnRate.value
 
         if (lastContextSize != gameContext.contextSize) {
             lastContextSize.set(gameContext.contextSize)
