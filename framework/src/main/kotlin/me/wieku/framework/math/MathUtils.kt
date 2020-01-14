@@ -21,3 +21,5 @@ fun clamp(value: Float, minVal: Float, maxVal: Float) = min(maxVal, max(value, m
 fun Float.clamped(minVal: Float, maxVal: Float): Float = clamp(this, minVal, maxVal)
 
 fun Float.equalsEpsilon(b: Float, epsilon: Float = 0.01f) = abs(this-b) <= epsilon
+
+inline fun Vector2f.cpy() = Vector2f(this)
