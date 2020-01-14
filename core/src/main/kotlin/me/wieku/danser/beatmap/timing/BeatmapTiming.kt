@@ -2,7 +2,7 @@ package me.wieku.danser.beatmap.timing
 
 import me.wieku.danser.audio.SampleData
 import me.wieku.danser.audio.SampleSet
-import me.wieku.danser.utils.binarySearchApproximate
+import me.wieku.framework.utils.binarySearchIndex
 
 class BeatmapTiming {
 
@@ -37,7 +37,11 @@ class BeatmapTiming {
     }
 
     fun getPointAt(time: Long): TimingPoint {
-        val index = points.binarySearchApproximate(comparison = { point: TimingPoint -> point.time.compareTo(time) })
+        val index = points.binarySearchIndex {
+            if (points[it].time <= time) {
+                if (it == points.size - 1 || points[it + 1].time > time) 0 else -1
+            } else if (it == 0) 0 else 1
+        }
         check(index != -1) {
             "No timing points found"
         }
