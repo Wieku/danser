@@ -1,6 +1,5 @@
 package me.wieku.framework.di.bindable
 
-import java.lang.ref.Reference
 import java.lang.ref.WeakReference
 
 open class Bindable<T> (startValue: T) {
@@ -15,54 +14,51 @@ open class Bindable<T> (startValue: T) {
         set(value) {
             if (value == _value) return
 
-            _value = value
-
             setValue(value, this)
         }
 
     private val listeners = ArrayList<BindableListener<T>>()
 
-    private val bounded = ArrayList<WeakReference<Bindable<T>>>()
+    private val bindables = ArrayList<WeakReference<Bindable<T>>>()
 
-    private fun setValue(value: T?, source: Bindable<T>) {
-        bounded.removeIf { it.get() == null }
+    private fun setValue(value: T, source: Bindable<T>) {
+        bindables.removeIf { it.get() == null }
 
-        bounded.forEach {
+        bindables.forEach {
             val bindable = it.get()!!
-            if (source == bindable) return@forEach
+            if (source === bindable) return@forEach
 
             bindable.setValue(value, this)
         }
 
-        notifyListeners()
+        notifyListeners(_value, value)
+        _value = value
     }
 
-    private fun notifyListeners() {
-        listeners.forEach { it.valueChanged(this) }
+    private fun notifyListeners(previousValue: T, newValue: T) {
+        listeners.forEach { it(previousValue, newValue, this) }
     }
 
     fun bindTo(bindable: Bindable<T>) {
         value = bindable._value
 
-        bounded += WeakReference(bindable)
-        bindable.bounded += WeakReference(this)
+        bindables += WeakReference(bindable)
+        bindable.bindables += WeakReference(this)
     }
 
     fun unbindFrom(bindable: Bindable<T>) {
-        bounded.removeIf { it.get() == null || it.get()!! == bindable }
-        bindable.bounded.removeIf { it.get() == null || it.get()!! == this }
+        bindables.removeIf { it.get() == null || it.get()!! === bindable }
+        bindable.bindables.removeIf { it.get() == null || it.get()!! === this }
     }
 
-    fun addListener(listener: BindableListener<T>, notifyNow: Boolean = false) {
+    fun addListener(notifyNow: Boolean = false, listener: BindableListener<T>) {
         listeners.add(listener)
 
         if (notifyNow) {
-            listener.valueChanged(this)
+            listener(_value, _value, this)
         }
     }
 
-    fun removeListener(listener: BindableListener<T>) {
-        listeners.removeIf { reference -> reference == listener }
-    }
+    fun addListener(listener: BindableListener<T>) = addListener(false, listener)
 
 }

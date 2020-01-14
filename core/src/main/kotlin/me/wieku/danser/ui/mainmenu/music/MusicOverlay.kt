@@ -21,6 +21,8 @@ class MusicOverlay(): Container() {
     private lateinit var textContainer: YogaContainer
     private val beatmapBindable: Bindable<Beatmap?> by inject()
 
+    private val beatmap = Bindable<Beatmap?>(null)
+
     private var lastWidth = 100f
 
     private val text = TextSprite("Exo2") {
@@ -38,18 +40,17 @@ class MusicOverlay(): Container() {
     }
 
     init {
+        beatmap.bindTo(beatmapBindable)
 
-        beatmapBindable.addListener(object : BindableListener<Beatmap?> {
-            override fun valueChanged(bindable: Bindable<Beatmap?>) {
-                if (bindable.value != null) {
-                    text.text = String.format(
-                        "%s - %s",
-                        bindable.value!!.beatmapMetadata.artist,
-                        bindable.value!!.beatmapMetadata.title
-                    )
-                }
+        beatmap.addListener { _, newBeatmap, _ ->
+            newBeatmap?.let {
+                text.text = String.format(
+                    "%s - %s",
+                    it.beatmapMetadata.artist,
+                    it.beatmapMetadata.title
+                )
             }
-        })
+        }
 
         addChild(
             YogaContainer {

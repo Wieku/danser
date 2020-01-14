@@ -4,8 +4,8 @@ import jouvieje.bass.Bass
 import jouvieje.bass.BassInit
 import jouvieje.bass.structures.BASS_DEVICEINFO
 import me.wieku.framework.configuration.FrameworkConfig
-import me.wieku.framework.di.bindable.Bindable
-import me.wieku.framework.di.bindable.BindableListener
+import me.wieku.framework.di.bindable.typed.BindableFloat
+import me.wieku.framework.di.bindable.typed.BindableString
 import org.lwjgl.system.Library
 import org.lwjgl.system.Platform
 import java.lang.ref.WeakReference
@@ -15,6 +15,11 @@ import java.nio.channels.FileChannel
 object BassSystem {
 
     internal var tracks: ArrayList<WeakReference<Track>> = ArrayList()
+
+    val audioDevice = BindableString("")
+    val generalVolume = BindableFloat(1f)
+    val musicVolume = BindableFloat(1f)
+    val effectsVolume = BindableFloat(1f)
 
     init {
         val field = BassInit::class.java.getDeclaredField("librariesLoaded")
@@ -48,35 +53,33 @@ object BassSystem {
     }
 
     fun initSystem() {
+
+        audioDevice.bindTo(FrameworkConfig.audioDevice)
+        generalVolume.bindTo(FrameworkConfig.generalVolume)
+        musicVolume.bindTo(FrameworkConfig.musicVolume)
+        effectsVolume.bindTo(FrameworkConfig.effectsVolume)
+
         println("--Available sound devices--")
 
         getSoundDevices().forEach{println(it)}
 
         println("--End of the list--")
 
-        val deviceId = getDeviceId(FrameworkConfig.audioDevice.value)
+        val deviceId = getDeviceId(audioDevice.value)
 
         println("Device id: $deviceId")
 
-        FrameworkConfig.audioDevice.value = getDeviceName(deviceId)
+        audioDevice.value = getDeviceName(deviceId)
 
         Bass.BASS_Init(deviceId, 44100, 0, null, null)
 
-        FrameworkConfig.audioDevice.addListener(object: BindableListener<String> {
-            override fun valueChanged(bindable: Bindable<String>) {
-                Bass.BASS_SetDevice(getDeviceId(bindable.value))
-            }
-        })
-
-        val volumeCallback = object: BindableListener<Float> {
-            override fun valueChanged(bindable: Bindable<Float>) {
-                updateAll()
-            }
+        audioDevice.addListener { _, newValue, _ ->
+            Bass.BASS_SetDevice(getDeviceId(newValue))
         }
 
-        FrameworkConfig.generalVolume.addListener(volumeCallback)
-        FrameworkConfig.musicVolume.addListener(volumeCallback)
-        FrameworkConfig.effectsVolume.addListener(volumeCallback)
+        generalVolume.addListener { _, _, _ -> updateAll() }
+        musicVolume.addListener { _, _, _ -> updateAll() }
+        effectsVolume.addListener { _, _, _ -> updateAll() }
     }
 
     fun getSoundDevices(): List<String> {

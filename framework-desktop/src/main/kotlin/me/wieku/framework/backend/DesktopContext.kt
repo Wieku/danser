@@ -71,41 +71,33 @@ class DesktopContext: GameContext() {
 
     private fun generateEventBindings() {
 
-        val vectorListeners = object : BindableListener<Vector2i> {
-            override fun valueChanged(bindable: Bindable<Vector2i>) {
+        val vectorListeners = { _: Vector2i, newValue: Vector2i, bindable: Bindable<Vector2i> ->
                 when (bindable) {
                     FrameworkConfig.fullScreenResolution -> {
                         if (FrameworkConfig.windowMode.value == WindowMode.Fullscreen)
-                            setWindowSize(bindable.value.x, bindable.value.y)
+                            setWindowSize(newValue.x, newValue.y)
                     }
                     FrameworkConfig.windowSize -> {
                         if (FrameworkConfig.windowMode.value == WindowMode.Windowed)
-                            setWindowSize(bindable.value.x, bindable.value.y)
+                            setWindowSize(newValue.x, newValue.y)
                     }
                 }
             }
-        }
 
         FrameworkConfig.fullScreenResolution.addListener(vectorListeners)
         FrameworkConfig.windowSize.addListener(vectorListeners)
 
-        FrameworkConfig.windowTitle.addListener(object : BindableListener<String> {
-            override fun valueChanged(bindable: Bindable<String>) {
-                setWindowTitle(bindable.value)
+        FrameworkConfig.windowTitle.addListener { _, newValue, _ ->
+                setWindowTitle(newValue)
             }
-        }, false)
 
-        FrameworkConfig.windowMode.addListener(object : BindableListener<WindowMode> {
-            override fun valueChanged(bindable: Bindable<WindowMode>) {
-                setWindowMode(bindable.value)
+        FrameworkConfig.windowMode.addListener { _, newValue, _ ->
+                setWindowMode(newValue)
             }
-        }, false)
 
-        FrameworkConfig.vSync.addListener(object : BindableListener<Boolean> {
-            override fun valueChanged(bindable: Bindable<Boolean>) {
-                setVSync(bindable.value)
+        FrameworkConfig.vSync.addListener { _, newValue, _ ->
+                setVSync(newValue)
             }
-        }, false)
     }
 
     private fun generateGLFWCallbacks() {

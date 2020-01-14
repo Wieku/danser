@@ -34,11 +34,14 @@ class MenuBackground(): ParallaxContainer(), KoinComponent {
 
     val beatmapBindable: Bindable<Beatmap?> by inject()
 
+    val beatmap = Bindable<Beatmap?>(null)
+
     constructor(inContext: MenuBackground.() -> Unit) : this() {
         inContext()
     }
 
     init {
+        beatmap.bindTo(beatmapBindable)
 
         defaultBackground = Sprite("menu/backgrounds/background-1.png") {
             fillMode = Scaling.Fill
@@ -63,30 +66,47 @@ class MenuBackground(): ParallaxContainer(), KoinComponent {
 
         wrapper.addChild(defaultBackground)
 
-        beatmapBindable.addListener(object : BindableListener<Beatmap?> {
-            override fun valueChanged(bindable: Bindable<Beatmap?>) {
-                val beatmap = bindable.value!!
-                if (beatmap.beatmapInfo.version != "Danser Intro") {
-                    oldBackground = currentBackground
-                    oldBackground!!.addTransform(
+        beatmapBindable.addListener { _, newBeatmap, _ ->
+            val beatmap = newBeatmap!!
+
+            if (beatmap.beatmapInfo.version != "Danser Intro") {
+                oldBackground = currentBackground
+                oldBackground!!.addTransform(
+                    Transform(
+                        TransformType.Fade,
+                        clock.currentTime,
+                        clock.currentTime + 500f,
+                        1f,
+                        0f
+                    )
+                )
+                oldBackground!!.drawForever = false
+
+                val handle = FileHandle(System.getenv("localappdata") + "/osu!/Songs/" + beatmap.beatmapSet.directory + File.separator + beatmap.beatmapMetadata.backgroundFile, FileType.Absolute)
+
+                if (handle.file.exists()) {
+                    fileTextureHandle = handle
+                    currentBackground = Sprite {
+                        fillMode = Scaling.Fill
+                        anchor = Origin.Centre
+                    }
+                    currentBackground!!.addTransform(
                         Transform(
                             TransformType.Fade,
                             clock.currentTime,
                             clock.currentTime + 500f,
-                            1f,
-                            0f
+                            0f,
+                            1f
                         )
                     )
-                    oldBackground!!.drawForever = false
-
-                    val handle = FileHandle(System.getenv("localappdata") + "/osu!/Songs/" + beatmap.beatmapSet.directory + File.separator + beatmap.beatmapMetadata.backgroundFile, FileType.Absolute)
-
-                    if (handle.file.exists()) {
-                        fileTextureHandle = handle
-                        currentBackground = Sprite {
-                            fillMode = Scaling.Fill
-                            anchor = Origin.Centre
-                        }
+                    wrapper.addChild(currentBackground!!)
+                } else {
+                    if (oldBackground === defaultBackground) {
+                        oldBackground!!.transforms.clear()
+                        oldBackground!!.drawForever = true
+                    } else {
+                        currentBackground = defaultBackground
+                        currentBackground!!.drawForever = true
                         currentBackground!!.addTransform(
                             Transform(
                                 TransformType.Fade,
@@ -97,28 +117,10 @@ class MenuBackground(): ParallaxContainer(), KoinComponent {
                             )
                         )
                         wrapper.addChild(currentBackground!!)
-                    } else {
-                        if (oldBackground === defaultBackground) {
-                            oldBackground!!.transforms.clear()
-                            oldBackground!!.drawForever = true
-                        } else {
-                            currentBackground = defaultBackground
-                            currentBackground!!.drawForever = true
-                            currentBackground!!.addTransform(
-                                Transform(
-                                    TransformType.Fade,
-                                    clock.currentTime,
-                                    clock.currentTime + 500f,
-                                    0f,
-                                    1f
-                                )
-                            )
-                            wrapper.addChild(currentBackground!!)
-                        }
                     }
                 }
             }
-        })
+        }
 
     }
 
