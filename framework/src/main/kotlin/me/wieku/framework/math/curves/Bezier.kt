@@ -3,9 +3,14 @@ package me.wieku.framework.math.curves
 import org.joml.Vector2f
 import kotlin.math.ceil
 
-class Bezier(vararg points: Vector2f) : NCCurve() {
+class Bezier(vararg points: Vector2f) : Curve2d {
+
+    private var curveLength: Float = 0f
 
     private val points = Array(points.size) { i -> Vector2f(points[i]) }
+
+    private val temp1 = Vector2f()
+    private val temp2 = Vector2f()
 
     init {
         var pointLength = 0.0f
@@ -16,18 +21,28 @@ class Bezier(vararg points: Vector2f) : NCCurve() {
         pointLength = ceil(pointLength)
 
         for (i in 1..pointLength.toInt()) {
-            approxLength += ncPointAt(i / pointLength, temp1).distance(ncPointAt((i - 1) / pointLength, temp2))
+            curveLength += pointAt(i / pointLength, temp1).distance(pointAt((i - 1) / pointLength, temp2))
         }
     }
 
-    override fun ncPointAt(t: Float, vec: Vector2f): Vector2f {
-        vec.set(0f)
+    override fun getStartAngle(): Float {
+        return pointAt(0f, temp1).angle(pointAt(1.0f / curveLength, temp2))
+    }
+
+    override fun getEndAngle(): Float {
+        return pointAt(1f, temp1).angle(pointAt((curveLength - 1.0f) / curveLength, temp2))
+    }
+
+    override fun getLength() = curveLength
+
+    override fun pointAt(t: Float, dest: Vector2f): Vector2f {
+        dest.set(0f)
         val n = points.size - 1
         for (i in 0..n) {
             val b = bernstein(i, n, t)
-            vec.add(points[i].x * b, points[i].y * b)
+            dest.add(points[i].x * b, points[i].y * b)
         }
-        return vec
+        return dest
     }
 
     private fun binomialCoefficient(n: Int, k: Int): Int {
