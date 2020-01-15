@@ -5,9 +5,9 @@ import me.wieku.framework.math.curves.approximation.CurveApproximator
 import me.wieku.framework.utils.binarySearchIndex
 import org.joml.Vector2f
 
-open class ApproximatedCurve(approximator: CurveApproximator): Curve2d {
+open class ApproximatedCurve(approximator: CurveApproximator) : Curve2d {
 
-    private val lines = ArrayList<Line>()
+    val lines = ArrayList<Line>()
 
     private var combinedLength = 0f
 
@@ -45,6 +45,4 @@ open class ApproximatedCurve(approximator: CurveApproximator): Curve2d {
     }
 
     override fun getLength(): Float = combinedLength
-
-
 }
