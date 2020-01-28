@@ -90,7 +90,7 @@ class CircularArc(point1: Vector2f, point2: Vector2f, point3: Vector2f) : Curve2
 
     override fun pointAt(t: Float, dest: Vector2f): Vector2f {
         val rad = angleStart + direction * t * totalAngle
-        return dest.set(cos(rad) * radius, sin(rad) * radius)
+        return dest.set(cos(rad) * radius, sin(rad) * radius).add(centre)
     }
 
     override fun getLength() = radius * totalAngle
