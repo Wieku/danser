@@ -9,7 +9,7 @@ open class ApproximatedCurve(approximator: CurveApproximator) : Curve2d {
 
     val lines = ArrayList<Line>()
 
-    private var combinedLength = 0f
+    private var combinedLength = 0.0f
 
     private val sections = ArrayList<Float>()
 
@@ -33,7 +33,7 @@ open class ApproximatedCurve(approximator: CurveApproximator) : Curve2d {
 
         val index = sections.binarySearchIndex(0, sections.size - 1) {
             if (sections[it] <= desiredWidth) {
-                if (sections[it + 1] > desiredWidth) 0 else -1
+                if (sections[it + 1] >= desiredWidth) 0 else -1
             } else 1
         }
 
