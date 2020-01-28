@@ -6,27 +6,25 @@ import org.joml.Vector2f
 import java.util.*
 import kotlin.collections.ArrayList
 
-class BezierApproximator(private val tolerance: Float, private val points: List<Vector2f>) : CurveApproximator {
+class BezierApproximator(tolerance: Float, private val points: List<Vector2f>) : CurveApproximator {
 
     private val toleranceSq = tolerance * tolerance
 
     private val count = points.size
-    private val subdivisionBuffer1 = ArrayList<Vector2f>(points.size)
-    private val subdivisionBuffer2 = ArrayList<Vector2f>(points.size * 2 - 1)
+    private val subdivisionBuffer1 = arrayOfNulls<Vector2f>(points.size)
+    private val subdivisionBuffer2 = arrayOfNulls<Vector2f>(points.size * 2 - 1)
 
     override fun approximate(): Array<Line> {
         val output = ArrayList<Vector2f>()
 
         if (count == 0) {
-            return Array(0) { Line(Vector2f(), Vector2f()) }
+            return emptyArray()
         }
 
-        val toFlatten = ArrayDeque<ArrayList<Vector2f>>()
-        val freeBuffers = ArrayDeque<ArrayList<Vector2f>>()
+        val toFlatten = ArrayDeque<Array<Vector2f?>>()
+        val freeBuffers = ArrayDeque<Array<Vector2f?>>()
 
-        val nCP = ArrayList(points)
-
-        toFlatten.push(nCP)
+        toFlatten.push(points.toTypedArray())
 
         val leftChild = subdivisionBuffer2
 
@@ -40,7 +38,7 @@ class BezierApproximator(private val tolerance: Float, private val points: List<
 
             val rightChild = when {
                 freeBuffers.size > 0 -> freeBuffers.pop()
-                else -> ArrayList(count)
+                else -> Array<Vector2f?>(count) { null }
             }
 
             subdivide(parent, leftChild, rightChild)
@@ -63,7 +61,7 @@ class BezierApproximator(private val tolerance: Float, private val points: List<
         }
     }
 
-    private fun isFlatEnough(controlPoints: ArrayList<Vector2f>): Boolean {
+    private fun isFlatEnough(controlPoints: Array<Vector2f?>): Boolean {
         val tmp1 = Vector2f()
         val tmp2 = Vector2f()
         for (i in 1 until (controlPoints.size - 1)) {
@@ -75,7 +73,7 @@ class BezierApproximator(private val tolerance: Float, private val points: List<
         return true
     }
 
-    private fun subdivide(controlPoints: ArrayList<Vector2f>, l: ArrayList<Vector2f>, r: ArrayList<Vector2f>) {
+    private fun subdivide(controlPoints: Array<Vector2f?>, l: Array<Vector2f?>, r: Array<Vector2f?>) {
         val midpoints = subdivisionBuffer1
 
         for (i in 0 until count) {
@@ -87,12 +85,12 @@ class BezierApproximator(private val tolerance: Float, private val points: List<
             r[count - i - 1] = midpoints[count - i - 1]
 
             for (j in 0 until (count - i - 1)) {
-                midpoints[j] = (midpoints[j].cpy().add(midpoints[j + 1])).mul(0.5f)
+                midpoints[j] = (midpoints[j]!!.cpy().add(midpoints[j + 1])).mul(0.5f)
             }
         }
     }
 
-    private fun approximate(controlPoints: ArrayList<Vector2f>, output: ArrayList<Vector2f>) {
+    private fun approximate(controlPoints: Array<Vector2f?>, output: ArrayList<Vector2f>) {
         val l = subdivisionBuffer2
         val r = subdivisionBuffer1
 
@@ -102,11 +100,11 @@ class BezierApproximator(private val tolerance: Float, private val points: List<
             l[count + i] = r[i + 1]
         }
 
-        output.add(controlPoints[0])
+        output.add(controlPoints[0]!!)
 
         for (i in 1 until (count - 1)) {
             val index = 2 * i
-            val p = (l[index - 1].cpy().add(l[index].cpy().mul(2.0f)).add(l[index + 1])).mul(0.25f)
+            val p = (l[index - 1]!!.cpy().add(l[index]!!.cpy().mul(2.0f)).add(l[index + 1])).mul(0.25f)
             output.add(p)
         }
     }
