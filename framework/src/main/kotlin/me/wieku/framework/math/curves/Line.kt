@@ -1,10 +1,11 @@
 package me.wieku.framework.math.curves
 
+import me.wieku.framework.math.cpy
 import org.joml.Vector2f
 
 class Line(point1: Vector2f, point2: Vector2f) : Curve2d {
-    private var pt1 = Vector2f(point1)
-    private var pt2 = Vector2f(point2)
+    private var pt1 = point1.cpy()
+    private var pt2 = point2.cpy()
 
     override fun getStartAngle(): Float = pt1.angle(pt2)
 

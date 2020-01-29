@@ -2,10 +2,12 @@ package me.wieku.framework.math.curves
 
 import org.joml.Vector2f
 import kotlin.math.ceil
+import kotlin.math.min
+import kotlin.math.pow
 
 class Bezier(vararg points: Vector2f) : Curve2d {
 
-    private var curveLength: Float = 0f
+    private var curveLength: Float = 0.0f
 
     private val points = Array(points.size) { i -> Vector2f(points[i]) }
 
@@ -20,23 +22,25 @@ class Bezier(vararg points: Vector2f) : Curve2d {
 
         pointLength = ceil(pointLength)
 
+        pointAt(0.0f, temp2)
         for (i in 1..pointLength.toInt()) {
-            curveLength += pointAt(i / pointLength, temp1).distance(pointAt((i - 1) / pointLength, temp2))
+            curveLength += pointAt(i / pointLength, temp1).distance(temp2)
+            temp2.set(temp1)
         }
     }
 
     override fun getStartAngle(): Float {
-        return pointAt(0f, temp1).angle(pointAt(1.0f / curveLength, temp2))
+        return pointAt(0.0f, temp1).angle(pointAt(1.0f / curveLength, temp2))
     }
 
     override fun getEndAngle(): Float {
-        return pointAt(1f, temp1).angle(pointAt((curveLength - 1.0f) / curveLength, temp2))
+        return pointAt(1.0f, temp1).angle(pointAt(1.0f - 1.0f / curveLength, temp2))
     }
 
     override fun getLength() = curveLength
 
     override fun pointAt(t: Float, dest: Vector2f): Vector2f {
-        dest.set(0f)
+        dest.set(0.0f)
         val n = points.size - 1
         for (i in 0..n) {
             val b = bernstein(i, n, t)
@@ -46,27 +50,23 @@ class Bezier(vararg points: Vector2f) : Curve2d {
     }
 
     private fun binomialCoefficient(n: Int, k: Int): Int {
-        if (k < 0 || k > n) {
+        if (k !in 0..n)
             return 0
-        }
-        if (k == 0 || k == n) {
-            return 1
-        }
 
-        val k1 = Math.min(k, n - k)
+        if (k == 0 || k == n)
+            return 1
+
+        val k1 = min(k, n - k)
         var c = 1
         for (i in 0 until k1) {
-            c = c * (n - i) / (i + 1)
+            c *= (n - i) / (i + 1)
         }
 
         return c
     }
 
     private fun bernstein(i: Int, n: Int, t: Float): Float {
-        return (binomialCoefficient(n, i).toFloat() * Math.pow(t.toDouble(), i.toDouble()) * Math.pow(
-            1.0 - t,
-            (n - i).toDouble()
-        )).toFloat()
+        return binomialCoefficient(n, i) * t.pow(i) * (1.0f - t).pow(n - 1)
     }
 
 }
