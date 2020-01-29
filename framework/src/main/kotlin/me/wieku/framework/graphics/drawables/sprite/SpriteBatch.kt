@@ -21,7 +21,6 @@ import org.lwjgl.system.MemoryUtil
 import java.nio.FloatBuffer
 import java.util.*
 
-//TODO: support Int IBOs
 /**
  * @property maxSprites - maximum batch size in sprites, which mean x4 vertices and x6 indices
  */
@@ -53,6 +52,7 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
     private var currentTexture: ITexture? = null
 
     init {
+        require(maxSprites * 6 <= 0xFFFF) { "SpriteBatch size is too big, maximum sprites allowed: 10922, given: $maxSprites" }
         val location = "frameworkAssets/sprite"
         shader = Shader(
             FileHandle("$location.vsh", FileType.Classpath),
@@ -221,12 +221,8 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
         draw(texture.region, x, y, scaleX, scaleY, color)
     }
 
-    //TODO: More draw options
-
     fun draw(region: TextureRegion, x: Float, y: Float, scaleX: Float, scaleY: Float, color: Vector4f) {
-        if (!drawing) {
-            throw IllegalStateException("Batching not started")
-        }
+        check(drawing) { "Batching not started" }
 
         bind(region.getTexture())
         if (vertexCount / 4 >= maxSprites) {
@@ -251,9 +247,7 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
     }
 
     fun draw(sprite: Sprite) {
-        if (!drawing) {
-            throw IllegalStateException("Batching not started")
-        }
+        check(drawing) { "Batching not started" }
 
         if (sprite.texture == null) return
 
