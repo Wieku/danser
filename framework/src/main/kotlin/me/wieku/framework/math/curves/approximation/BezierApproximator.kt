@@ -38,7 +38,7 @@ class BezierApproximator(tolerance: Float, private val points: List<Vector2f>) :
 
             val rightChild = when {
                 freeBuffers.size > 0 -> freeBuffers.pop()
-                else -> Array<Vector2f?>(count) { null }
+                else -> arrayOfNulls(count)
             }
 
             subdivide(parent, leftChild, rightChild)
@@ -55,8 +55,8 @@ class BezierApproximator(tolerance: Float, private val points: List<Vector2f>) :
 
         return Array(output.size - 1) { p ->
             Line(
-                output[p].cpy(),
-                output[p + 1].cpy()
+                output[p],
+                output[p + 1]
             )
         }
     }
@@ -64,7 +64,7 @@ class BezierApproximator(tolerance: Float, private val points: List<Vector2f>) :
     private fun isFlatEnough(controlPoints: Array<Vector2f?>): Boolean {
         val tmp1 = Vector2f()
         val tmp2 = Vector2f()
-        for (i in 1 until (controlPoints.size - 1)) {
+        for (i in 1 until controlPoints.size - 1) {
             if (tmp1.set(controlPoints[i - 1]).sub(tmp2.set(controlPoints[i]).mul(2f)).add(controlPoints[i + 1]).lengthSquared() > toleranceSq) {
                 return false
             }
@@ -84,8 +84,8 @@ class BezierApproximator(tolerance: Float, private val points: List<Vector2f>) :
             l[i] = midpoints[0]
             r[count - i - 1] = midpoints[count - i - 1]
 
-            for (j in 0 until (count - i - 1)) {
-                midpoints[j] = (midpoints[j]!!.cpy().add(midpoints[j + 1])).mul(0.5f)
+            for (j in 0 until count - i - 1) {
+                midpoints[j] = midpoints[j]!!.cpy().add(midpoints[j + 1]).mul(0.5f)
             }
         }
     }
@@ -96,15 +96,15 @@ class BezierApproximator(tolerance: Float, private val points: List<Vector2f>) :
 
         subdivide(controlPoints, l, r)
 
-        for (i in 0 until (count - 1)) {
+        for (i in 0 until count - 1) {
             l[count + i] = r[i + 1]
         }
 
         output.add(controlPoints[0]!!)
 
-        for (i in 1 until (count - 1)) {
+        for (i in 1 until count - 1) {
             val index = 2 * i
-            val p = (l[index - 1]!!.cpy().add(l[index]!!.cpy().mul(2.0f)).add(l[index + 1])).mul(0.25f)
+            val p = l[index - 1]!!.cpy().add(l[index]!!.cpy().mul(2.0f)).add(l[index + 1]).mul(0.25f)
             output.add(p)
         }
     }

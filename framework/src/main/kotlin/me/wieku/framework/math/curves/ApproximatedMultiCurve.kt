@@ -44,7 +44,7 @@ class ApproximatedMultiCurve : Curve2d {
             MultiCurveType.Bezier -> {
                 var lastIndex = 0
                 for ((i, p) in points1.withIndex()) {
-                    if ((i == points1.size - 1 && p != points1[i - 1]) || (i < points1.size - 1 && points1[i + 1] == p)) {
+                    if (i == points1.size - 1 && p != points1[i - 1] || i < points1.size - 1 && points1[i + 1] == p) {
                         val pts = points1.slice(lastIndex until i + 1)
 
                         when {
@@ -67,7 +67,7 @@ class ApproximatedMultiCurve : Curve2d {
                 }
 
                 for (i in 0 until points1.size - 3) {
-                    val c = ApproximatedCentripetalCatmullRom(50, points1.slice(i until (i + 4)).toTypedArray())
+                    val c = ApproximatedCentripetalCatmullRom(50, points1.slice(i until i + 4).toTypedArray())
                     lines.addAll(c.lines)
                 }
             }

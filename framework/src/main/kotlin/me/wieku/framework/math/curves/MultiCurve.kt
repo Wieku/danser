@@ -27,7 +27,7 @@ class MultiCurve : Curve2d {
             type = MultiCurveType.Linear
         }
 
-        when(type) {
+        when (type) {
             MultiCurveType.Linear -> {
                 for (i in 1 until points1.size) {
                     curves.add(Line(points1[i - 1], points1[i]))
@@ -45,8 +45,8 @@ class MultiCurve : Curve2d {
             MultiCurveType.Bezier -> {
                 var lastIndex = 0
                 for ((i, p) in points1.withIndex()) {
-                    if ((i == points1.size - 1 && p != points1[i - 1]) || (i < points1.size - 1 && points1[i + 1] == p)) {
-                        val pts = points1.slice(lastIndex until i+1)
+                    if (i == points1.size - 1 && p != points1[i - 1] || i < points1.size - 1 && points1[i + 1] == p) {
+                        val pts = points1.slice(lastIndex until i + 1)
                         val c = when {
                             pts.size > 2 -> Bezier(*pts.toTypedArray())
                             pts.size == 2 -> Line(pts[0], pts[1])
@@ -68,7 +68,7 @@ class MultiCurve : Curve2d {
                 }
 
                 for (i in 0 until points1.size - 3) {
-                    val c = CentripetalCatmullRom(points1.slice(i until (i+4)).toTypedArray())
+                    val c = CentripetalCatmullRom(points1.slice(i until i + 4).toTypedArray())
                     curves.add(c)
                 }
             }
