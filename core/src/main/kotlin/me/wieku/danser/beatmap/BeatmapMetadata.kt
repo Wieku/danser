@@ -7,7 +7,7 @@ import javax.persistence.GenerationType
 import javax.persistence.Id
 
 @Entity(name = "BeatmapMetadata")
-open class BeatmapMetadata {
+class BeatmapMetadata {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,4 +47,6 @@ open class BeatmapMetadata {
             this.videoFile
         )
     }
+
+    override fun hashCode() = Objects.hash(creator, artist, title, audioFile)
 }

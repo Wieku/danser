@@ -42,7 +42,7 @@ class FpsLimiter(var fps: Int = 60) {
             } catch (e: InterruptedException) {
                 e.printStackTrace()
             } finally {
-                lastTime = System.nanoTime() - Math.min(overSleep, sleepTime)
+                lastTime = System.nanoTime() - min(overSleep, sleepTime)
 
                 // auto tune the time sync should yield
                 if (overSleep > variableYieldTime) {
@@ -56,7 +56,12 @@ class FpsLimiter(var fps: Int = 60) {
         }
 
         val time = System.nanoTime()
-        delta = (time-lastRealTime)/1000000f
+
+        if (lastRealTime == 0L) {
+            lastRealTime = time
+        }
+
+        delta = (time - lastRealTime) / 1000000f
         lastRealTime = time
     }
 
