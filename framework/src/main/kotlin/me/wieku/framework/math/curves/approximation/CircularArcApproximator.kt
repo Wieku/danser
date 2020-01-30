@@ -1,6 +1,5 @@
 package me.wieku.framework.math.curves.approximation
 
-import me.wieku.framework.math.cpy
 import me.wieku.framework.math.curves.CircularArc
 import me.wieku.framework.math.curves.Line
 
@@ -8,8 +7,8 @@ class CircularArcApproximator(private val detail: Float, private val arc: Circul
     override fun approximate(): Array<Line> {
         if (arc.unstable) {
             return arrayOf(
-                Line(arc.pt1.cpy(), arc.pt2.cpy()),
-                Line(arc.pt2.cpy(), arc.pt3.cpy())
+                Line(arc.pt1, arc.pt2),
+                Line(arc.pt2, arc.pt3)
             )
         }
 
