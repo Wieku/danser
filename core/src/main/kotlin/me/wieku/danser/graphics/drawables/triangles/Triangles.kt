@@ -41,12 +41,13 @@ class Triangles() : Container(), KoinComponent {
             colorGlider.update(clock.currentTime)
 
             color.set(
-                when(colorGlider.value) {
+                when (colorGlider.value) {
                     0f -> oldColor
                     1f -> newColor
                     else -> helper.set(newColor).sub(oldColor).mul(colorGlider.value).add(oldColor)
                 }
             )
+
             super.update()
         }
 
@@ -115,6 +116,8 @@ class Triangles() : Container(), KoinComponent {
     var spawnEnabled = true
     var startOnScreen = true
 
+    var triangleOrder = TriangleOrder.Random
+
     constructor(inContext: Triangles.() -> Unit) : this() {
         inContext()
     }
@@ -122,26 +125,39 @@ class Triangles() : Container(), KoinComponent {
     private fun addTriangles(onscreen: Boolean = false) {
         val maxTriangles = (sqrt(drawSize.x * drawSize.y) * triangleSpawnRate * spawnRate).toInt()
 
+        modificationLock.lock()
+
         for (i in 0 until maxTriangles - children.size) {
             addTriangle(onscreen)
         }
+
+        if (triangleOrder == TriangleOrder.SmallestToBiggest) {
+            children.sortByDescending { it.scale.y }
+        } else if (triangleOrder == TriangleOrder.BiggestToSmallest) {
+            children.sortBy { it.scale.y }
+        }
+
+        modificationLock.unlock()
     }
 
     fun addTriangle(onscreen: Boolean) {
         val size = minSize + (sin(random.nextFloat() * 2 * PI.toFloat()) * 0.5f + 0.5f) * (maxSize - minSize)
         val position = Vector2f(random.nextFloat(), (if (onscreen) random.nextFloat() else 1f) * (1f + size / 2))
 
-        val triangle =
-            Triangle(position, size)
+        val triangle = Triangle(position, size)
 
         if (colorArray != null) {
             triangle.updateColors(colorArray!!)
         } else triangle.updateColors(colorDark, colorLight)
 
-        insertChild(
-            triangle,
-            if (children.size > 0) random.nextInt(children.size) else 0
-        )
+        if (triangleOrder == TriangleOrder.Random) {
+            insertChild(
+                triangle,
+                if (children.size > 0) random.nextInt(children.size) else 0
+            )
+        } else {
+            addChild(triangle)
+        }
     }
 
     override fun update() {

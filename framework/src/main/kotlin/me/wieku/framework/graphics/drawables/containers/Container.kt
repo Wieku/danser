@@ -18,8 +18,8 @@ open class Container() : Drawable() {
     var useScissor = false
 
     private val lock = ReentrantReadWriteLock()
-    private val accessLock = lock.readLock()
-    private val modificationLock = lock.writeLock()
+    protected val accessLock = lock.readLock()
+    protected val modificationLock = lock.writeLock()
 
     override var wasUpdated: Boolean
         get() {
