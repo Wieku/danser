@@ -9,14 +9,19 @@ import me.wieku.framework.math.Scaling
 import me.wieku.framework.time.IFramedClock
 import me.wieku.framework.utils.Disposable
 import me.wieku.framework.utils.synchronized
+import org.joml.Matrix4f
 import org.joml.Vector2f
 import org.joml.Vector2i
 import org.joml.Vector4f
 import org.koin.core.KoinComponent
 import org.koin.core.inject
+import java.util.*
 import java.util.concurrent.locks.ReentrantLock
+import kotlin.collections.ArrayList
+import kotlin.math.PI
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.tan
 
 abstract class Drawable() : InputHandler(), Disposable, KoinComponent {
 
@@ -58,6 +63,8 @@ abstract class Drawable() : InputHandler(), Disposable, KoinComponent {
     var color = Vector4f(1f, 1f, 1f, 1f)
     var drawColor = Vector4f(1f, 1f, 1f, 1f)
     private var tempColor = Vector4f(1f, 1f, 1f, 1f)
+
+    protected val transformInfo = Matrix4f()
 
     var flipX = false
     var flipY = false
@@ -131,6 +138,28 @@ abstract class Drawable() : InputHandler(), Disposable, KoinComponent {
         drawOrigin.set(tempOrigin)
         drawSize.set(tempSize)
         drawColor.set(tempColor)
+
+        if (rotation != 0.0f || shearX != 0.0f || shearY != 0.0f) {
+            val tempMatrix1 = popMatrix()
+            val tempMatrix2 = popMatrix()
+            val tempMatrix3 = popMatrix()
+
+            tempMatrix1.identity().translate((drawPosition.x + drawOrigin.x), (drawPosition.y + drawOrigin.y), 0.0f)
+            tempMatrix3.identity().translate(-(drawPosition.x + drawOrigin.x), -(drawPosition.y + drawOrigin.y), 0.0f)
+
+            tempMatrix2.identity()
+            tempMatrix2.m10(1 / tan(PI.toFloat() / 2 * (1 - shearX)) / 2)
+            tempMatrix2.m01(1 / tan(PI.toFloat() / 2 * (1 - shearY)) / 2)
+            tempMatrix2.rotateZ(-rotation)
+
+            transformInfo.set(tempMatrix1.mul(tempMatrix2).mul(tempMatrix3))
+
+            pushMatrix(tempMatrix1)
+            pushMatrix(tempMatrix2)
+            pushMatrix(tempMatrix3)
+        } else transformInfo.identity()
+
+
     }
 
     abstract fun draw(batch: SpriteBatch)
@@ -220,5 +249,12 @@ abstract class Drawable() : InputHandler(), Disposable, KoinComponent {
         }
         this.startTime = startTime
         this.endTime = endTime
+    }
+
+    protected companion object {
+        private val matrixStack = ArrayDeque<Matrix4f>()
+
+        fun popMatrix() = if(matrixStack.size > 0) matrixStack.pop().identity() else Matrix4f()
+        fun pushMatrix(matrix: Matrix4f) = matrixStack.push(matrix)
     }
 }

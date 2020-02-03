@@ -4,10 +4,14 @@ import me.wieku.framework.graphics.drawables.Drawable
 import me.wieku.framework.graphics.drawables.sprite.SpriteBatch
 import me.wieku.framework.input.InputHandler
 import me.wieku.framework.utils.MaskingInfo
+import org.joml.Matrix4f
 import org.joml.Vector2i
 import java.util.*
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.collections.ArrayList
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.tan
 
 open class Container() : Drawable() {
 
@@ -73,7 +77,10 @@ open class Container() : Drawable() {
 
     override fun update() {
         super.update()
-        maskInfo.rect.set(drawPosition.x, drawPosition.y, drawPosition.x + drawSize.x, drawPosition.y + drawSize.y)
+        if (useScissor) {
+            maskInfo.rect.set(drawPosition.x, drawPosition.y, drawPosition.x + drawSize.x, drawPosition.y + drawSize.y)
+            maskInfo.maskToLocalCoords.set(transformInfo)
+        }
 
         accessLock.lock()
 
@@ -93,6 +100,10 @@ open class Container() : Drawable() {
 
         modificationLock.unlock()
     }
+
+    private val tempMatrix1 = Matrix4f()
+    private val tempMatrix2 = Matrix4f()
+    private val tempMatrix3 = Matrix4f()
 
     override fun draw(batch: SpriteBatch) {
         val scissorUsed = useScissor
