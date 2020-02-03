@@ -2,10 +2,9 @@ package me.wieku.danser.ui.mainmenu.music
 
 import me.wieku.danser.beatmap.Beatmap
 import me.wieku.danser.beatmap.TrackManager
-import me.wieku.danser.graphics.drawables.Triangles
+import me.wieku.danser.graphics.drawables.triangles.Triangles
 import me.wieku.framework.di.bindable.Bindable
 import me.wieku.framework.graphics.drawables.containers.ColorContainer
-import me.wieku.framework.graphics.drawables.containers.RoundedEdgeContainer
 import me.wieku.framework.graphics.drawables.containers.YogaContainer
 import me.wieku.framework.math.Scaling
 import org.joml.Vector4f

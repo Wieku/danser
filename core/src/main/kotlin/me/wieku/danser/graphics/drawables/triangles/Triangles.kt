@@ -1,4 +1,4 @@
-package me.wieku.danser.graphics.drawables
+package me.wieku.danser.graphics.drawables.triangles
 
 import me.wieku.danser.beatmap.Beatmap
 import me.wieku.framework.animation.Glider
@@ -131,7 +131,8 @@ class Triangles() : Container(), KoinComponent {
         val size = minSize + (sin(random.nextFloat() * 2 * PI.toFloat()) * 0.5f + 0.5f) * (maxSize - minSize)
         val position = Vector2f(random.nextFloat(), (if (onscreen) random.nextFloat() else 1f) * (1f + size / 2))
 
-        val triangle = Triangle(position, size)
+        val triangle =
+            Triangle(position, size)
 
         if (colorArray != null) {
             triangle.updateColors(colorArray!!)

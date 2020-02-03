@@ -5,7 +5,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.wieku.danser.beatmap.Beatmap
 import me.wieku.danser.graphics.drawables.CursorWithTrail
-import me.wieku.danser.graphics.drawables.Triangles
+import me.wieku.danser.graphics.drawables.triangles.Triangles
 import me.wieku.danser.ui.common.FPSStatistics
 import me.wieku.danser.ui.screens.LoadingScreen
 import me.wieku.framework.animation.Glider

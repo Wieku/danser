@@ -1,25 +1,19 @@
 package me.wieku.danser.ui.screens
 
-import me.wieku.danser.beatmap.Beatmap
 import me.wieku.danser.beatmap.BeatmapManager
-import me.wieku.danser.graphics.drawables.Triangles
+import me.wieku.danser.graphics.drawables.triangles.Triangles
 import me.wieku.framework.animation.Glider
 import me.wieku.framework.animation.Transform
 import me.wieku.framework.animation.TransformType
-import me.wieku.framework.di.bindable.Bindable
-import me.wieku.framework.font.BitmapFont
 import me.wieku.framework.graphics.drawables.containers.CircularContainer
 import me.wieku.framework.graphics.drawables.containers.ColorContainer
 import me.wieku.framework.graphics.drawables.sprite.Sprite
 import me.wieku.framework.graphics.drawables.sprite.TextSprite
-import me.wieku.framework.graphics.textures.Texture
 import me.wieku.framework.gui.screen.Screen
 import me.wieku.framework.gui.screen.ScreenCache
 import me.wieku.framework.math.Easing
 import me.wieku.framework.math.Origin
 import me.wieku.framework.math.Scaling
-import me.wieku.framework.resource.FileHandle
-import me.wieku.framework.resource.FileType
 import org.joml.Vector2f
 import org.joml.Vector4f
 import org.koin.core.KoinComponent
