@@ -17,14 +17,15 @@ import kotlin.math.*
 class Triangles() : Container(), KoinComponent {
 
     private class Triangle(position: Vector2f, size: Float) : Sprite("misc/triangle.png") {
-
-        val colorIndex = random.nextInt(Int.MAX_VALUE)
-        val colorShade = random.nextFloat()
-
-        val oldColor = Vector4f(Float.NaN)
-        val newColor = Vector4f(Float.NaN)
         private val helper = Vector4f()
-        val colorGlider = Glider(1f)
+
+        private val colorIndex = random.nextInt(Int.MAX_VALUE)
+        private val colorShade = random.nextFloat()
+
+        private val oldColor = Vector4f(Float.NaN)
+        private val newColor = Vector4f(Float.NaN)
+
+        private val colorGlider = Glider(1f)
 
         init {
             customSize = true
@@ -52,17 +53,22 @@ class Triangles() : Container(), KoinComponent {
         }
 
         fun updateColors(dark: Vector4f, light: Vector4f) {
-            oldColor.set(newColor)
-            newColor.set(helper.set(light).sub(dark).mul(colorShade).add(dark))
-            if (oldColor.x.isNaN()) oldColor.set(newColor)
-            else colorGlider.addEvent(clock.currentTime, clock.currentTime + 500, 0f, 1f)
+            colorTo(helper.set(light).sub(dark).mul(colorShade).add(dark))
         }
 
         fun updateColors(colorArray: Array<Vector4f>) {
-            oldColor.set(newColor)
-            newColor.set(colorArray[colorIndex % colorArray.size])
-            if (oldColor.x.isNaN()) oldColor.set(newColor)
-            else colorGlider.addEvent(clock.currentTime, clock.currentTime + 500, 0f, 1f)
+            colorTo(colorArray[colorIndex % colorArray.size])
+        }
+
+        private fun colorTo(newColor: Vector4f) {
+            oldColor.set(color)
+
+            if(!this.newColor.x.isNaN()) {
+                colorGlider.reset()
+                colorGlider.addEvent(clock.currentTime, clock.currentTime + 500, 0f, 1f)
+            }
+
+            this.newColor.set(newColor)
         }
     }
 
