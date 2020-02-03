@@ -63,7 +63,7 @@ class Triangles() : Container(), KoinComponent {
         private fun colorTo(newColor: Vector4f) {
             oldColor.set(color)
 
-            if(!this.newColor.x.isNaN()) {
+            if (!this.newColor.x.isNaN()) {
                 colorGlider.reset()
                 colorGlider.addEvent(clock.currentTime, clock.currentTime + 500, 0f, 1f)
             }
@@ -123,6 +123,7 @@ class Triangles() : Container(), KoinComponent {
     var startOnScreen = true
 
     var triangleOrder = TriangleOrder.Random
+    var triangleDirection = TriangleDirection.Up
 
     constructor(inContext: Triangles.() -> Unit) : this() {
         inContext()
@@ -148,9 +149,17 @@ class Triangles() : Container(), KoinComponent {
 
     fun addTriangle(onscreen: Boolean) {
         val size = minSize + (sin(random.nextFloat() * 2 * PI.toFloat()) * 0.5f + 0.5f) * (maxSize - minSize)
-        val position = Vector2f(random.nextFloat(), (if (onscreen) random.nextFloat() else 1f) * (1f + size / 2))
+
+        val position = when (triangleDirection) {
+            TriangleDirection.Up -> Vector2f(random.nextFloat(), if (onscreen) random.nextFloat() else 1f + size / 2)
+            TriangleDirection.Down -> Vector2f(random.nextFloat(), if (onscreen) random.nextFloat() else -size / 2)
+            TriangleDirection.Left -> Vector2f(if (onscreen) random.nextFloat() else 1f + size / 2, random.nextFloat())
+            TriangleDirection.Right -> Vector2f(if (onscreen) random.nextFloat() else -size / 2, random.nextFloat())
+        }
 
         val triangle = Triangle(position, size)
+
+        if (triangleDirection.directionX != 0.0f) triangle.rotation = PI.toFloat() / 2
 
         if (colorArray != null) {
             triangle.updateColors(colorArray!!)
@@ -190,12 +199,15 @@ class Triangles() : Container(), KoinComponent {
         velocity = max(velocity, baseVelocity)
 
         val toRemove = children.filter {
-            it.customAnchor.sub(
-                0f,
+            val base =
                 clock.time.frameTime / 1000f * velocity * (0.2f + (1.0f - it.scale.y / maxSize * 0.8f) * separation)
+
+            it.customAnchor.add(
+                triangleDirection.directionX * base,
+                triangleDirection.directionY * base
             )
 
-            it.customAnchor.y < -it.scale.y / 2
+            it.customAnchor.y !in -it.scale.y / 2..1f + it.scale.y / 2 || it.customAnchor.x !in -it.scale.x / 2..1f + it.scale.x / 2
         }
 
         toRemove.forEach {
