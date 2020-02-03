@@ -9,9 +9,6 @@ import org.joml.Vector2i
 import java.util.*
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.collections.ArrayList
-import kotlin.math.PI
-import kotlin.math.cos
-import kotlin.math.tan
 
 open class Container() : Drawable() {
 
