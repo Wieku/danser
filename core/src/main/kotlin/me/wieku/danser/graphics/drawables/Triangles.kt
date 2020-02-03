@@ -1,6 +1,7 @@
 package me.wieku.danser.graphics.drawables
 
 import me.wieku.danser.beatmap.Beatmap
+import me.wieku.framework.animation.Glider
 import me.wieku.framework.di.bindable.Bindable
 import me.wieku.framework.graphics.drawables.containers.Container
 import me.wieku.framework.graphics.drawables.sprite.Sprite
@@ -11,40 +12,114 @@ import org.joml.Vector4f
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.util.*
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.sqrt
+import kotlin.math.*
 
 class Triangles() : Container(), KoinComponent {
+
+    private class Triangle(position: Vector2f, size: Float) : Sprite("misc/triangle.png") {
+
+        val colorIndex = random.nextInt(Int.MAX_VALUE)
+        val colorShade = random.nextFloat()
+
+        val oldColor = Vector4f(Float.NaN)
+        val newColor = Vector4f(Float.NaN)
+        private val helper = Vector4f()
+        val colorGlider = Glider(1f)
+
+        init {
+            customSize = true
+            fillMode = Scaling.Fit
+            scale = Vector2f(size)
+
+            anchor = Origin.Custom
+            customAnchor = position
+
+            flipX = random.nextBoolean()
+        }
+
+        override fun update() {
+            colorGlider.update(clock.currentTime)
+
+            color.set(
+                when(colorGlider.value) {
+                    0f -> oldColor
+                    1f -> newColor
+                    else -> helper.set(newColor).sub(oldColor).mul(colorGlider.value).add(oldColor)
+                }
+            )
+            super.update()
+        }
+
+        fun updateColors(dark: Vector4f, light: Vector4f) {
+            oldColor.set(newColor)
+            newColor.set(helper.set(light).sub(dark).mul(colorShade).add(dark))
+            if (oldColor.x.isNaN()) oldColor.set(newColor)
+            else colorGlider.addEvent(clock.currentTime, clock.currentTime + 500, 0f, 1f)
+        }
+
+        fun updateColors(colorArray: Array<Vector4f>) {
+            oldColor.set(newColor)
+            newColor.set(colorArray[colorIndex % colorArray.size])
+            if (oldColor.x.isNaN()) oldColor.set(newColor)
+            else colorGlider.addEvent(clock.currentTime, clock.currentTime + 500, 0f, 1f)
+        }
+    }
 
     private val beatmapBindable: Bindable<Beatmap?> by inject()
 
     private val separation = 1.4f
     private val bars = 40
     private val triangleSpawnRate = 0.25
-    private val random = Random()
+
+    var colorDark = Vector4f(0f, 0f, 0f, 1f)
+        set(value) {
+            if (value == colorDark) return
+
+            children.forEach {
+                (it as Triangle).updateColors(value, colorLight)
+            }
+
+            field = value
+        }
+
+    var colorLight = Vector4f(1f, 1f, 1f, 1f)
+        set(value) {
+            if (value == colorLight) return
+
+            children.forEach {
+                (it as Triangle).updateColors(colorDark, value)
+            }
+
+            field = value
+        }
+
+    var colorArray: Array<Vector4f>? = null
+        set(value) {
+            value?.let {
+                children.forEach {
+                    (it as Triangle).updateColors(value)
+                }
+            }
+
+            field = value
+        }
 
     var minSize = 0.120f
     var maxSize = 0.520f
-    var colorDark = Vector4f(0f, 0f, 0f, 1f)
-    var colorLight = Vector4f(1f, 1f, 1f, 1f)
+
     var baseVelocity = 0.1f
+    var speedMultiplier = 1f
+    private var velocity = 0f
+
     var spawnRate = 1f
     var spawnEnabled = true
     var startOnScreen = true
-    var speedMultiplier = 1f
-
-    var randomColors = false
-    var randomColorsAlphaLow = 1f
-    var randomColorsAlphaHigh = 1f
-
-    private var velocity = 0f
 
     constructor(inContext: Triangles.() -> Unit) : this() {
         inContext()
     }
 
-    fun addTriangles(onscreen: Boolean = false) {
+    private fun addTriangles(onscreen: Boolean = false) {
         val maxTriangles = (sqrt(drawSize.x * drawSize.y) * triangleSpawnRate * spawnRate).toInt()
 
         for (i in 0 until maxTriangles - children.size) {
@@ -53,26 +128,17 @@ class Triangles() : Container(), KoinComponent {
     }
 
     fun addTriangle(onscreen: Boolean) {
-        val size = minSize + (random.nextGaussian().toFloat() * 0.28f + 1f) / 2 * (maxSize - minSize)
+        val size = minSize + (sin(random.nextFloat() * 2 * PI.toFloat()) * 0.5f + 0.5f) * (maxSize - minSize)
         val position = Vector2f(random.nextFloat(), (if (onscreen) random.nextFloat() else 1f) * (1f + size / 2))
 
+        val triangle = Triangle(position, size)
+
+        if (colorArray != null) {
+            triangle.updateColors(colorArray!!)
+        } else triangle.updateColors(colorDark, colorLight)
+
         insertChild(
-            Sprite("misc/triangle.png") {
-                customSize = true
-                fillMode = Scaling.Fit
-
-                scale.set(size)
-
-                anchor = Origin.Custom
-                customAnchor = position
-
-                if (randomColors)
-                    color = Vector4f(Math.random().toFloat(), Math.random().toFloat(), Math.random().toFloat(), randomColorsAlphaLow + Math.random().toFloat() * (randomColorsAlphaHigh - randomColorsAlphaLow))
-                else
-                    color = Vector4f(colorLight).sub(colorDark).mul(random.nextFloat()).add(colorDark)
-
-                flipX = random.nextBoolean()
-            },
+            triangle,
             if (children.size > 0) random.nextInt(children.size) else 0
         )
     }
@@ -117,4 +183,7 @@ class Triangles() : Container(), KoinComponent {
         super.update()
     }
 
+    private companion object {
+        val random = Random()
+    }
 }
