@@ -525,6 +525,8 @@ open class YogaContainer() : Container() {
                 drawColor.mul(it.drawColor)
             }
         }
+
+        updateTransformInfo()
     }
 
     private fun recalculateLayout() {

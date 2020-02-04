@@ -16,7 +16,6 @@ import org.joml.Vector4f
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.util.*
-import java.util.concurrent.locks.ReentrantLock
 import kotlin.collections.ArrayList
 import kotlin.math.PI
 import kotlin.math.max
@@ -139,12 +138,16 @@ abstract class Drawable() : InputHandler(), Disposable, KoinComponent {
         drawSize.set(tempSize)
         drawColor.set(tempColor)
 
+        updateTransformInfo()
+    }
+
+    protected fun updateTransformInfo() {
         if (rotation != 0.0f || shearX != 0.0f || shearY != 0.0f) {
             val tempMatrix1 = popMatrix()
             val tempMatrix2 = popMatrix()
             val tempMatrix3 = popMatrix()
 
-            tempMatrix1.identity().translate((drawPosition.x + drawOrigin.x), (drawPosition.y + drawOrigin.y), 0.0f)
+            tempMatrix1.identity().translate(drawPosition.x + drawOrigin.x, drawPosition.y + drawOrigin.y, 0.0f)
             tempMatrix3.identity().translate(-(drawPosition.x + drawOrigin.x), -(drawPosition.y + drawOrigin.y), 0.0f)
 
             tempMatrix2.identity()
@@ -158,8 +161,6 @@ abstract class Drawable() : InputHandler(), Disposable, KoinComponent {
             pushMatrix(tempMatrix2)
             pushMatrix(tempMatrix3)
         } else transformInfo.identity()
-
-
     }
 
     abstract fun draw(batch: SpriteBatch)
@@ -168,9 +169,17 @@ abstract class Drawable() : InputHandler(), Disposable, KoinComponent {
         return !drawForever && clock.currentTime >= endTime
     }
 
+    private val tempVector4f = Vector4f()
+    private fun toLocalSpace(position: Vector2i): Vector2f {
+        tempVector4f.set(position.x.toFloat(), position.y.toFloat(), 0f, 1f)
+        tempVector4f.mul(transformInfo)
+        return Vector2f(tempVector4f.x, tempVector4f.y)
+    }
+
     override fun isCursorIn(cursorPosition: Vector2i): Boolean {
-        return cursorPosition.x >= drawPosition.x && cursorPosition.x < drawPosition.x + drawSize.x &&
-                cursorPosition.y >= drawPosition.y && cursorPosition.y < drawPosition.y + drawSize.y
+        val cursorPosition1 = toLocalSpace(cursorPosition)
+        return cursorPosition1.x >= drawPosition.x && cursorPosition1.x < drawPosition.x + drawSize.x &&
+                cursorPosition1.y >= drawPosition.y && cursorPosition1.y < drawPosition.y + drawSize.y
     }
 
     fun update(time: Float) {
