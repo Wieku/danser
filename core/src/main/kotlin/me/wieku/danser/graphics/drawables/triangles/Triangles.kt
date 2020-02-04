@@ -117,6 +117,7 @@ class Triangles() : Container(), KoinComponent {
     var baseVelocity = 0.1f
     var speedMultiplier = 1f
     private var velocity = 0f
+    var reactive = true
 
     var spawnRate = 1f
     var spawnEnabled = true
@@ -182,12 +183,14 @@ class Triangles() : Container(), KoinComponent {
 
         var boost = 0f
 
-        beatmapBindable.value?.let {
-            if (it.getTrack().isRunning) {
-                val fft = it.getTrack().fftData
+        if (reactive) {
+            beatmapBindable.value?.let {
+                if (it.getTrack().isRunning) {
+                    val fft = it.getTrack().fftData
 
-                for (i in 0 until bars) {
-                    boost += 2 * fft[i] * (bars - i).toFloat() / bars.toFloat()
+                    for (i in 0 until bars) {
+                        boost += 2 * fft[i] * (bars - i).toFloat() / bars.toFloat()
+                    }
                 }
             }
         }
