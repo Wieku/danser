@@ -77,7 +77,8 @@ class DanserCoin : Container(), KoinComponent {
                         },
                         Triangles {
                             fillMode = Scaling.Fit
-                            spawnRate = 0.25f
+                            spawnRate = 0.33f
+                            maxSize = 0.32f
                             speedMultiplier = 0.33f
                             spawnEnabled = false
                             colorDark = Vector4f(0.054f, 0.054f, 0.054f, 1f)
