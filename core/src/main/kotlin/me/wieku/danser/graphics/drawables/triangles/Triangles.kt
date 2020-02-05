@@ -120,6 +120,7 @@ class Triangles() : Container(), KoinComponent {
     var reactive = true
 
     var spawnRate = 1f
+    var trianglesMinimum = 0
     var spawnEnabled = true
     var startOnScreen = true
 
@@ -131,7 +132,7 @@ class Triangles() : Container(), KoinComponent {
     }
 
     private fun addTriangles(onscreen: Boolean = false) {
-        val maxTriangles = (sqrt(drawSize.x * drawSize.y) * triangleSpawnRate * spawnRate).toInt()
+        val maxTriangles = max(trianglesMinimum, (sqrt(drawSize.x * drawSize.y) * triangleSpawnRate * spawnRate).toInt())
 
         modificationLock.lock()
 
