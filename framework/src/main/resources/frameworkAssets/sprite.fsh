@@ -11,7 +11,8 @@ out vec4 color;
 
 uniform vec4 g_MaskRect;
 uniform float g_CornerRadius;
-uniform float g_UseMask;
+uniform bool g_UseMask;
+uniform float g_MaskBlendRange;
 
 vec2 max3(vec2 a, vec2 b, vec2 c)
 {
@@ -27,16 +28,14 @@ float distanceFromRoundedRect()
 	return length(distanceFromShrunkRect);
 }
 
-
 void main()
 {
-	float dist = g_UseMask == 0.0 ? 0.0 : distanceFromRoundedRect();
+	float dist = g_UseMask ? distanceFromRoundedRect() : 0.0;
     vec4 in_color = texture(tex, tex_coord);
 	color = in_color*col_tint;
 
-	float radiusCorrection = max(0.0, 1.0 - g_CornerRadius);
-	if (dist > g_CornerRadius - 1.0 + radiusCorrection)
-	color.a *= max(0.0, g_CornerRadius - dist + radiusCorrection);
+	float radiusCorrection = g_CornerRadius <= 0.0 ? g_MaskBlendRange : max(0.0, g_MaskBlendRange - g_CornerRadius);
+	color.a *= min(1.0, (g_CornerRadius + radiusCorrection - dist) / g_MaskBlendRange );
 
 	color.rgb *= color.a;
 	color.a *= additive;

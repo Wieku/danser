@@ -15,7 +15,7 @@ open class Container() : Drawable() {
     protected val children = ArrayList<Drawable>()
     private val childrenToRemove = ArrayList<Drawable>()
 
-    protected val maskInfo = MaskingInfo()
+    val maskingInfo = MaskingInfo()
     var useScissor = false
 
     private val lock = ReentrantReadWriteLock()
@@ -75,8 +75,8 @@ open class Container() : Drawable() {
     override fun update() {
         super.update()
         if (useScissor) {
-            maskInfo.rect.set(drawPosition.x, drawPosition.y, drawPosition.x + drawSize.x, drawPosition.y + drawSize.y)
-            maskInfo.maskToLocalCoords.set(transformInfo)
+            maskingInfo.rect.set(drawPosition.x, drawPosition.y, drawPosition.x + drawSize.x, drawPosition.y + drawSize.y)
+            maskingInfo.maskToLocalCoords.set(transformInfo)
         }
 
         accessLock.lock()
@@ -106,7 +106,7 @@ open class Container() : Drawable() {
         val scissorUsed = useScissor
 
         if (scissorUsed) {
-            batch.pushMaskingInfo(maskInfo)
+            batch.pushMaskingInfo(maskingInfo)
         }
 
         accessLock.lock()

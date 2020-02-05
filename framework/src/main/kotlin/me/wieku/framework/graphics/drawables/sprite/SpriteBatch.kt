@@ -315,6 +315,7 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
             helperBuffer.clear()
             shader.setUniform("g_MaskTransform", inf.maskToLocalCoords.get(helperBuffer))
             shader.setUniform("g_UseMask", 1f)
+            shader.setUniform("g_MaskBlendRange", inf.blendRange)
         } else {
             shader.setUniform("g_MaskRect", 0f, 0f, 1f, 1f)
             shader.setUniform("g_CornerRadius", 0f)

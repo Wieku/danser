@@ -91,7 +91,7 @@ class MusicControl: YogaContainer() {
         playPauseButton.icon = if (isPlaying) "\uf04c" else "\uf04b"
 
         super.update()
-        maskInfo.radius = min(drawSize.x, drawSize.y) * 0.5f / 2
+        maskingInfo.radius = min(drawSize.x, drawSize.y) * 0.5f / 2
     }
 
 }
