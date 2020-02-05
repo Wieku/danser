@@ -1,6 +1,8 @@
 package me.wieku.danser.ui.mainmenu
 
 import me.wieku.danser.graphics.drawables.DanserCoin
+import me.wieku.danser.graphics.drawables.triangles.TriangleDirection
+import me.wieku.danser.graphics.drawables.triangles.Triangles
 import me.wieku.framework.animation.Glider
 import me.wieku.framework.animation.Transform
 import me.wieku.framework.animation.TransformType
@@ -20,7 +22,7 @@ class ButtonSystem() : ParallaxContainer() {
     private var clicked = false
 
     private var coin: DanserCoin
-    private var left: Container
+    private var background: Container
     private var buttons: RightButtonsContainer
 
     private var introFinish = 0f
@@ -37,10 +39,19 @@ class ButtonSystem() : ParallaxContainer() {
                 color = Vector4f(0.2f, 0.2f, 0.2f, 1f)
                 scale = Vector2f(1f, 0f)
                 color.w = 0f
-                fillMode = Scaling.StretchY
-                origin = Origin.CentreRight
-                anchor = Origin.None
-            }.also { left = it },
+                fillMode = Scaling.Stretch
+                addChild(
+                    Triangles {
+                        useScissor = true
+                        maskingInfo.blendRange = 0f
+                        trianglesMinimum = 100
+                        fillMode = Scaling.Stretch
+                        triangleDirection = TriangleDirection.Down
+                        colorDark = Vector4f(0.9f, 0.9f, 0.9f, 1f)
+                        reactive = false
+                    }
+                )
+            }.also { background = it },
             RightButtonsContainer().also { buttons = it },
             DanserCoin().apply {
                 scale = Vector2f(0.6f)
@@ -55,7 +66,7 @@ class ButtonSystem() : ParallaxContainer() {
 
     fun click() {
         clicked = !clicked
-        left.addTransform(
+        background.addTransform(
             Transform(
                 TransformType.ScaleVector,
                 clock.currentTime + if (clicked) 100f else 0f,
@@ -65,7 +76,7 @@ class ButtonSystem() : ParallaxContainer() {
                 Easing.InOutQuad
             )
         )
-        left.addTransform(
+        background.addTransform(
             Transform(
                 TransformType.Fade,
                 clock.currentTime + if (clicked) 100f else 0f,
@@ -102,11 +113,6 @@ class ButtonSystem() : ParallaxContainer() {
         super.update()
 
         if (coin.wasUpdated) {
-            left.position.set(coin.drawSize).mul(0.10f, 0.5f).add(coin.drawPosition)
-            left.size.x = buttons.position.x
-            left.invalidate()
-            left.update()
-
             buttons.position.set(coin.drawSize).mul(0.9f, 0.5f).add(coin.drawPosition)
             buttons.size.x = drawSize.x - buttons.position.x
             buttons.invalidate()

@@ -1,12 +1,13 @@
 package me.wieku.danser.ui.mainmenu
 
 import me.wieku.danser.beatmap.Beatmap
+import me.wieku.danser.graphics.drawables.triangles.TriangleDirection
+import me.wieku.danser.graphics.drawables.triangles.Triangles
 import me.wieku.framework.animation.Glider
 import me.wieku.framework.animation.Transform
 import me.wieku.framework.animation.TransformType
 import me.wieku.framework.audio.SampleStore
 import me.wieku.framework.di.bindable.Bindable
-import me.wieku.framework.font.BitmapFont
 import me.wieku.framework.graphics.drawables.Drawable
 import me.wieku.framework.graphics.drawables.containers.ColorContainer
 import me.wieku.framework.graphics.drawables.containers.YogaContainer
@@ -18,15 +19,12 @@ import me.wieku.framework.math.Easing
 import me.wieku.framework.math.Origin
 import me.wieku.framework.math.Scaling
 import me.wieku.framework.math.vector2fRad
-import me.wieku.framework.resource.FileHandle
-import me.wieku.framework.resource.FileType
 import org.joml.Vector2f
 import org.joml.Vector4f
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import org.lwjgl.util.yoga.Yoga
 import kotlin.math.floor
-import kotlin.math.max
 
 class MenuButton(private val text: String, icon: String, font: String, color: Vector4f, private val isFirst: Boolean = false): YogaContainer(), KoinComponent {
 
@@ -59,12 +57,25 @@ class MenuButton(private val text: String, icon: String, font: String, color: Ve
         yogaFlexDirection = Yoga.YGFlexDirectionColumn
 
         this.color.w = 0f
+        shearX = 0.2f
 
         addChild(
             ColorContainer {
                 fillMode = Scaling.Stretch
                 shearX = 0.2f
                 this.color = color
+                addChild(
+                    Triangles {
+                        useScissor = true
+                        maskingInfo.blendRange = 0f
+                        shearX = 0.2f
+                        trianglesMinimum = 40
+                        fillMode = Scaling.Stretch
+                        triangleDirection = TriangleDirection.Down
+                        colorDark = Vector4f(0.9f, 0.9f, 0.9f, 1f)
+                        reactive = false
+                    }
+                )
             },
             ColorContainer {
                 fillMode = Scaling.Stretch
@@ -96,7 +107,6 @@ class MenuButton(private val text: String, icon: String, font: String, color: Ve
                                         scaleToSize = true
                                         drawShadow = true
                                         shadowOffset = Vector2f(0f, 0.1f)
-                                        origin = Origin.Centre
                                         anchor = Origin.Custom
                                         customAnchor = Vector2f(0.5f)
                                         drawFromBottom = true
@@ -120,7 +130,6 @@ class MenuButton(private val text: String, icon: String, font: String, color: Ve
                                         drawShadow = true
                                         shadowOffset = Vector2f(0f, 0.1f)
                                         scaleToSize = true
-                                        origin = Origin.Centre
                                         fillMode = Scaling.Fit
                                     }
                                 )
@@ -179,7 +188,7 @@ class MenuButton(private val text: String, icon: String, font: String, color: Ve
 
         glider.update(clock.currentTime)
         jGlider.update(clock.currentTime)
-        //println(jGlider.value)
+
         iconDrawable.customAnchor.set(0.5f, 0.5f-jGlider.value)
         iconDrawable.invalidate()
         super.update()

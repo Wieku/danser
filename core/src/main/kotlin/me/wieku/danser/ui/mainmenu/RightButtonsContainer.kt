@@ -1,5 +1,7 @@
 package me.wieku.danser.ui.mainmenu
 
+import me.wieku.danser.graphics.drawables.triangles.TriangleDirection
+import me.wieku.danser.graphics.drawables.triangles.Triangles
 import me.wieku.danser.ui.screens.SongSelect
 import me.wieku.framework.animation.Transform
 import me.wieku.framework.animation.TransformType
@@ -30,11 +32,6 @@ class RightButtonsContainer : YogaContainer(), KoinComponent {
         yogaFlexDirection = Yoga.YGFlexDirectionRow
         yogaDirection = Yoga.YGDirectionLTR
         addChild(
-            ColorContainer {
-                fillMode = Scaling.Stretch
-                scale = Vector2f(1f, 0f)
-                color = Vector4f(0.2f, 0.2f, 0.2f, 0f)
-            },
             MenuButton("danse!", "\uf144", "FontAwesome-Regular", Vector4f(65f, 17f, 158f, 255f).mul(1 / 255f), true) {
                 action = {
                     if (songSelect == null) {
@@ -56,41 +53,8 @@ class RightButtonsContainer : YogaContainer(), KoinComponent {
 
     fun show(clicked: Boolean) {
         children.forEach {
-            when (it) {
-                is ColorContainer -> {
-                    it.addTransform(
-                        Transform(
-                            TransformType.ScaleVector,
-                            clock.currentTime + if (clicked) 100f else 0f,
-                            clock.currentTime + 400f,
-                            Vector2f(1f, if (clicked) 0f else 1f),
-                            Vector2f(1f, if (clicked) 1f else 0f),
-                            Easing.InOutQuad
-                        )
-                    )
-                    it.addTransform(
-                        Transform(
-                            TransformType.Fade,
-                            clock.currentTime + if (clicked) 100f else 0f,
-                            clock.currentTime + 400f,
-                            if (clicked) 0f else 1f,
-                            if (clicked) 1f else 0f,
-                            Easing.InOutQuad
-                        )
-                    )
-                }
-                is MenuButton -> {
-                    it.show(clicked)
-                }
-            }
+            (it as MenuButton).show(clicked)
         }
     }
 
 }
-
-/*
-MenuButton("play", "\uf144", "FontAwesome-Regular", Vector4f(0.7f, 0f, 0f, 1f), true),
-            MenuButton("download", "\uf358", "FontAwesome-Regular", Vector4f(0f, 0.7f, 0.7f, 1f)),
-            MenuButton("settings", "\uf013", "FontAwesome-Solid", Vector4f(0.7f, 0.7f, 0f, 1f)),
-            MenuButton("exit", "\uf057", "FontAwesome-Regular", Vector4f(0.7f, 0f, 0.7f, 1f))
- */
