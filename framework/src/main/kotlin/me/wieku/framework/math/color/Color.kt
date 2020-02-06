@@ -2,8 +2,6 @@ package me.wieku.framework.math.color
 
 import org.joml.Vector4f
 import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.min
 
 class Color : Vector4f {
 
@@ -31,7 +29,50 @@ class Color : Vector4f {
             w = value
         }
 
-    constructor(color: Int, hasAlpha: Boolean = true) : super() {
+    constructor() : super(1f)
+
+    constructor(color: Int, hasAlpha: Boolean = true) : this() {
+        setInt(color, hasAlpha)
+    }
+
+    constructor(r: Float, g: Float, b: Float, a: Float) : super(r, g, b, a)
+
+    constructor(r: Int, g: Int, b: Int, a: Int) : this(r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f)
+
+    constructor(h: Float, s: Float, v: Float) : this() {
+        setHSV(h, s, v)
+    }
+
+    fun mixedWith(second: Color, t: Float): Color = set(mix(this, second, t)) as Color
+
+    fun getHSV() = rgbToHsv(r, g, b)
+
+    fun shifted(h: Float, s: Float = 0.0f, v: Float = 0.0f): Color {
+        var (h1, s1, v1) = rgbToHsv(this.r, this.g, this.b)
+
+        h1 = (h1 + h) % 1.0f
+        if (h1 < 0.0f) h1 += 1.0f
+
+        s1 = (s1 + s) % 1.0f
+        if (s1 < 0.0f) s1 += 1.0f
+
+        v1 = (v1 + v) % 1.0f
+        if (v1 < 0.0f) v1 += 1.0f
+
+        return setHSV(h1, s1, v1)
+    }
+
+    fun setHSV(h: Float, s: Float, v: Float): Color {
+        val (r, g, b) = hsvToRgb(h, s, v)
+
+        this.r = r
+        this.g = g
+        this.b = b
+
+        return this
+    }
+
+    fun setInt(color: Int, hasAlpha: Boolean = true): Color {
         val baseShift = if (hasAlpha) 24 else 16
         val rInt = (color ushr baseShift) and 0xFF
         val gInt = (color ushr (baseShift - 8)) and 0xFF
@@ -42,21 +83,8 @@ class Color : Vector4f {
         g = gInt / 255.0f
         b = bInt / 255.0f
         a = aInt / 255.0f
-    }
 
-    constructor() : this(0xFFFFFFFF.toInt()) //TODO: Switch to UInt when it becomes not experimental
-
-    constructor(r: Float, g: Float, b: Float, a: Float) : super(r, g, b, a)
-
-    constructor(r: Int, g: Int, b: Int, a: Int) : super(r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f)
-
-    constructor(h: Float, s: Float, v: Float) : super() {
-        val (r, g, b) = hsvToRgb(h, s, v)
-
-        this.r = r
-        this.g = g
-        this.b = b
-        this.a = 1.0f
+        return this
     }
 
     companion object {
@@ -102,7 +130,7 @@ class Color : Vector4f {
         }
 
         fun rgbToHsv(r: Float, g: Float, b: Float): Triple<Float, Float, Float> {
-            val min = min(min(r, g), b)
+            val min = minOf(r, g, b)
             val v = maxOf(r, g, b)
             val c = v - min
 
