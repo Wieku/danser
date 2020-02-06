@@ -9,7 +9,6 @@ import me.wieku.framework.graphics.drawables.sprite.TextSprite
 import me.wieku.framework.input.event.ClickEvent
 import me.wieku.framework.input.event.HoverEvent
 import me.wieku.framework.input.event.HoverLostEvent
-import me.wieku.framework.math.Easing
 import me.wieku.framework.math.Scaling
 import org.joml.Vector2f
 import org.joml.Vector4f
@@ -20,7 +19,7 @@ class ControlButton(_icon: String): YogaContainer(), KoinComponent {
 
     private val sampleStore: SampleStore by inject()
 
-    private lateinit var highlight: ColorContainer
+    private val highlight: ColorContainer
     private lateinit var text: TextSprite
 
     var icon: String

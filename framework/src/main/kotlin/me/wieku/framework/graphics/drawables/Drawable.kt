@@ -23,13 +23,9 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.tan
 
-abstract class Drawable() : InputHandler(), Disposable, KoinComponent {
+abstract class Drawable : InputHandler(), Disposable, KoinComponent {
 
     val clock: IFramedClock by inject()
-
-    constructor(inContext: Drawable.() -> Unit) : this() {
-        inContext()
-    }
 
     /**
      * Relative position of drawable

@@ -10,10 +10,10 @@ import me.wieku.danser.ui.common.FPSStatistics
 import me.wieku.danser.ui.screens.LoadingScreen
 import me.wieku.framework.animation.Glider
 import me.wieku.framework.audio.SampleStore
-import me.wieku.framework.di.bindable.Bindable
-import me.wieku.framework.font.FontStore
 import me.wieku.framework.backend.Game
 import me.wieku.framework.backend.GameContext
+import me.wieku.framework.di.bindable.Bindable
+import me.wieku.framework.font.FontStore
 import me.wieku.framework.graphics.drawables.containers.Container
 import me.wieku.framework.graphics.drawables.sprite.SpriteBatch
 import me.wieku.framework.graphics.textures.store.TextureStore
@@ -28,7 +28,6 @@ import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.FileType
 import org.joml.Vector2f
 import org.joml.Vector2i
-import org.joml.Vector4f
 import org.koin.core.KoinComponent
 import org.koin.core.context.loadKoinModules
 import org.koin.core.inject
@@ -114,7 +113,7 @@ class Danser : Game(), KoinComponent {
             }.also { screenChangeTriangles = it }
         )
 
-        screenCache += { previous, next ->
+        screenCache += { previous, _ ->
             if (previous != null && previous !is LoadingScreen) {
                 trianglesSpeed.addEvent(updateClock.currentTime, updateClock.currentTime + 200, 2f, 4f, Easing.OutQuad)
                 trianglesSpawnRate.addEvent(updateClock.currentTime, updateClock.currentTime + 100, 0.1f, 2f, Easing.OutQuad)

@@ -29,7 +29,7 @@ open class Container() : Drawable() {
             }
             return false
         }
-        set(value) {}
+        set(_) {}
 
     constructor(inContext: Container.() -> Unit) : this() {
         inContext()

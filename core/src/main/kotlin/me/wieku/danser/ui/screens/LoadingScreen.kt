@@ -16,7 +16,6 @@ import me.wieku.framework.math.Origin
 import me.wieku.framework.math.Scaling
 import me.wieku.framework.math.color.Color
 import org.joml.Vector2f
-import org.joml.Vector4f
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 

@@ -25,6 +25,6 @@ class BackgroundWrapper: Container() {
 
             return false
         }
-        set(value) {}
+        set(_) {}
 
 }

@@ -3,15 +3,13 @@ package me.wieku.framework.graphics.textures
 import me.wieku.framework.graphics.pixmap.Pixmap
 import me.wieku.framework.resource.FileHandle
 import org.lwjgl.opengl.GL32.*
-import org.lwjgl.stb.STBImage.*
-import org.lwjgl.system.MemoryStack
 import org.lwjgl.system.MemoryUtil
 import java.nio.ByteBuffer
 import java.nio.FloatBuffer
 import java.nio.IntBuffer
 
 class Texture: ITexture {
-    private lateinit var store: TextureStore
+    private var store: TextureStore
     val region = TextureRegion(this, 0f, 1f, 0f, 1f, 0)
 
     override var width: Int = 0
