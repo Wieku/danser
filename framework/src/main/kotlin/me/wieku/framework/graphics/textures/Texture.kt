@@ -94,14 +94,15 @@ class Texture: ITexture {
         }
     }
 
-    constructor(file: FileHandle, mipmaps: Int = 1) {
-        val pixmap = Pixmap(file)
+    constructor(pixmap: Pixmap, mipmaps: Int = 1) {
         this.width = pixmap.width
         this.height = pixmap.height
         this.mipmaps = if(mipmaps < 1) 1 else mipmaps
         this.store = TextureStore(1, this.width, this.height, this.mipmaps)
         setData(pixmap.pixels)
     }
+
+    constructor(file: FileHandle, mipmaps: Int = 1): this(Pixmap(file), mipmaps)
 
     fun setData(data: ByteArray, x: Int = 0, y: Int = 0, width: Int = this.width, height: Int = this.height) {
         if (data.size != width * height * store.format.sizePerPixel * (if (store.format.type == GL_FLOAT) 4 else 1)) {
