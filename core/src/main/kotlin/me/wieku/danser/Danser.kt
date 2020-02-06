@@ -98,7 +98,7 @@ class Danser : Game(), KoinComponent {
 
         mainContainer.addChild(CursorWithTrail())
 
-        camera.setViewportF(0, 0, 1920, 1080, true)
+        camera.setViewport(0, 0, 1920, 1080, true)
         camera.update()
 
         mainContainer.addChild(
@@ -144,7 +144,7 @@ class Danser : Game(), KoinComponent {
             lastContextSize.set(gameContext.contextSize)
             mainContainer.size.set(lastContextSize)
             mainContainer.invalidate()
-            camera.setViewportF(0, 0, lastContextSize.x, lastContextSize.y)
+            camera.setViewport(0, 0, lastContextSize.x, lastContextSize.y)
             camera.update()
         }
 

@@ -36,7 +36,7 @@ open class BlurredContainer() : Container() {
 
     override fun update() {
         super.update()
-        camera.setViewportF(drawPosition.x.toInt(), drawPosition.y.toInt(), drawSize.x.toInt(), drawSize.y.toInt())
+        camera.setViewport(drawPosition.x.toInt(), drawPosition.y.toInt(), drawSize.x.toInt(), drawSize.y.toInt())
         camera.update()
         lock.lock()
         if (wasUpdated) {
