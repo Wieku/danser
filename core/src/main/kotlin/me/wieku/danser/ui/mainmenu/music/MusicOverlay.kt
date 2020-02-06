@@ -74,15 +74,15 @@ class MusicOverlay(): Container() {
                                 addChild(
                                     ColorContainer {
                                         fillMode = Scaling.Stretch
-                                        color = Color(0.2f, 0.2f, 0.2f, 1f)
+                                        color = Color(0.2f, 1f)
                                     },
                                     Triangles {
                                         fillMode = Scaling.Stretch
                                         minSize = 1f
                                         maxSize = 2f
                                         spawnRate = 2f
-                                        colorDark = Vector4f(0.054f, 0.054f, 0.054f, 1f)
-                                        colorLight = Vector4f(0.2f, 0.2f, 0.2f, 1f)
+                                        colorDark = Color(0.054f, 1f)
+                                        colorLight = Color(0.2f, 1f)
                                     }
                                 )
                             },

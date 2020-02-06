@@ -82,8 +82,8 @@ class DanserCoin : Container(), KoinComponent {
                             maxSize = 0.32f
                             speedMultiplier = 0.33f
                             spawnEnabled = false
-                            colorDark = Vector4f(0.054f, 0.054f, 0.054f, 1f)
-                            colorLight = Vector4f(0.2f, 0.2f, 0.2f, 1f)
+                            colorDark = Color(0.054f, 1f)
+                            colorLight = Color(0.2f, 1f)
                         }.also { triangles = it }
                     )
                 }.also { circularContainer = it },

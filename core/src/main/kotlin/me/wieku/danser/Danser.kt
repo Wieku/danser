@@ -22,6 +22,7 @@ import me.wieku.framework.input.InputManager
 import me.wieku.framework.math.Easing
 import me.wieku.framework.math.Origin
 import me.wieku.framework.math.Scaling
+import me.wieku.framework.math.color.Color
 import me.wieku.framework.math.view.Camera
 import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.FileType
@@ -106,8 +107,8 @@ class Danser : Game(), KoinComponent {
                 fillMode = Scaling.Stretch
                 startOnScreen = false
                 spawnEnabled = false
-                colorDark = Vector4f(0.054f, 0.054f, 0.054f, 1f)
-                colorLight = Vector4f(0.2f, 0.2f, 0.2f, 1f)
+                colorDark = Color(0.054f, 1f)
+                colorLight = Color(0.2f, 1f)
                 color.w = 0.5f
                 maxSize = 0.4f
             }.also { screenChangeTriangles = it }

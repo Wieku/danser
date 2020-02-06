@@ -7,8 +7,8 @@ import me.wieku.framework.graphics.drawables.containers.Container
 import me.wieku.framework.graphics.drawables.sprite.Sprite
 import me.wieku.framework.math.Origin
 import me.wieku.framework.math.Scaling
+import me.wieku.framework.math.color.Color
 import org.joml.Vector2f
-import org.joml.Vector4f
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.util.*
@@ -17,13 +17,13 @@ import kotlin.math.*
 class Triangles() : Container(), KoinComponent {
 
     private class Triangle(position: Vector2f, size: Float) : Sprite("misc/triangle.png") {
-        private val helper = Vector4f()
+        private val helper = Color()
 
         private val colorIndex = random.nextInt(Int.MAX_VALUE)
         private val colorShade = random.nextFloat()
 
-        private val oldColor = Vector4f(Float.NaN)
-        private val newColor = Vector4f(Float.NaN)
+        private val oldColor = Color(Float.NaN)
+        private val newColor = Color(Float.NaN)
 
         private val colorGlider = Glider(1f)
 
@@ -45,22 +45,22 @@ class Triangles() : Container(), KoinComponent {
                 when (colorGlider.value) {
                     0f -> oldColor
                     1f -> newColor
-                    else -> helper.set(newColor).sub(oldColor).mul(colorGlider.value).add(oldColor)
+                    else -> Color.mix(oldColor, newColor, colorGlider.value, helper)
                 }
             )
 
             super.update()
         }
 
-        fun updateColors(dark: Vector4f, light: Vector4f) {
-            colorTo(helper.set(light).sub(dark).mul(colorShade).add(dark))
+        fun updateColors(dark: Color, light: Color) {
+            colorTo(Color.mix(dark, light, colorShade, helper))
         }
 
-        fun updateColors(colorArray: Array<Vector4f>) {
+        fun updateColors(colorArray: Array<Color>) {
             colorTo(colorArray[colorIndex % colorArray.size])
         }
 
-        private fun colorTo(newColor: Vector4f) {
+        private fun colorTo(newColor: Color) {
             oldColor.set(color)
 
             if (!this.newColor.x.isNaN()) {
@@ -78,7 +78,7 @@ class Triangles() : Container(), KoinComponent {
     private val bars = 40
     private val triangleSpawnRate = 0.25
 
-    var colorDark = Vector4f(0f, 0f, 0f, 1f)
+    var colorDark = Color(0f, 1f)
         set(value) {
             if (value == colorDark) return
 
@@ -89,7 +89,7 @@ class Triangles() : Container(), KoinComponent {
             field = value
         }
 
-    var colorLight = Vector4f(1f, 1f, 1f, 1f)
+    var colorLight = Color(1f)
         set(value) {
             if (value == colorLight) return
 
@@ -100,7 +100,7 @@ class Triangles() : Container(), KoinComponent {
             field = value
         }
 
-    var colorArray: Array<Vector4f>? = null
+    var colorArray: Array<Color>? = null
         set(value) {
             value?.let {
                 children.forEach {

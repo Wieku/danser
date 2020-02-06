@@ -73,7 +73,7 @@ class MenuButton(private val text: String, icon: String, font: String, color: Co
                         trianglesMinimum = 40
                         fillMode = Scaling.Stretch
                         triangleDirection = TriangleDirection.Down
-                        colorDark = Vector4f(0.9f, 0.9f, 0.9f, 1f)
+                        colorDark = Color(0.9f, 1f)
                         reactive = false
                     }
                 )

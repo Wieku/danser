@@ -38,8 +38,8 @@ class MusicControl: YogaContainer() {
                 minSize = 1f
                 maxSize = 2f
                 spawnRate = 2f
-                colorDark = Vector4f(0.054f, 0.054f, 0.054f, 0.5f)
-                colorLight = Vector4f(0.2f, 0.2f, 0.2f, 0.5f)
+                colorDark = Color(0.054f, 0.5f)
+                colorLight = Color(0.2f, 0.5f)
             },
             YogaContainer {
                 yogaHeightPercent = 100f
