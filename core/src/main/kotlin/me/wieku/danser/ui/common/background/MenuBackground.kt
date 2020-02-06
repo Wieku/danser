@@ -46,6 +46,8 @@ class MenuBackground() : ParallaxContainer(), KoinComponent {
     init {
         beatmap.bindTo(beatmapBindable)
 
+        useScissor = true
+
         addChild(
             Container {
                 fillMode = Scaling.Stretch
@@ -60,12 +62,12 @@ class MenuBackground() : ParallaxContainer(), KoinComponent {
             }.also { triangles = it }
         )
 
-        beatmap.addListener { oldBeatmap, newBeatmap, _ ->
-            val beatmap = newBeatmap!!
+        beatmap.addListener(true) { _, newBeatmap, _ ->
+            if (newBeatmap == null) return@addListener
 
-            val fileHandle = if (beatmap.beatmapInfo.version != "Danser Intro") {
+            val fileHandle = if (newBeatmap.beatmapInfo.version != "Danser Intro") {
                 val tmpHandle = FileHandle(
-                    System.getenv("localappdata") + "/osu!/Songs/" + beatmap.beatmapSet.directory + File.separator + beatmap.beatmapMetadata.backgroundFile,
+                    System.getenv("localappdata") + "/osu!/Songs/" + newBeatmap.beatmapSet.directory + File.separator + newBeatmap.beatmapMetadata.backgroundFile,
                     FileType.Absolute
                 )
                 if (tmpHandle.file.exists()) tmpHandle else FileHandle(
@@ -77,6 +79,7 @@ class MenuBackground() : ParallaxContainer(), KoinComponent {
             oldBackground = currentBackground
 
             pixmap = Pixmap(fileHandle)
+            updateColors(pixmap!!)
 
             currentBackground = Sprite {
                 fillMode = Scaling.Fill
@@ -85,7 +88,7 @@ class MenuBackground() : ParallaxContainer(), KoinComponent {
 
             wrapper.addChild(currentBackground!!)
 
-            if (oldBeatmap != null) {
+            if (oldBackground != null) {
                 oldBackground!!.addTransform(
                     Transform(
                         TransformType.Fade,
@@ -112,8 +115,6 @@ class MenuBackground() : ParallaxContainer(), KoinComponent {
 
     override fun draw(batch: SpriteBatch) {
         if (currentBackground!!.texture == null && pixmap != null) {
-            updateColors(pixmap!!)
-
             currentBackground!!.texture = Texture(pixmap!!).region
             currentBackground!!.size =
                 Vector2f(currentBackground!!.texture!!.getWidth(), currentBackground!!.texture!!.getHeight())
