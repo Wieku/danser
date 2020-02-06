@@ -69,7 +69,7 @@ class Track(file: FileHandle, val fftMode: FFTMode = FFTMode.FFT512) : IClock {
 
     override var isRunning: Boolean
         get() = getState() == ChannelStatus.Playing
-        set(value) {}
+        set(_) {}
 
     init {
         synchronized(BassSystem.tracks) {
