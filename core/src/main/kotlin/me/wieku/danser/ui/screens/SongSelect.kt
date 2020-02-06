@@ -1,6 +1,5 @@
 package me.wieku.danser.ui.screens
 
-import javafx.scene.transform.Scale
 import me.wieku.danser.beatmap.TrackManager
 import me.wieku.danser.ui.common.background.MenuBackground
 import me.wieku.framework.animation.Transform
