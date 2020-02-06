@@ -29,13 +29,17 @@ class Color : Vector4f {
             w = value
         }
 
-    constructor() : super(1f)
+    constructor(d: Float) : super(d)
+
+    constructor() : this(1f)
 
     constructor(color: Int, hasAlpha: Boolean = true) : this() {
         setInt(color, hasAlpha)
     }
 
     constructor(r: Float, g: Float, b: Float, a: Float) : super(r, g, b, a)
+
+    constructor(whiteness: Float, alpha: Float) : this(whiteness, whiteness, whiteness, alpha)
 
     constructor(r: Int, g: Int, b: Int, a: Int) : this(r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f)
 
