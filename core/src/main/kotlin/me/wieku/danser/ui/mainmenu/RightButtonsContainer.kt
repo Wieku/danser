@@ -11,6 +11,7 @@ import me.wieku.framework.gui.screen.ScreenCache
 import me.wieku.framework.math.Easing
 import me.wieku.framework.math.Origin
 import me.wieku.framework.math.Scaling
+import me.wieku.framework.math.color.Color
 import org.joml.Vector2f
 import org.joml.Vector4f
 import org.koin.core.KoinComponent
@@ -32,7 +33,7 @@ class RightButtonsContainer : YogaContainer(), KoinComponent {
         yogaFlexDirection = Yoga.YGFlexDirectionRow
         yogaDirection = Yoga.YGDirectionLTR
         addChild(
-            MenuButton("danse!", "\uf144", "FontAwesome-Regular", Vector4f(65f, 17f, 158f, 255f).mul(1 / 255f), true) {
+            MenuButton("danse!", "\uf144", "FontAwesome-Regular", Color(65, 17, 158, 255), true) {
                 action = {
                     if (songSelect == null) {
                         songSelect = SongSelect()
@@ -44,10 +45,10 @@ class RightButtonsContainer : YogaContainer(), KoinComponent {
                 "download",
                 "\uf358",
                 "FontAwesome-Regular",
-                Vector4f(97f * 0.9f, 212f * 0.9f, 21f * 0.9f, 255f).mul(1 / 255f)
+                Color(87, 191, 19, 255)
             ),
-            MenuButton("settings", "\uf013", "FontAwesome-Solid", Vector4f(232f, 176f, 0f, 255f).mul(1 / 255f)),
-            MenuButton("exit", "\uf057", "FontAwesome-Regular", Vector4f(255f, 23f, 224f, 255f).mul(1 / 255f))
+            MenuButton("settings", "\uf013", "FontAwesome-Solid", Color(232, 176, 0, 255)),
+            MenuButton("exit", "\uf057", "FontAwesome-Regular", Color(255, 23, 224, 255))
         )
     }
 

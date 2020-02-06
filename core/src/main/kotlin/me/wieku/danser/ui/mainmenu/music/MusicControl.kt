@@ -7,6 +7,7 @@ import me.wieku.framework.di.bindable.Bindable
 import me.wieku.framework.graphics.drawables.containers.ColorContainer
 import me.wieku.framework.graphics.drawables.containers.YogaContainer
 import me.wieku.framework.math.Scaling
+import me.wieku.framework.math.color.Color
 import org.joml.Vector4f
 import org.koin.core.inject
 import org.lwjgl.util.yoga.Yoga
@@ -30,7 +31,7 @@ class MusicControl: YogaContainer() {
         addChild(
             ColorContainer {
                 fillMode = Scaling.Stretch
-                color = Vector4f(0.2f, 0.2f, 0.2f, 0.5f)
+                color = Color(0.2f, 0.2f, 0.2f, 0.5f)
             },
             Triangles {
                 fillMode = Scaling.Stretch

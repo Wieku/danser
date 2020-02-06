@@ -14,6 +14,7 @@ import me.wieku.framework.gui.screen.ScreenCache
 import me.wieku.framework.math.Easing
 import me.wieku.framework.math.Origin
 import me.wieku.framework.math.Scaling
+import me.wieku.framework.math.color.Color
 import org.joml.Vector2f
 import org.joml.Vector4f
 import org.koin.core.KoinComponent
@@ -44,7 +45,7 @@ class LoadingScreen : Screen(), KoinComponent {
                 addChild(
                     ColorContainer {
                         fillMode = Scaling.Stretch
-                        color = Vector4f(0f, 0f, 0f, 0.6f)
+                        color = Color(0f, 0f, 0f, 0.6f)
                     }
                 )
             },

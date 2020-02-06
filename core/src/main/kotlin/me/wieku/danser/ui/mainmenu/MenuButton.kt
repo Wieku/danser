@@ -18,6 +18,7 @@ import me.wieku.framework.input.event.HoverLostEvent
 import me.wieku.framework.math.Easing
 import me.wieku.framework.math.Origin
 import me.wieku.framework.math.Scaling
+import me.wieku.framework.math.color.Color
 import me.wieku.framework.math.vector2fRad
 import org.joml.Vector2f
 import org.joml.Vector4f
@@ -26,7 +27,7 @@ import org.koin.core.inject
 import org.lwjgl.util.yoga.Yoga
 import kotlin.math.floor
 
-class MenuButton(private val text: String, icon: String, font: String, color: Vector4f, private val isFirst: Boolean = false): YogaContainer(), KoinComponent {
+class MenuButton(private val text: String, icon: String, font: String, color: Color, private val isFirst: Boolean = false): YogaContainer(), KoinComponent {
 
     private lateinit var iconDrawable: Drawable
     private val beatmapBindable: Bindable<Beatmap?> by inject()
@@ -46,7 +47,7 @@ class MenuButton(private val text: String, icon: String, font: String, color: Ve
 
     private var armed = false
 
-    constructor(text: String, icon: String, font: String, color: Vector4f, isFirst: Boolean = false, inContext: MenuButton.() -> Unit) : this(text, icon, font, color, isFirst) {
+    constructor(text: String, icon: String, font: String, color: Color, isFirst: Boolean = false, inContext: MenuButton.() -> Unit) : this(text, icon, font, color, isFirst) {
         inContext()
     }
 

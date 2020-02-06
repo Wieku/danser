@@ -10,6 +10,7 @@ import me.wieku.framework.graphics.drawables.containers.YogaContainer
 import me.wieku.framework.graphics.drawables.sprite.TextSprite
 import me.wieku.framework.math.Origin
 import me.wieku.framework.math.Scaling
+import me.wieku.framework.math.color.Color
 import org.joml.Vector2f
 import org.joml.Vector4f
 import org.koin.core.inject
@@ -73,7 +74,7 @@ class MusicOverlay(): Container() {
                                 addChild(
                                     ColorContainer {
                                         fillMode = Scaling.Stretch
-                                        color = Vector4f(0.2f, 0.2f, 0.2f, 1f)
+                                        color = Color(0.2f, 0.2f, 0.2f, 1f)
                                     },
                                     Triangles {
                                         fillMode = Scaling.Stretch

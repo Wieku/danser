@@ -7,6 +7,7 @@ import me.wieku.framework.graphics.drawables.containers.YogaContainer
 import me.wieku.framework.input.event.ClickEvent
 import me.wieku.framework.math.Origin
 import me.wieku.framework.math.Scaling
+import me.wieku.framework.math.color.Color
 import org.joml.Vector2f
 import org.joml.Vector4f
 import org.koin.core.KoinComponent
@@ -25,13 +26,13 @@ class ProgressBar: YogaContainer(), KoinComponent {
         addChild(
             ColorContainer {
                 fillMode = Scaling.Stretch
-                color = Vector4f(249f/255, 168f/255, 37f/255, 1f)
+                color = Color(249, 168, 37, 255)
             },
             ColorContainer {
                 fillMode = Scaling.Stretch
                 anchor = Origin.TopLeft
                 origin = Origin.TopLeft
-                color = Vector4f(255f/255, 217f/255, 90f/255, 1f)
+                color = Color(255, 217, 90, 255)
             }.also { progress = it }
         )
 

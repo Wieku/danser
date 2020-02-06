@@ -5,6 +5,7 @@ import me.wieku.framework.graphics.shaders.Shader
 import me.wieku.framework.graphics.textures.ITexture
 import me.wieku.framework.graphics.textures.Texture
 import me.wieku.framework.graphics.textures.TextureRegion
+import me.wieku.framework.math.color.Color
 import me.wieku.framework.math.rot
 import me.wieku.framework.math.vector2fRad
 import me.wieku.framework.math.view.Camera
@@ -196,7 +197,7 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
         glBlendFunc(preSFactor, preDFactor)
     }
 
-    private fun addVertex(position: Vector2f, texCoords: Vector3f, color: Vector4f, additive: Boolean = false) {
+    private fun addVertex(position: Vector2f, texCoords: Vector3f, color: Color, additive: Boolean = false) {
 
         vertexBuffer.put(position.x)
         vertexBuffer.put(position.y)
@@ -204,10 +205,10 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
         vertexBuffer.put(texCoords.x)
         vertexBuffer.put(texCoords.y)
         vertexBuffer.put(texCoords.z)
-        vertexBuffer.put(color.x)
-        vertexBuffer.put(color.y)
-        vertexBuffer.put(color.z)
-        vertexBuffer.put(color.w)
+        vertexBuffer.put(color.r)
+        vertexBuffer.put(color.g)
+        vertexBuffer.put(color.b)
+        vertexBuffer.put(color.a)
         vertexBuffer.put(if (additive) 0f else 1f)
 
         vertexCount += 1
@@ -217,11 +218,11 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
     private var tmp1 = Vector3f()
     private var tmp2 = Vector2f()
 
-    fun draw(texture: Texture, x: Float, y: Float, scaleX: Float, scaleY: Float, color: Vector4f) {
+    fun draw(texture: Texture, x: Float, y: Float, scaleX: Float, scaleY: Float, color: Color) {
         draw(texture.region, x, y, scaleX, scaleY, color)
     }
 
-    fun draw(region: TextureRegion, x: Float, y: Float, scaleX: Float, scaleY: Float, color: Vector4f) {
+    fun draw(region: TextureRegion, x: Float, y: Float, scaleX: Float, scaleY: Float, color: Color) {
         check(drawing) { "Batching not started" }
 
         bind(region.getTexture())

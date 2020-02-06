@@ -6,6 +6,7 @@ import me.wieku.framework.graphics.drawables.sprite.SpriteBatch
 import me.wieku.framework.input.InputHandler
 import me.wieku.framework.math.Origin
 import me.wieku.framework.math.Scaling
+import me.wieku.framework.math.color.Color
 import me.wieku.framework.time.IFramedClock
 import me.wieku.framework.utils.Disposable
 import me.wieku.framework.utils.synchronized
@@ -59,9 +60,9 @@ abstract class Drawable() : InputHandler(), Disposable, KoinComponent {
     private var tempSize = Vector2f()
 
     var inheritColor = true
-    var color = Vector4f(1f, 1f, 1f, 1f)
-    var drawColor = Vector4f(1f, 1f, 1f, 1f)
-    private var tempColor = Vector4f(1f, 1f, 1f, 1f)
+    var color = Color()
+    var drawColor = Color()
+    private var tempColor = Color()
 
     protected val transformInfo = Matrix4f()
 

@@ -12,6 +12,7 @@ import me.wieku.framework.graphics.drawables.containers.ParallaxContainer
 import me.wieku.framework.math.Easing
 import me.wieku.framework.math.Origin
 import me.wieku.framework.math.Scaling
+import me.wieku.framework.math.color.Color
 import org.joml.Vector2f
 import org.joml.Vector4f
 
@@ -36,7 +37,7 @@ class ButtonSystem() : ParallaxContainer() {
         parallaxAmount = 1f / 80
         addChild(
             ColorContainer {
-                color = Vector4f(0.2f, 0.2f, 0.2f, 1f)
+                color = Color(0.2f, 0.2f, 0.2f, 1f)
                 scale = Vector2f(1f, 0f)
                 color.w = 0f
                 fillMode = Scaling.Stretch

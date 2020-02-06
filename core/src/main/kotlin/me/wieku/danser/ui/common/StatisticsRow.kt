@@ -8,6 +8,7 @@ import me.wieku.framework.graphics.drawables.sprite.TextSprite
 import me.wieku.framework.math.Easing
 import me.wieku.framework.math.Origin
 import me.wieku.framework.math.Scaling
+import me.wieku.framework.math.color.Color
 import org.joml.Vector2f
 import org.joml.Vector4f
 import org.lwjgl.util.yoga.Yoga
@@ -79,7 +80,7 @@ class StatisticsRow() : YogaContainer() {
                         fillMode = Scaling.Stretch
                         addChild(
                             ColorContainer {
-                                color = Vector4f(0f, 0f, 0f, 0.5f)
+                                color = Color(0f, 0f, 0f, 0.5f)
                                 fillMode = Scaling.Stretch
                             }
                         )

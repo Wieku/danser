@@ -17,6 +17,7 @@ import me.wieku.framework.input.event.HoverLostEvent
 import me.wieku.framework.math.Easing
 import me.wieku.framework.math.Easings
 import me.wieku.framework.math.Scaling
+import me.wieku.framework.math.color.Color
 import org.joml.Vector2f
 import org.joml.Vector2i
 import org.joml.Vector4f
@@ -73,7 +74,7 @@ class DanserCoin : Container(), KoinComponent {
                     addChild(
                         ColorContainer {
                             fillMode = Scaling.Stretch
-                            color = Vector4f(28f / 255, 28f / 255, 28f / 255, 1f)
+                            color = Color(28, 28, 28, 255)
                         },
                         Triangles {
                             fillMode = Scaling.Fit
@@ -95,7 +96,7 @@ class DanserCoin : Container(), KoinComponent {
                     addChild(
                         ColorContainer {
                             fillMode = Scaling.Stretch
-                            color = Vector4f(1f, 1f, 1f, 0f)
+                            color = Color(1f, 1f, 1f, 0f)
                         }.also { coinFlash = it }
                     )
                 }
