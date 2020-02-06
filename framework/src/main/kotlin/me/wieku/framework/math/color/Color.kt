@@ -78,9 +78,9 @@ class Color : Vector4f {
 
     fun setInt(color: Int, hasAlpha: Boolean = true): Color {
         val baseShift = if (hasAlpha) 24 else 16
-        val rInt = (color ushr baseShift) and 0xFF
-        val gInt = (color ushr (baseShift - 8)) and 0xFF
-        val bInt = (color ushr (baseShift - 16)) and 0xFF
+        val rInt = color ushr baseShift and 0xFF
+        val gInt = color ushr baseShift - 8 and 0xFF
+        val bInt = color ushr baseShift - 16 and 0xFF
         val aInt = if (hasAlpha) color and 0xFF else 0xFF
 
         r = rInt / 255.0f
@@ -96,7 +96,7 @@ class Color : Vector4f {
         fun hsvToRgb(h: Float, s: Float, v: Float): Triple<Float, Float, Float> {
             val hp = h * 6
             val c = v * s
-            val xx = c * (1.0f - abs((hp % 2.0f) - 1.0f))
+            val xx = c * (1.0f - abs(hp % 2.0f - 1.0f))
 
             val m = v - c
             var rr = 0.0f
@@ -143,7 +143,7 @@ class Color : Vector4f {
             var h = 0.0f
             if (min != v) {
                 if (v == r) {
-                    h = ((g - b) / c) % 6.0f
+                    h = (g - b) / c % 6.0f
                 }
                 if (v == g) {
                     h = (b - r) / c + 2.0f
