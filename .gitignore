@@ -50,8 +50,11 @@ gradle-app.setting
 /core/build/
 /core/out/
 /framework/build/
+/framework/out/
 /framework-desktop/build/
+/framework-desktop/out/
 /desktop/build/
+/desktop/out/
 /desktop/run/
 
 ## OS Specific
