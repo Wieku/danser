@@ -2,7 +2,6 @@ package me.wieku.framework.backend
 
 import me.wieku.framework.configuration.FrameworkConfig
 import me.wieku.framework.di.bindable.Bindable
-import me.wieku.framework.di.bindable.BindableListener
 import me.wieku.framework.input.DesktopInputManager
 import me.wieku.framework.input.InputManager
 import org.joml.Vector2i
@@ -12,8 +11,9 @@ import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL33.*
 
 class DesktopContext: GameContext() {
-
     internal var windowHandle: Long = 0
+
+    private var minimized = false
 
     private val pos1 = Vector2i()
     private val pos2 = Vector2i()
@@ -105,8 +105,15 @@ class DesktopContext: GameContext() {
             this.focused = focused
         }
 
+        glfwSetWindowIconifyCallback(windowHandle) { _, iconified ->
+            minimized = iconified
+
+            if (minimized)
+                FrameworkConfig.windowPosition.value = Vector2i(pos2)
+        }
+
         glfwSetWindowSizeCallback(windowHandle) { _, width, height ->
-            if (FrameworkConfig.windowMode.value != WindowMode.Maximized)
+            if (FrameworkConfig.windowMode.value != WindowMode.Maximized && !minimized)
                 FrameworkConfig.windowSize.value = Vector2i(width, height)
         }
 
