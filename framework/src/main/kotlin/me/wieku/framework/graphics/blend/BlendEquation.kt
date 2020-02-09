@@ -4,7 +4,7 @@ import me.wieku.framework.utils.EnumWithId
 import org.lwjgl.opengl.GL33.*
 
 /**
- * Documentation about these factors can be found [here](https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glBlendEquation.xhtml)
+ * Documentation about these equations can be found [here](https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glBlendEquation.xhtml)
  */
 enum class BlendEquation(override val enumId: Int): EnumWithId {
     Add(GL_FUNC_ADD),
