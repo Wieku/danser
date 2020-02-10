@@ -79,4 +79,8 @@ object BlendHelper {
         setColor(data.color)
         setFunction(data.source, data.destination, data.sourceAlpha, data.destinationAlpha)
     }
+
+    fun clearBlendStack() {
+        blendStack.clear()
+    }
 }
