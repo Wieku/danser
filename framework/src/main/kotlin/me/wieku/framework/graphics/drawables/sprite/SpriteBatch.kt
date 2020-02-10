@@ -1,5 +1,7 @@
 package me.wieku.framework.graphics.drawables.sprite
 
+import me.wieku.framework.graphics.blend.BlendFactor
+import me.wieku.framework.graphics.blend.BlendHelper
 import me.wieku.framework.graphics.buffers.*
 import me.wieku.framework.graphics.shaders.Shader
 import me.wieku.framework.graphics.textures.ITexture
@@ -16,8 +18,6 @@ import me.wieku.framework.utils.MaskingInfo
 import org.joml.Vector2f
 import org.joml.Vector3f
 import org.joml.Vector4f
-import org.lwjgl.opengl.GL11
-import org.lwjgl.opengl.GL33.*
 import org.lwjgl.system.MemoryUtil
 import java.nio.FloatBuffer
 import java.util.*
@@ -106,10 +106,6 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
         helperBuffer = MemoryUtil.memAllocFloat(16)
     }
 
-    private var preBlendState: Boolean = false
-    private var preSFactor: Int = 0
-    private var preDFactor: Int = 0
-
     private fun bind(texture: ITexture) {
         if (currentTexture != null) {
             if (currentTexture!!.id == texture.id) {
@@ -141,14 +137,9 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
         vao.bind()
         ibo.bind()
 
-        preBlendState = GL11.glIsEnabled(GL_BLEND)
-        preSFactor = glGetInteger(GL_BLEND_SRC)
-        preDFactor = glGetInteger(GL_BLEND_DST)
-
-        if (!preBlendState)
-            glEnable(GL_BLEND)
-
-        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
+        BlendHelper.pushBlend()
+        BlendHelper.enable()
+        BlendHelper.setFunction(BlendFactor.One, BlendFactor.OneMinusSrcAlpha)
 
         currentTexture?.let {
             if (it.location == 0) {
@@ -192,9 +183,7 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
 
         shader.unbind()
 
-        if (!preBlendState)
-            glDisable(GL_BLEND)
-        glBlendFunc(preSFactor, preDFactor)
+        BlendHelper.popBlend()
     }
 
     private fun addVertex(position: Vector2f, texCoords: Vector3f, color: Color, additive: Boolean = false) {
