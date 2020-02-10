@@ -4,10 +4,12 @@ import me.wieku.danser.beatmap.TrackManager
 import me.wieku.danser.ui.common.background.MenuBackground
 import me.wieku.framework.animation.Transform
 import me.wieku.framework.animation.TransformType
+import me.wieku.framework.graphics.drawables.sprite.TextSprite
 import me.wieku.framework.gui.screen.Screen
 import me.wieku.framework.input.MouseButton
 import me.wieku.framework.input.event.MouseUpEvent
 import me.wieku.framework.math.Scaling
+import me.wieku.framework.math.color.Color
 import org.joml.Vector2f
 import org.koin.core.KoinComponent
 
@@ -23,7 +25,15 @@ class SongSelect(): Screen(), KoinComponent {
             MenuBackground {
                 parallaxAmount = 1f / 40
                 fillMode = Scaling.Stretch
-                color.w = 0.6f
+                color = Color(0.6f, 1f)
+            },
+            TextSprite("Exo2") {
+                scaleToSize = true
+                fillMode = Scaling.Fit
+                scale = Vector2f(0.5f)
+                drawShadow = true
+                shadowOffset = Vector2f(0f, 0.1f)
+                text = "Nothing there! Check later"
             }
         )
 

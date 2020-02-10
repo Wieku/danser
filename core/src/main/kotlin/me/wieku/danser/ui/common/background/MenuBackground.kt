@@ -53,6 +53,7 @@ class MenuBackground() : ParallaxContainer(), KoinComponent {
                 fillMode = Scaling.Stretch
             }.also { wrapper = it },
             Triangles {
+                drawShadows = true
                 fillMode = Scaling.Stretch
                 minSize = 0.05f
                 maxSize = 0.32f

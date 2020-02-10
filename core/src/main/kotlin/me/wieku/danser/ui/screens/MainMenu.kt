@@ -7,7 +7,7 @@ import me.wieku.danser.ui.mainmenu.ButtonSystem
 import me.wieku.danser.ui.mainmenu.music.MusicOverlay
 import me.wieku.framework.animation.Transform
 import me.wieku.framework.animation.TransformType
-import me.wieku.framework.graphics.drawables.containers.*
+import me.wieku.framework.graphics.drawables.containers.ColorContainer
 import me.wieku.framework.gui.screen.Screen
 import me.wieku.framework.input.MouseButton
 import me.wieku.framework.input.event.MouseUpEvent
@@ -52,7 +52,6 @@ class MainMenu : Screen(), KoinComponent {
         TrackManager.update(clock.currentTime)
 
         super.update()
-
     }
 
     override fun onEnter(previous: Screen?) {

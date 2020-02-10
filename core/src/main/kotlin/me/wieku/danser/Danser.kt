@@ -88,6 +88,18 @@ class Danser : Game(), KoinComponent {
         mainContainer.addChild(screenCache)
 
         mainContainer.addChild(
+            Triangles {
+                fillMode = Scaling.Stretch
+                startOnScreen = false
+                spawnEnabled = false
+                colorDark = Color(0.054f, 1f)
+                colorLight = Color(0.2f, 1f)
+                color.w = 0.5f
+                maxSize = 0.4f
+            }.also { screenChangeTriangles = it }
+        )
+
+        mainContainer.addChild(
             FPSStatistics(this) {
                 fillMode = Scaling.Stretch
                 scale = Vector2f(1f, 0.08f)
@@ -100,18 +112,6 @@ class Danser : Game(), KoinComponent {
 
         camera.setViewport(0, 0, 1920, 1080, true)
         camera.update()
-
-        mainContainer.addChild(
-            Triangles {
-                fillMode = Scaling.Stretch
-                startOnScreen = false
-                spawnEnabled = false
-                colorDark = Color(0.054f, 1f)
-                colorLight = Color(0.2f, 1f)
-                color.w = 0.5f
-                maxSize = 0.4f
-            }.also { screenChangeTriangles = it }
-        )
 
         screenCache += { previous, _ ->
             if (previous != null && previous !is LoadingScreen) {

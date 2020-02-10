@@ -20,7 +20,6 @@ import me.wieku.framework.math.Scaling
 import me.wieku.framework.math.color.Color
 import org.joml.Vector2f
 import org.joml.Vector2i
-import org.joml.Vector4f
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import kotlin.math.floor
@@ -105,7 +104,7 @@ class DanserCoin : Container(), KoinComponent {
 
         coinTop = Sprite("menu/coin-overlay.png") {
             fillMode = Scaling.FillY
-            color.w = 0.3f
+            color.w = 0.4f
         }
 
         addChild(
@@ -132,8 +131,6 @@ class DanserCoin : Container(), KoinComponent {
         val bTime = (beatmapBindable.value!!.getTrack().getPosition() * 1000).toLong()
 
         val timingPoint = beatmapBindable.value!!.timing.getPointAt(bTime)
-
-        coinTop.color.w = if (timingPoint.kiai) 0.12f else 0.3f
 
         val bProg = when (beatmapBindable.value!!.getTrack().isRunning) {
             true -> (bTime - timingPoint.time) / timingPoint.baseBpm
@@ -181,8 +178,11 @@ class DanserCoin : Container(), KoinComponent {
         progress = lastProgress * ratio + pV * (1 - ratio)
         lastProgress = progress
 
-        coinBottom.scale.set(1.05f - Easings.OutQuad(progress * 0.05f))
-        coinTop.scale.set(1.05f + Easings.OutQuad(progress * 0.03f))
+        coinBottom.scale.set(1.05f - Easings.OutQuad(progress) * 0.05f)
+
+        coinTop.additive = timingPoint.kiai
+        coinTop.color.w = (if (timingPoint.kiai) 0.1f else 0.4f) * (1f - Easings.OutQuad(progress))
+        coinTop.scale.set(1.05f + Easings.OutQuad(progress) * 0.03f)
 
         coinInflate.update(clock.currentTime)
         invalidate()
