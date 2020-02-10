@@ -4,72 +4,57 @@ import me.wieku.framework.graphics.drawables.Drawable
 import me.wieku.framework.graphics.drawables.sprite.SpriteBatch
 import me.wieku.framework.input.InputHandler
 import me.wieku.framework.utils.MaskingInfo
+import me.wieku.framework.utils.fastForEach
 import org.joml.Matrix4f
 import org.joml.Vector2i
 import java.util.*
-import java.util.concurrent.locks.ReentrantReadWriteLock
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.collections.ArrayList
 
 open class Container() : Drawable() {
 
-    protected val children = ArrayList<Drawable>()
+    protected val children = CopyOnWriteArrayList<Drawable>()
     private val childrenToRemove = ArrayList<Drawable>()
 
     val maskingInfo = MaskingInfo()
     var useScissor = false
 
-    private val lock = ReentrantReadWriteLock()
-    protected val accessLock = lock.readLock()
-    protected val modificationLock = lock.writeLock()
-
     override var wasUpdated: Boolean
         get() {
-            children.forEach {
+            children.fastForEach {
                 if (it.wasUpdated) return true
             }
             return false
         }
         set(_) {}
 
+    val childNumber: Int
+        get() = children.size
+
     constructor(inContext: Container.() -> Unit) : this() {
         inContext()
     }
 
     open fun addChild(vararg drawable: Drawable) {
-        modificationLock.lock()
-
         children.addAll(drawable)
         drawable.forEach { it.parent = this }
-
-        modificationLock.unlock()
     }
 
     open fun insertChild(drawable: Drawable, index: Int) {
-        modificationLock.lock()
-
         children.add(index, drawable)
         drawable.parent = this
-
-        modificationLock.unlock()
     }
 
     open fun removeChild(drawable: Drawable) {
-        modificationLock.lock()
 
         children.remove(drawable)
         drawable.parent = null
-
-        modificationLock.unlock()
     }
 
     override fun invalidate() {
         super.invalidate()
 
-        accessLock.lock()
-
-        children.forEach { it.invalidate() }
-
-        accessLock.unlock()
+        children.fastForEach { it.invalidate() }
     }
 
     override fun update() {
@@ -79,8 +64,6 @@ open class Container() : Drawable() {
             maskingInfo.maskToLocalCoords.set(transformInfo)
         }
 
-        accessLock.lock()
-
         children.forEach {
             it.update()
             if (it.canBeDeleted()) {
@@ -88,14 +71,8 @@ open class Container() : Drawable() {
             }
         }
 
-        accessLock.unlock()
-
-        modificationLock.lock()
-
         children.removeAll(childrenToRemove)
         childrenToRemove.clear()
-
-        modificationLock.unlock()
     }
 
     private val tempMatrix1 = Matrix4f()
@@ -109,11 +86,7 @@ open class Container() : Drawable() {
             batch.pushMaskingInfo(maskingInfo)
         }
 
-        accessLock.lock()
-
-        children.forEach { it.draw(batch) }
-
-        accessLock.unlock()
+        children.fastForEach { it.draw(batch) }
 
         if (scissorUsed) {
             batch.popMaskingInfo()
@@ -121,19 +94,15 @@ open class Container() : Drawable() {
     }
 
     override fun dispose() {
-        children.forEach { it.dispose() }
+        children.fastForEach { it.dispose() }
     }
 
     override fun buildInputQueue(cursorPosition: Vector2i, queue: ArrayDeque<InputHandler>) {
         super.buildInputQueue(cursorPosition, queue)
 
-        accessLock.lock()
-
-        children.forEach {
+        children.fastForEach {
                 it.buildInputQueue(cursorPosition, queue)
             }
-
-        accessLock.unlock()
     }
 
 }
