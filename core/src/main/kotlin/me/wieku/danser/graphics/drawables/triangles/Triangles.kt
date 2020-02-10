@@ -19,7 +19,7 @@ class Triangles() : Drawable(), KoinComponent {
 
     private val beatmapBindable: Bindable<Beatmap?> by inject()
 
-    private val bars = 40
+    private val bars = 10
     private val triangleSpawnRate = 0.25
 
     private val triangles = ArrayList<Triangle>()
