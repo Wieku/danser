@@ -1,4 +1,4 @@
-package me.wieku.framework.graphics.blend
+package me.wieku.framework.graphics.helpers.blend
 
 import me.wieku.framework.math.color.Color
 

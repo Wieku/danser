@@ -1,8 +1,8 @@
 package me.wieku.framework.graphics.drawables.sprite
 
-import me.wieku.framework.graphics.blend.BlendFactor
-import me.wieku.framework.graphics.blend.BlendHelper
 import me.wieku.framework.graphics.buffers.*
+import me.wieku.framework.graphics.helpers.blend.BlendFactor
+import me.wieku.framework.graphics.helpers.blend.BlendHelper
 import me.wieku.framework.graphics.shaders.Shader
 import me.wieku.framework.graphics.textures.ITexture
 import me.wieku.framework.graphics.textures.Texture
