@@ -4,7 +4,6 @@ import me.wieku.framework.graphics.drawables.Drawable
 import me.wieku.framework.graphics.drawables.sprite.SpriteBatch
 import me.wieku.framework.input.InputHandler
 import me.wieku.framework.utils.MaskingInfo
-import me.wieku.framework.utils.fastForEach
 import org.joml.Matrix4f
 import org.joml.Vector2i
 import java.util.*
@@ -21,7 +20,7 @@ open class Container() : Drawable() {
 
     override var wasUpdated: Boolean
         get() {
-            children.fastForEach {
+            children.forEach {
                 if (it.wasUpdated) return true
             }
             return false
@@ -46,7 +45,6 @@ open class Container() : Drawable() {
     }
 
     open fun removeChild(drawable: Drawable) {
-
         children.remove(drawable)
         drawable.parent = null
     }
@@ -54,13 +52,18 @@ open class Container() : Drawable() {
     override fun invalidate() {
         super.invalidate()
 
-        children.fastForEach { it.invalidate() }
+        children.forEach { it.invalidate() }
     }
 
     override fun update() {
         super.update()
         if (useScissor) {
-            maskingInfo.rect.set(drawPosition.x, drawPosition.y, drawPosition.x + drawSize.x, drawPosition.y + drawSize.y)
+            maskingInfo.rect.set(
+                drawPosition.x,
+                drawPosition.y,
+                drawPosition.x + drawSize.x,
+                drawPosition.y + drawSize.y
+            )
             maskingInfo.maskToLocalCoords.set(transformInfo)
         }
 
@@ -71,8 +74,10 @@ open class Container() : Drawable() {
             }
         }
 
-        children.removeAll(childrenToRemove)
-        childrenToRemove.clear()
+        if (childrenToRemove.isNotEmpty()) {
+            children.removeAll(childrenToRemove)
+            childrenToRemove.clear()
+        }
     }
 
     private val tempMatrix1 = Matrix4f()
@@ -86,7 +91,7 @@ open class Container() : Drawable() {
             batch.pushMaskingInfo(maskingInfo)
         }
 
-        children.fastForEach { it.draw(batch) }
+        children.forEach { it.draw(batch) }
 
         if (scissorUsed) {
             batch.popMaskingInfo()
@@ -94,15 +99,15 @@ open class Container() : Drawable() {
     }
 
     override fun dispose() {
-        children.fastForEach { it.dispose() }
+        children.forEach { it.dispose() }
     }
 
     override fun buildInputQueue(cursorPosition: Vector2i, queue: ArrayDeque<InputHandler>) {
         super.buildInputQueue(cursorPosition, queue)
 
-        children.fastForEach {
-                it.buildInputQueue(cursorPosition, queue)
-            }
+        children.forEach {
+            it.buildInputQueue(cursorPosition, queue)
+        }
     }
 
 }
