@@ -8,6 +8,7 @@ import me.wieku.framework.resource.FileType
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.util.*
+import kotlin.math.min
 
 object TrackManager: KoinComponent {
 
@@ -49,7 +50,7 @@ object TrackManager: KoinComponent {
             do {
                 beatmapSet = BeatmapManager.beatmapSets.random()
                 lastIndex = playlistHistory.lastIndexOf(beatmapSet)
-            } while (lastIndex > -1 && playlistHistory.size - lastIndex < 20)
+            } while (lastIndex > -1 && playlistHistory.size - lastIndex < min(BeatmapManager.beatmapSets.size, 20))
 
             playlistHistory.add(beatmapSet)
             startBeatmap(beatmapSet.beatmaps[beatmapSet.beatmaps.size-1])
