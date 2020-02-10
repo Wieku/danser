@@ -91,6 +91,8 @@ class Color : Vector4f {
         return this
     }
 
+    fun cpy() = Color(r, g, b, a)
+
     companion object {
 
         fun hsvToRgb(h: Float, s: Float, v: Float): Triple<Float, Float, Float> {
