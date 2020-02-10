@@ -4,14 +4,13 @@ import me.wieku.framework.graphics.buffers.Framebuffer
 import me.wieku.framework.graphics.buffers.VertexArrayObject
 import me.wieku.framework.graphics.buffers.VertexAttribute
 import me.wieku.framework.graphics.buffers.VertexAttributeType
+import me.wieku.framework.graphics.helpers.ViewportHelper
 import me.wieku.framework.graphics.shaders.Shader
 import me.wieku.framework.graphics.textures.Texture
 import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.FileType
 import org.joml.Vector2f
-import org.joml.Vector2i
 import org.joml.Vector4f
-import org.lwjgl.opengl.GL33.*
 import kotlin.math.exp
 
 class BlurEffect(__width: Int, __height: Int) {
@@ -40,8 +39,6 @@ class BlurEffect(__width: Int, __height: Int) {
         }
 
     private lateinit var vao: VertexArrayObject
-
-    private var previousViewport = intArrayOf(0, 0, 0, 0)
 
     private fun initialize() {
         blurShader = Shader(
@@ -90,8 +87,7 @@ class BlurEffect(__width: Int, __height: Int) {
         }
 
         fbo1.bind(true, Vector4f(0f, 0f, 0f, 0f))
-        glGetIntegerv(GL_VIEWPORT, previousViewport)
-        glViewport(0, 0, _width, _height)
+        ViewportHelper.pushViewport(_width, _height)
     }
 
     fun resize(width: Int, height: Int) {
@@ -138,7 +134,7 @@ class BlurEffect(__width: Int, __height: Int) {
 
         vao.unbind()
         blurShader.unbind()
-        glViewport(previousViewport[0], previousViewport[1], previousViewport[2], previousViewport[3])
+        ViewportHelper.popViewport()
         return fbo1.getTexture()!!
     }
 

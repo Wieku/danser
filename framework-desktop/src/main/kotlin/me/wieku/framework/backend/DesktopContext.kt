@@ -2,6 +2,7 @@ package me.wieku.framework.backend
 
 import me.wieku.framework.configuration.FrameworkConfig
 import me.wieku.framework.di.bindable.Bindable
+import me.wieku.framework.graphics.helpers.ViewportHelper
 import me.wieku.framework.input.DesktopInputManager
 import me.wieku.framework.input.InputManager
 import org.joml.Vector2i
@@ -168,13 +169,14 @@ class DesktopContext: GameContext() {
     override fun handleGameCycle(): Boolean {
         val shouldGetClosed = glfwWindowShouldClose(windowHandle)
         if (!shouldGetClosed) {
-            glViewport(0, 0, contextSize.x, contextSize.y)
+            ViewportHelper.pushViewport(contextSize.x, contextSize.y)
             glClearColor(0f, 0f, 0f, 1.0f)
             glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
 
             game!!.draw()
 
             glfwSwapBuffers(windowHandle)
+            ViewportHelper.clearViewportStack()
         }
 
         return shouldGetClosed
