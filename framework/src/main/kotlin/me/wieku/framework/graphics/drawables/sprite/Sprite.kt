@@ -1,21 +1,24 @@
 package me.wieku.framework.graphics.drawables.sprite
 
-import me.wieku.framework.animation.Transform
-import me.wieku.framework.animation.TransformType
 import me.wieku.framework.graphics.drawables.Drawable
 import me.wieku.framework.graphics.textures.TextureRegion
-import me.wieku.framework.graphics.textures.store.TextureAtlasStore
 import me.wieku.framework.graphics.textures.store.TextureStore
 import org.joml.Vector2f
-import org.joml.Vector4f
 import org.koin.core.KoinComponent
 import org.koin.core.inject
-import java.util.*
 
 open class Sprite() : Drawable(), KoinComponent {
 
-    private var textureName = ""
     private val textureStore: TextureStore by inject()
+
+    private var textureDirty = false
+    protected var textureName = ""
+        set(value) {
+            if (value == field) return
+
+            field = value
+            textureDirty = true
+        }
 
     var customSize = false
 
@@ -36,13 +39,17 @@ open class Sprite() : Drawable(), KoinComponent {
     var texture: TextureRegion? = null
 
     override fun draw(batch: SpriteBatch) {
-        if (texture == null && textureName != "") {
+        if (textureDirty) {
             texture = textureStore.getResourceOrLoad(textureName).region
+
             if (!customSize) {
                 size = Vector2f(texture!!.getWidth(), texture!!.getHeight())
                 invalidate()
             }
+
+            textureDirty = false
         }
+
         batch.draw(this)
     }
 

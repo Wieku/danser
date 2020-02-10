@@ -27,6 +27,14 @@ class Triangles() : Container(), KoinComponent {
 
         private val colorGlider = Glider(1f)
 
+        var useShadow: Boolean = false
+        set(value) {
+            if (value == field) return
+
+            textureName = "misc/triangle" + (if (value) "-shadow" else "") + ".png"
+            field = value
+        }
+
         init {
             customSize = true
             fillMode = Scaling.Fit
@@ -77,6 +85,8 @@ class Triangles() : Container(), KoinComponent {
     private val separation = 1.4f
     private val bars = 40
     private val triangleSpawnRate = 0.25
+
+    var drawShadows: Boolean = false
 
     var colorDark = Color(0f, 1f)
         set(value) {
@@ -134,8 +144,6 @@ class Triangles() : Container(), KoinComponent {
     private fun addTriangles(onscreen: Boolean = false) {
         val maxTriangles = max(trianglesMinimum, (sqrt(drawSize.x * drawSize.y) * triangleSpawnRate * spawnRate).toInt())
 
-        modificationLock.lock()
-
         for (i in 0 until maxTriangles - children.size) {
             addTriangle(onscreen)
         }
@@ -146,7 +154,6 @@ class Triangles() : Container(), KoinComponent {
             children.sortBy { it.scale.y }
         }
 
-        modificationLock.unlock()
     }
 
     fun addTriangle(onscreen: Boolean) {
@@ -202,7 +209,8 @@ class Triangles() : Container(), KoinComponent {
 
         velocity = max(velocity, baseVelocity)
 
-        val toRemove = children.filter {
+        children.forEach {
+            (it as Triangle).useShadow = drawShadows
             val base =
                 clock.time.frameTime / 1000f * velocity * (0.2f + (1.0f - it.scale.y / maxSize * 0.8f) * separation)
 
@@ -211,11 +219,9 @@ class Triangles() : Container(), KoinComponent {
                 triangleDirection.directionY * base
             )
 
-            it.customAnchor.y !in -it.scale.y / 2..1f + it.scale.y / 2 || it.customAnchor.x !in -it.scale.x / 2..1f + it.scale.x / 2
-        }
-
-        toRemove.forEach {
-            removeChild(it)
+            if(it.customAnchor.y !in -it.scale.y / 2..1f + it.scale.y / 2 || it.customAnchor.x !in -it.scale.x / 2..1f + it.scale.x / 2) {
+                it.drawForever = false
+            }
         }
 
         super.invalidate()
