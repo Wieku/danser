@@ -2,7 +2,7 @@ package me.wieku.danser.ui.screens
 
 import me.wieku.danser.beatmap.TrackManager
 import me.wieku.danser.graphics.drawables.SideFlashes
-import me.wieku.danser.ui.common.background.MenuBackground
+import me.wieku.danser.ui.common.background.MenuBackgroundTest
 import me.wieku.danser.ui.mainmenu.ButtonSystem
 import me.wieku.danser.ui.mainmenu.music.MusicOverlay
 import me.wieku.framework.animation.Transform
@@ -26,7 +26,7 @@ class MainMenu : Screen(), KoinComponent {
         customOrigin = Vector2f(0.5f)
 
         addChild(
-            MenuBackground {
+            MenuBackgroundTest {
                 parallaxAmount = 1f / 40
                 fillMode = Scaling.Stretch
             },
