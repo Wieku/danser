@@ -52,8 +52,8 @@ open class Sprite() : Drawable(), KoinComponent {
         set(value) {
             if (value == field) return
 
-            if (!customSize) {
-                size = Vector2f(texture!!.getWidth(), texture!!.getHeight())
+            if (!customSize && value != null) {
+                size = Vector2f(value.getWidth(), value.getHeight())
                 invalidate()
             }
 
