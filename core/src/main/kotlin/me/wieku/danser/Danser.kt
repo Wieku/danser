@@ -115,7 +115,7 @@ class Danser : Game(), KoinComponent {
 
         screenCache += { previous, _ ->
             if (previous != null && previous !is LoadingScreen) {
-                trianglesSpeed.addEvent(updateClock.currentTime, updateClock.currentTime + 200, 2f, 4f, Easing.OutQuad)
+                trianglesSpeed.addEvent(updateClock.currentTime, updateClock.currentTime + 200, 1f, 2.5f, Easing.OutQuint)
                 trianglesSpawnRate.addEvent(updateClock.currentTime, updateClock.currentTime + 100, 0.1f, 2f, Easing.OutQuad)
                 trianglesSpawnRate.addEvent(updateClock.currentTime + 100, updateClock.currentTime + 200, 2f, 0.1f, Easing.OutQuad)
                 screenChangeTriangles.spawnEnabled = true

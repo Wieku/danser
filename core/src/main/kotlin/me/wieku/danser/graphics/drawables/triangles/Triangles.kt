@@ -96,14 +96,18 @@ class Triangles() : Drawable(), KoinComponent {
         val maxTriangles =
             max(trianglesMinimum, (sqrt(drawSize.x * drawSize.y) * triangleSpawnRate * spawnRate).toInt())
 
-        for (i in 0 until maxTriangles - triangles.size) {
+        val toAdd = maxTriangles - triangles.size
+
+        for (i in 0 until toAdd) {
             addTriangle(onscreen)
         }
 
-        if (triangleOrder == TriangleOrder.SmallestToBiggest) {
-            triangles.sortByDescending { it.size }
-        } else if (triangleOrder == TriangleOrder.BiggestToSmallest) {
-            triangles.sortBy { it.size }
+        if (toAdd > 0) {
+            if (triangleOrder == TriangleOrder.SmallestToBiggest) {
+                triangles.sortByDescending { it.size }
+            } else if (triangleOrder == TriangleOrder.BiggestToSmallest) {
+                triangles.sortBy { it.size }
+            }
         }
     }
 
@@ -190,6 +194,9 @@ class Triangles() : Drawable(), KoinComponent {
     private var drawArray = emptyArray<Triangle?>()
 
     override fun draw(batch: SpriteBatch) {
+        if (drawArray.size < triangles.size + 2) {
+            drawArray = arrayOfNulls(triangles.size + 2) //hack, but prevents ArrayIndexOutOfBoundsException during triangles.toArray. Needs a better solution.
+        }
         drawArray = triangles.toArray(drawArray)
 
         tempSprite.rotation = if (triangleDirection.directionX != 0.0f) PI.toFloat() / 2 else 0.0f
