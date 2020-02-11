@@ -4,25 +4,27 @@ import me.wieku.framework.graphics.drawables.sprite.Sprite
 import me.wieku.framework.graphics.drawables.sprite.SpriteBatch
 import me.wieku.framework.graphics.effects.BlurEffect
 import me.wieku.framework.math.view.Camera
-import java.util.concurrent.locks.ReentrantLock
 
 open class BlurredContainer() : Container() {
 
-    private val blur = BlurEffect(1920, 1080)
+    private val blur = BlurEffect(1, 1)
     private val tempSprite = Sprite()
 
-    private val lock = ReentrantLock()
+    @Volatile
+    private var needsRedraw = true
 
-    var needsRedraw = true
+    @Volatile
+    private var needsResize = true
 
     var blurAmount = 0.0f
         set(value) {
+            if (value == field) return
+
             blur.setBlur(value, value)
-            invalidate()
+            forceRedraw()
+
             field = value
         }
-
-    private var needsResize = true
 
     private var camera = Camera()
 
@@ -36,17 +38,10 @@ open class BlurredContainer() : Container() {
 
     override fun update() {
         super.update()
-        camera.setViewport(drawPosition.x.toInt(), drawPosition.y.toInt(), drawSize.x.toInt(), drawSize.y.toInt())
-        camera.update()
-        lock.lock()
+
         if (wasUpdated) {
-            needsRedraw = true
+            forceRedraw()
         }
-        if ((drawSize.x.toInt() != blur.width || drawSize.y.toInt() != blur.height) && !needsResize) {
-            needsRedraw = true
-            needsResize = true
-        }
-        lock.unlock()
     }
 
     override fun updateDrawable() {
@@ -62,10 +57,21 @@ open class BlurredContainer() : Container() {
             flipX = this@BlurredContainer.flipX
             flipY = this@BlurredContainer.flipY
         }
+
+        camera.setViewport(drawPosition.x.toInt(), drawPosition.y.toInt(), drawSize.x.toInt(), drawSize.y.toInt())
+        camera.update()
+
+        if ((drawSize.x.toInt() != blur.width || drawSize.y.toInt() != blur.height) && !needsResize) {
+            needsRedraw = true
+            needsResize = true
+        }
+    }
+
+    fun forceRedraw() {
+        needsRedraw = true
     }
 
     override fun draw(batch: SpriteBatch) {
-        lock.lock()
         if (needsResize) {
             blur.resize(drawSize.x.toInt(), drawSize.y.toInt())
             needsResize = false
@@ -73,18 +79,22 @@ open class BlurredContainer() : Container() {
 
         if (needsRedraw) {
             batch.flush()
+
             blur.begin()
+
             val oldCamera = batch.camera
             batch.camera = camera
+
             super.draw(batch)
             batch.flush()
-            tempSprite.apply {
-                texture = blur.endAndProcess().region
-            }
+
+            tempSprite.texture = blur.endAndProcess().region
+
             batch.camera = oldCamera
+
             needsRedraw = false
         }
-        lock.unlock()
+
         batch.draw(tempSprite)
     }
 

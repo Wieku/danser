@@ -12,15 +12,27 @@ open class Sprite() : Drawable(), KoinComponent {
     private val textureStore: TextureStore by inject()
 
     private var textureDirty = false
+
     protected var textureName = ""
         set(value) {
             if (value == field) return
 
-            field = value
             textureDirty = true
+
+            field = value
         }
 
     var customSize = false
+    set(value) {
+        if (value == field) return
+
+        if (!value && texture != null) {
+            size = Vector2f(texture!!.getWidth(), texture!!.getHeight())
+            invalidate()
+        }
+
+        field = value
+    }
 
     constructor(inContext: Sprite.() -> Unit) : this() {
         inContext()
@@ -37,15 +49,20 @@ open class Sprite() : Drawable(), KoinComponent {
     override fun dispose() {}
 
     var texture: TextureRegion? = null
-
-    override fun draw(batch: SpriteBatch) {
-        if (textureDirty) {
-            texture = textureStore.getResourceOrLoad(textureName).region
+        set(value) {
+            if (value == field) return
 
             if (!customSize) {
                 size = Vector2f(texture!!.getWidth(), texture!!.getHeight())
                 invalidate()
             }
+
+            field = value
+        }
+
+    override fun draw(batch: SpriteBatch) {
+        if (textureDirty) {
+            texture = textureStore.getResourceOrLoad(textureName).region
 
             textureDirty = false
         }

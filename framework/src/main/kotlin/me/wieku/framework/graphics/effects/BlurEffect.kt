@@ -5,6 +5,7 @@ import me.wieku.framework.graphics.buffers.VertexArrayObject
 import me.wieku.framework.graphics.buffers.VertexAttribute
 import me.wieku.framework.graphics.buffers.VertexAttributeType
 import me.wieku.framework.graphics.helpers.ViewportHelper
+import me.wieku.framework.graphics.helpers.blend.BlendHelper
 import me.wieku.framework.graphics.shaders.Shader
 import me.wieku.framework.graphics.textures.Texture
 import me.wieku.framework.resource.FileHandle
@@ -106,6 +107,9 @@ class BlurEffect(__width: Int, __height: Int) {
     fun endAndProcess(): Texture {
         fbo1.unbind()
 
+        BlendHelper.pushBlend()
+        BlendHelper.disable()
+
         blurShader.bind()
         blurShader.setUniform("tex", 0f)
         blurShader.setUniform("kernelSize", kernelSize.x, kernelSize.y)
@@ -134,7 +138,11 @@ class BlurEffect(__width: Int, __height: Int) {
 
         vao.unbind()
         blurShader.unbind()
+
+        BlendHelper.popBlend()
+
         ViewportHelper.popViewport()
+
         return fbo1.getTexture()!!
     }
 
