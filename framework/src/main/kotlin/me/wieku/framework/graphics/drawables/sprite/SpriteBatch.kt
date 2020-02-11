@@ -40,13 +40,10 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
         set(value) {
             if (drawing) {
                 flush()
-                helperBuffer.clear()
-                shader.setUniform("proj", value.projectionView.get(helperBuffer))
+                shader.setUniformMatrix4("proj", value.projectionView)
             }
             field = value
         }
-
-    private var helperBuffer: FloatBuffer
 
     private var color: Vector4f = Vector4f(1f, 1f, 1f, 1f)
 
@@ -102,8 +99,6 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
         ibo.unbind()
 
         MemoryUtil.memFree(indexBuffer)
-
-        helperBuffer = MemoryUtil.memAllocFloat(16)
     }
 
     private fun bind(texture: ITexture) {
@@ -116,7 +111,6 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
         }
 
         currentTexture = texture
-        shader.setUniform("tex", currentTexture!!.location.toFloat())
     }
 
     fun begin() {
@@ -127,8 +121,8 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
         drawing = true
 
         shader.bind()
-        helperBuffer.clear()
-        shader.setUniform("proj", camera.projectionView.get(helperBuffer))
+        shader.setUniformMatrix4("proj", camera.projectionView)
+
         vao.bind()
         ibo.bind()
 
@@ -136,12 +130,6 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
         BlendHelper.enable()
         BlendHelper.setFunction(BlendFactor.One, BlendFactor.OneMinusSrcAlpha)
 
-        currentTexture?.let {
-            if (it.location == 0) {
-                it.bind(0)
-            }
-            shader.setUniform("tex", it.location.toFloat())
-        }
         applyMaskingInfo()
     }
 
@@ -158,6 +146,8 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
             if (it.location == 0) {
                 it.bind(0)
             }
+
+            shader.setUniform1i("tex", it.location)
         }
 
         ibo.draw(to = vertexCount / 4 * 6)
@@ -302,16 +292,15 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
         flush()
         val inf: MaskingInfo? = info ?: maskingStack.peek()
         if (inf != null) {
-            shader.setUniform("g_MaskRect", inf.rect.x, inf.rect.y, inf.rect.z, inf.rect.w)
-            shader.setUniform("g_CornerRadius", inf.radius)
-            helperBuffer.clear()
-            shader.setUniform("g_MaskTransform", inf.maskToLocalCoords.get(helperBuffer))
-            shader.setUniform("g_UseMask", 1f)
-            shader.setUniform("g_MaskBlendRange", inf.blendRange)
+            shader.setUniform4f("g_MaskRect", inf.rect)
+            shader.setUniform1f("g_CornerRadius", inf.radius)
+            shader.setUniformMatrix4("g_MaskTransform", inf.maskToLocalCoords)
+            shader.setUniform1i("g_UseMask", 1)
+            shader.setUniform1f("g_MaskBlendRange", inf.blendRange)
         } else {
-            shader.setUniform("g_MaskRect", 0f, 0f, 1f, 1f)
-            shader.setUniform("g_CornerRadius", 0f)
-            shader.setUniform("g_UseMask", 0f)
+            shader.setUniform4f("g_MaskRect", Vector4f(0f, 0f, 1f, 1f))
+            shader.setUniform1f("g_CornerRadius", 0f)
+            shader.setUniform1i("g_UseMask", 0)
         }
     }
 
@@ -325,7 +314,6 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
         vao.dispose()
         shader.dispose()
         MemoryUtil.memFree(vertexBuffer)
-        MemoryUtil.memFree(helperBuffer)
     }
 
 }

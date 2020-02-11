@@ -6,7 +6,6 @@ import me.wieku.framework.animation.TransformType
 import me.wieku.framework.graphics.buffers.VertexArrayObject
 import me.wieku.framework.graphics.buffers.VertexAttribute
 import me.wieku.framework.graphics.buffers.VertexAttributeType
-import me.wieku.framework.graphics.drawables.Drawable
 import me.wieku.framework.graphics.drawables.containers.Container
 import me.wieku.framework.graphics.drawables.sprite.Sprite
 import me.wieku.framework.graphics.drawables.sprite.SpriteBatch
@@ -14,10 +13,8 @@ import me.wieku.framework.graphics.shaders.Shader
 import me.wieku.framework.graphics.textures.store.TextureStore
 import me.wieku.framework.input.InputManager
 import me.wieku.framework.input.MouseButton
-import me.wieku.framework.input.event.ClickEvent
 import me.wieku.framework.input.event.MouseDownEvent
 import me.wieku.framework.input.event.MouseUpEvent
-import me.wieku.framework.math.Easing
 import me.wieku.framework.math.Origin
 import me.wieku.framework.math.Scaling
 import me.wieku.framework.resource.FileHandle
@@ -63,8 +60,6 @@ class CursorWithTrail : Container(), KoinComponent {
 
     private val cursorShader: Shader
     private val cursorVAO = VertexArrayObject()
-
-    private val helperBuffer = MemoryUtil.memAllocFloat(16)
 
     private var dirty = false
     private val pointsRaw = MemoryUtil.memAllocFloat((trailMaxLength * trailDensity).toInt() * 2 * 2)
@@ -267,11 +262,10 @@ class CursorWithTrail : Container(), KoinComponent {
         }
 
         cursorShader.bind()
-        helperBuffer.clear()
-        cursorShader.setUniform("proj", batch.camera.projectionView.get(helperBuffer))
-        cursorShader.setUniform("tex", 0f)
-        cursorShader.setUniform("points", pointsNum.toFloat())
-        cursorShader.setUniform("endScale", trailEndScale)
+        cursorShader.setUniformMatrix4("proj", batch.camera.projectionView)
+        cursorShader.setUniform1i("tex", 0)
+        cursorShader.setUniform1i("points", pointsNum)
+        cursorShader.setUniform1f("endScale", trailEndScale)
 
         cursorVAO.draw(
             toInstance = pointsNum * 2

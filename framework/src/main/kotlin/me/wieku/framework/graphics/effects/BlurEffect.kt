@@ -111,11 +111,11 @@ class BlurEffect(__width: Int, __height: Int) {
         BlendHelper.disable()
 
         blurShader.bind()
-        blurShader.setUniform("tex", 0f)
-        blurShader.setUniform("kernelSize", kernelSize.x, kernelSize.y)
-        blurShader.setUniform("direction", 1f, 0f)
-        blurShader.setUniform("sigma", sigma.x, sigma.y)
-        blurShader.setUniform("size", _width.toFloat(), _height.toFloat())
+        blurShader.setUniform1i("tex", 0)
+        blurShader.setUniform2f("kernelSize", kernelSize)
+        blurShader.setUniform2f("direction", Vector2f(1f, 0f))
+        blurShader.setUniform2f("sigma", sigma)
+        blurShader.setUniform2f("size", Vector2f(_width.toFloat(), _height.toFloat()))
 
         vao.bind()
 
@@ -131,7 +131,7 @@ class BlurEffect(__width: Int, __height: Int) {
 
         fbo2.getTexture()!!.bind(0)
 
-        blurShader.setUniform("direction", 0f, 1f)
+        blurShader.setUniform2f("direction", Vector2f(0f, 1f))
         vao.draw(from = 6)
 
         fbo1.unbind()
