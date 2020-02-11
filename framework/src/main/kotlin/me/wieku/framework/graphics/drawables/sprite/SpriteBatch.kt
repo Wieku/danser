@@ -107,17 +107,12 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
     }
 
     private fun bind(texture: ITexture) {
-        if (currentTexture != null) {
-            if (currentTexture!!.id == texture.id) {
+        currentTexture?.let {
+            if (it.id == texture.id) {
                 return
             }
 
             flush()
-        }
-
-        //We are assuming that textures with location higher than 0 are already bound
-        if (texture.location == 0) {
-            texture.bind(0)
         }
 
         currentTexture = texture
@@ -157,6 +152,13 @@ class SpriteBatch(private var maxSprites: Int = 2000) : Disposable {
 
         vertexBuffer.flip()
         vao.setData("default", vertexBuffer)
+
+        currentTexture?.let {
+            //We assume that textures with location higher than 0 are already bound
+            if (it.location == 0) {
+                it.bind(0)
+            }
+        }
 
         ibo.draw(to = vertexCount / 4 * 6)
 
