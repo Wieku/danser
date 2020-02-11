@@ -3,7 +3,7 @@ package me.wieku.danser.graphics.drawables.triangles
 import me.wieku.danser.beatmap.Beatmap
 import me.wieku.framework.animation.Glider
 import me.wieku.framework.di.bindable.Bindable
-import me.wieku.framework.graphics.drawables.Drawable
+import me.wieku.framework.graphics.drawables.containers.Container
 import me.wieku.framework.graphics.drawables.sprite.Sprite
 import me.wieku.framework.graphics.drawables.sprite.SpriteBatch
 import me.wieku.framework.math.Scaling
@@ -15,7 +15,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.*
 
-class Triangles() : Drawable(), KoinComponent {
+class Triangles() : Container(), KoinComponent {
 
     private val beatmapBindable: Bindable<Beatmap?> by inject()
 
@@ -161,13 +161,13 @@ class Triangles() : Drawable(), KoinComponent {
 
         velocity *= 1.0f - 0.05f * clock.time.frameTime / 16.66667f
 
-        velocity = max(velocity, baseVelocity)
+        val velocityCurrent = baseVelocity + velocity
 
         trianglesToRemove.clear()
 
         triangles.forEach {
             val base =
-                clock.time.frameTime / 1000f * velocity * (1f + separation * (maxSize - it.size) / (maxSize - minSize))
+                clock.time.frameTime / 1000f * velocityCurrent * (1f + separation * (maxSize - it.size) / (maxSize - minSize))
 
             it.position.add(
                 triangleDirection.directionX * base,
@@ -201,6 +201,12 @@ class Triangles() : Drawable(), KoinComponent {
 
         tempSprite.rotation = if (triangleDirection.directionX != 0.0f) PI.toFloat() / 2 else 0.0f
 
+        val scissorUsed = useScissor
+
+        if (scissorUsed) {
+            batch.pushMaskingInfo(maskingInfo)
+        }
+
         for (it in drawArray) {
             if (it == null) break
 
@@ -210,6 +216,10 @@ class Triangles() : Drawable(), KoinComponent {
             tempSprite.drawColor.set(drawColor).mul(it.color)
             tempSprite.flipX = it.flipX
             tempSprite.draw(batch)
+        }
+
+        if (scissorUsed) {
+            batch.popMaskingInfo()
         }
     }
 
