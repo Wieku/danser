@@ -76,6 +76,8 @@ abstract class Drawable : InputHandler(), Disposable, KoinComponent {
     var endTime = 0f
     var drawForever = true
 
+    var pixelSnap = false
+
     var transforms = ArrayList<Transform>()
 
     /**
@@ -134,6 +136,12 @@ abstract class Drawable : InputHandler(), Disposable, KoinComponent {
         drawOrigin.set(tempOrigin)
         drawSize.set(tempSize)
         drawColor.set(tempColor)
+
+        if (pixelSnap) {
+            drawPosition.floor()
+            drawOrigin.ceil()
+            drawSize.floor()
+        }
 
         updateTransformInfo()
     }

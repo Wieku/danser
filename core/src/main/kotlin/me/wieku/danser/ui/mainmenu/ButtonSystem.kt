@@ -37,6 +37,7 @@ class ButtonSystem() : ParallaxContainer() {
         parallaxAmount = 1f / 80
         addChild(
             ColorContainer {
+                pixelSnap = true
                 color = Color(0.2f, 0.2f, 0.2f, 1f)
                 scale = Vector2f(1f, 0f)
                 color.w = 0f

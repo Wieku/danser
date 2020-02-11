@@ -69,7 +69,7 @@ class MenuButton(private val text: String, icon: String, font: String, color: Co
                     Triangles {
                         useScissor = true
                         maskingInfo.blendRange = 0f
-                        scale = Vector2f(0.99f, 1f)
+                        scale = Vector2f(0.995f, 1f)
                         shearX = 0.2f
                         trianglesMinimum = 40
                         fillMode = Scaling.Stretch
