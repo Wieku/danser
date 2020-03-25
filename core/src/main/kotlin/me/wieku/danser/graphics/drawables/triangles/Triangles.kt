@@ -188,7 +188,7 @@ class Triangles() : Container(), KoinComponent {
 
     override fun updateDrawable() {
         super.updateDrawable()
-        triangleSize.set(Scaling.Fit.apply(1.0f, 1.0f, drawSize.x, drawSize.y))
+        triangleSize.set(Scaling.Fit.apply(1.154506f, 1.0f, drawSize.x, drawSize.y))
     }
 
     private var drawArray = emptyArray<Triangle?>()
