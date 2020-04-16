@@ -9,6 +9,9 @@ import me.wieku.framework.graphics.buffers.VertexAttributeType
 import me.wieku.framework.graphics.drawables.containers.Container
 import me.wieku.framework.graphics.drawables.sprite.Sprite
 import me.wieku.framework.graphics.drawables.sprite.SpriteBatch
+import me.wieku.framework.graphics.helpers.blend.BlendEquation
+import me.wieku.framework.graphics.helpers.blend.BlendFactor
+import me.wieku.framework.graphics.helpers.blend.BlendHelper
 import me.wieku.framework.graphics.shaders.Shader
 import me.wieku.framework.graphics.textures.store.TextureStore
 import me.wieku.framework.input.InputManager
@@ -231,13 +234,15 @@ class CursorWithTrail : Container(), KoinComponent {
         tempCursor.draw(batch)
 
         batch.end()
-        GL33.glEnable(GL33.GL_BLEND)
-        GL33.glBlendEquation(GL33.GL_ADD)
-        GL33.glBlendFuncSeparate(
-            GL33.GL_SRC_ALPHA,
-            GL33.GL_ONE_MINUS_SRC_ALPHA,
-            GL33.GL_ONE,
-            GL33.GL_ONE_MINUS_SRC_ALPHA
+
+        BlendHelper.pushBlend()
+        BlendHelper.enable()
+        BlendHelper.setEquation(BlendEquation.Add)
+        BlendHelper.setFunction(
+            BlendFactor.SrcAlpha,
+            BlendFactor.OneMinusSrcAlpha,
+            BlendFactor.One,
+            BlendFactor.OneMinusSrcAlpha
         )
 
         val texture = textureStore.getResourceOrLoad("cursor/cursortrail.png")
@@ -262,8 +267,8 @@ class CursorWithTrail : Container(), KoinComponent {
         }
 
         cursorShader.bind()
-        cursorShader.setUniformMatrix4("proj", batch.camera.projectionView)
-        cursorShader.setUniform1i("tex", 0)
+        cursorShader.setUniformMatrix4("projView", batch.camera.projectionView)
+        cursorShader.setUniform1i("texture", 0)
         cursorShader.setUniform1i("points", pointsNum)
         cursorShader.setUniform1f("endScale", trailEndScale)
 
@@ -273,6 +278,8 @@ class CursorWithTrail : Container(), KoinComponent {
 
         cursorShader.unbind()
         cursorVAO.unbind()
+
+        BlendHelper.popBlend()
 
         batch.begin()
 
