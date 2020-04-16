@@ -267,7 +267,7 @@ class CursorWithTrail : Container(), KoinComponent {
 
         cursorShader.bind()
         cursorShader.setUniformMatrix4("projView", batch.camera.projectionView)
-        cursorShader.setUniform1i("texture", 0)
+        cursorShader.setUniform1i("u_texture", 0)
         cursorShader.setUniform1i("points", pointsNum)
         cursorShader.setUniform1f("endScale", trailEndScale)
 
