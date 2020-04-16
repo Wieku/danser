@@ -27,7 +27,6 @@ import org.joml.Vector2f
 import org.joml.Vector4f
 import org.koin.core.KoinComponent
 import org.koin.core.inject
-import org.lwjgl.opengl.GL33
 import org.lwjgl.system.MemoryUtil
 import java.util.*
 import kotlin.math.floor
