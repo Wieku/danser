@@ -2,6 +2,7 @@ package me.wieku.framework.graphics.buffers
 
 import me.wieku.framework.utils.Disposable
 import org.lwjgl.opengl.ARBBaseInstance
+import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL33.*
 import java.nio.IntBuffer
 import java.nio.ShortBuffer
@@ -49,14 +50,23 @@ class IndexBufferObject(
         check(isBound) { "IBO is not bound" }
         check(from in 0..to && to <= maxIndices) { "Drawing data out of buffer's memory" }
 
-        ARBBaseInstance.glDrawElementsInstancedBaseInstance(
-            GL_TRIANGLES,
-            to - from,
-            if (useInts) GL_UNSIGNED_INT else GL_UNSIGNED_SHORT,
-            from.toLong(),
-            toInstance - fromInstance,
-            fromInstance
-        )
+        if (fromInstance != 0 || toInstance != 1) {
+            ARBBaseInstance.glDrawElementsInstancedBaseInstance(
+                GL_TRIANGLES,
+                to - from,
+                if (useInts) GL_UNSIGNED_INT else GL_UNSIGNED_SHORT,
+                from.toLong(),
+                toInstance - fromInstance,
+                fromInstance
+            )
+        } else {
+            GL11.glDrawElements(
+                GL_TRIANGLES,
+                to - from,
+                if (useInts) GL_UNSIGNED_INT else GL_UNSIGNED_SHORT,
+                from.toLong()
+            )
+        }
     }
 
     override fun dispose() {

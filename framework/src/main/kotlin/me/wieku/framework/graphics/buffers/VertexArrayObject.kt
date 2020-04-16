@@ -24,7 +24,7 @@ class VertexArrayObject : Disposable {
     }
 
     fun bindToShader(shader: Shader) {
-        check(isBound) { "VBO is not bound" }
+        check(isBound) { "VAO is not bound" }
 
         vboMap.values.forEach { vboHolder ->
 
