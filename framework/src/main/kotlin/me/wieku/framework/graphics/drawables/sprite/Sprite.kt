@@ -63,7 +63,7 @@ open class Sprite() : Drawable(), KoinComponent {
     override fun draw(batch: SpriteBatch) {
         if (textureDirty) {
             texture = textureStore.getResourceOrLoad(textureName).region
-
+            updateDrawable()
             textureDirty = false
         }
 

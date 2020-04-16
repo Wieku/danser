@@ -12,8 +12,6 @@ fun main() {
         System.load(System.getProperty("user.dir")+"/renderdoc.dll")
     }
 
-    println("Version " + Build.Version)
-
     FrameworkConfig.windowTitle.value = "danser " + Build.Version
 
     val context = DesktopContext()

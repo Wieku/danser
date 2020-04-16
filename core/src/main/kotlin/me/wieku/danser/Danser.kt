@@ -4,6 +4,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.wieku.danser.beatmap.Beatmap
+import me.wieku.danser.build.Build
 import me.wieku.danser.graphics.drawables.CursorWithTrail
 import me.wieku.danser.graphics.drawables.triangles.Triangles
 import me.wieku.danser.ui.common.FPSStatistics
@@ -19,6 +20,7 @@ import me.wieku.framework.graphics.drawables.sprite.SpriteBatch
 import me.wieku.framework.graphics.textures.store.TextureStore
 import me.wieku.framework.gui.screen.ScreenCache
 import me.wieku.framework.input.InputManager
+import me.wieku.framework.logging.Logging
 import me.wieku.framework.math.Easing
 import me.wieku.framework.math.Origin
 import me.wieku.framework.math.Scaling
@@ -34,6 +36,8 @@ import org.koin.core.inject
 import org.koin.dsl.module
 
 class Danser : Game(), KoinComponent {
+
+    private val logger = Logging.getLogger("runtime")
 
     private val inputManager: InputManager by inject()
 
@@ -55,6 +59,7 @@ class Danser : Game(), KoinComponent {
     lateinit var textureStore: TextureStore
 
     override fun setup() {
+        logger.info("Starting danser version ${Build.Version}")
         batch = SpriteBatch()
 
         screenCache = ScreenCache()

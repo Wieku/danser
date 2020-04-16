@@ -6,6 +6,7 @@ import jouvieje.bass.defines.BASS_FX
 import jouvieje.bass.defines.BASS_POS.BASS_POS_BYTE
 import jouvieje.bass.defines.BASS_STREAM
 import me.wieku.framework.configuration.FrameworkConfig
+import me.wieku.framework.logging.Logging
 import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.FileType
 import me.wieku.framework.time.IClock
@@ -15,7 +16,10 @@ import java.io.File
 import java.lang.ref.WeakReference
 import kotlin.math.min
 
-class Track(file: FileHandle, val fftMode: FFTMode = FFTMode.FFT512) : IClock {
+class Track(val file: FileHandle, val fftMode: FFTMode = FFTMode.FFT512) : IClock {
+
+    private val logger = Logging.getLogger("runtime")
+
     private var channelStream = when (file.fileType) {
         FileType.Classpath -> {
             val tmpFile = File.createTempFile("danser", "." + file.file.extension)
@@ -80,19 +84,23 @@ class Track(file: FileHandle, val fftMode: FFTMode = FFTMode.FFT512) : IClock {
     fun play(volume: Float = 1f, isAbsolute: Boolean = false) {
         setVolume(volume, isAbsolute)
         BASS_ChannelPlay(fxChannel.asInt(), true)
+        logger.info("Track ${file.file.name} is being played.")
     }
 
     fun pause() {
         BASS_ChannelPause(fxChannel.asInt())
+        logger.info("Track ${file.file.name} paused.")
     }
 
     fun resume() {
         BASS_ChannelPlay(fxChannel.asInt(), false)
+        logger.info("Track ${file.file.name} resumed.")
     }
 
     fun stop() {
         BASS_ChannelStop(fxChannel.asInt())
         BASS_ChannelStop(channelStream.asInt())
+        logger.info("Track ${file.file.name} stopped.")
     }
 
     fun setVolume(volume: Float, isAbsolute: Boolean = false) {

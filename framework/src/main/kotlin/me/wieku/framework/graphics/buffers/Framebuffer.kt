@@ -1,6 +1,7 @@
 package me.wieku.framework.graphics.buffers
 
 import me.wieku.framework.graphics.textures.Texture
+import me.wieku.framework.logging.Logging
 import me.wieku.framework.utils.Disposable
 import org.joml.Vector4f
 import org.lwjgl.opengl.GL11
@@ -8,6 +9,8 @@ import org.lwjgl.opengl.GL33.*
 import java.util.*
 
 class Framebuffer(private var width: Int, private var height: Int, defaultColor: Boolean = true) : Disposable {
+
+    private val logger = Logging.getLogger("performance")
 
     var id: Int
         private set
@@ -24,7 +27,7 @@ class Framebuffer(private var width: Int, private var height: Int, defaultColor:
         }
 
         unbind()
-
+        logger.info("Framebuffer with size ${width}x$height created.")
     }
 
     fun addRenderbuffer(target: FramebufferTarget) {

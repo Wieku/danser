@@ -2,6 +2,7 @@ package me.wieku.danser.beatmap
 
 import me.wieku.danser.beatmap.parsing.BeatmapParser
 import me.wieku.danser.database.transactional
+import me.wieku.framework.logging.Logging
 import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.FileType
 import me.wieku.framework.resource.sha1
@@ -15,7 +16,10 @@ import javax.persistence.EntityManagerFactory
 import javax.persistence.Persistence
 
 object BeatmapManager {
-    private var entityManagerFactory:EntityManagerFactory
+
+    private val logger = Logging.getLogger("database")
+
+    private var entityManagerFactory: EntityManagerFactory
     private var entityManager: EntityManager
     private var parser = BeatmapParser()
 
@@ -23,19 +27,18 @@ object BeatmapManager {
     private var beatmapSetCache: HashMap<String, BeatmapSet>
 
     init {
-        val time = System.currentTimeMillis()
+        logger.info("Beatmap Manager is starting...")
+
         entityManagerFactory = Persistence.createEntityManagerFactory("default")
 
-        val time2 = System.currentTimeMillis()
-
         entityManager = entityManagerFactory.createEntityManager()
-
-        val time3 = System.currentTimeMillis()
 
         Runtime.getRuntime().addShutdownHook(Thread {
             entityManager.close()
             entityManagerFactory.close()
         })
+
+        logger.info("Beatmap Manager started! Loading cached beatmaps...")
 
         beatmapSets.addAll(
             entityManager.createQuery(
@@ -44,16 +47,14 @@ object BeatmapManager {
             ).resultList as ArrayList<BeatmapSet>
         )
 
-        val time4 = System.currentTimeMillis()
-
-        println("First ${time2-time}ms")
-        println("Second ${time3-time2}ms")
-        println("Third ${time4-time3}ms")
-
         beatmapSetCache = beatmapSets.map { it.directory to it }.toMap().toMutableMap() as HashMap<String, BeatmapSet>
+
+        logger.info("Cached beatmaps loaded!")
     }
 
     fun loadBeatmaps(location: String) {
+
+        logger.info("Scanning \"$location\"...")
 
         File(location).listFiles { it -> it.extension == "osz" }?.forEach {
             FileHandle(it.absolutePath, FileType.Absolute).unpack()
@@ -82,7 +83,7 @@ object BeatmapManager {
 
             candidates.forEach {
                 val beatmap = Beatmap()
-                println("Importing: ${it.name}")
+                logger.info("Importing: ${it.name}")
 
                 try {
                     parser.parse(FileHandle(it.absolutePath, FileType.Absolute), beatmap)
@@ -93,9 +94,9 @@ object BeatmapManager {
 
                 if (beatmap.parsedProperly) {
                     beatmapSet.beatmaps.add(beatmap)
-                    println("Imported successfully: ${it.name}")
+                    logger.info("Imported successfully: ${it.name}")
                 } else {
-                    println("Failed to import ${it.name}")
+                    logger.error("Failed to import ${it.name}")
                 }
             }
 
@@ -116,7 +117,7 @@ object BeatmapManager {
                     return
                 }
 
-                println("Found new beatmap version: ${it.name}")
+                logger.info("Found new beatmap version: ${it.name}")
 
                 if (beatmap == null) {
                     beatmap = Beatmap()
@@ -130,23 +131,23 @@ object BeatmapManager {
                 }
 
                 if (beatmap.parsedProperly) {
-                    println("Imported successfully: ${it.name}")
+                    logger.info("Imported successfully: ${it.name}")
                     if (wasNull) {
                         beatmapSet.beatmaps.add(beatmap)
                     }
                 } else {
                     if (!wasNull) {
-                        println("This beatmap is corrupted, removing from database... ${it.name}")
+                        logger.info("This beatmap is corrupted, removing from database... ${it.name}")
                         beatmapSet.beatmaps.remove(beatmap)
 
                     } else {
-                        println("Failed to import ${it.name}")
+                        logger.error("Failed to import ${it.name}")
                     }
                 }
             }
 
             if (beatmapSet.beatmaps.isEmpty()) {
-                println("${beatmapSet.metadata?.artist} - ${beatmapSet.metadata?.title} (${beatmapSet.metadata?.creator}) contains no beatmaps, removing...")
+                logger.info("${beatmapSet.metadata?.artist} - ${beatmapSet.metadata?.title} (${beatmapSet.metadata?.creator}) contains no beatmaps, removing...")
 
                 beatmapSets.remove(beatmapSet)
                 beatmapSetCache.remove(beatmapSet.directory)

@@ -3,6 +3,7 @@ package me.wieku.danser.beatmap
 import me.wieku.danser.beatmap.parsing.BeatmapParser
 import me.wieku.framework.animation.Glider
 import me.wieku.framework.di.bindable.Bindable
+import me.wieku.framework.logging.Logging
 import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.FileType
 import org.koin.core.KoinComponent
@@ -11,6 +12,8 @@ import java.util.*
 import kotlin.math.min
 
 object TrackManager: KoinComponent {
+
+    private val logger = Logging.getLogger("runtime")
 
     private val bindableBeatmap: Bindable<Beatmap?> by inject()
 
@@ -75,6 +78,7 @@ object TrackManager: KoinComponent {
 
     private fun startBeatmap(beatmap: Beatmap, startAtPreview: Boolean = false, previewOffset: Float = 0f) {
         bindableBeatmap.value?.getTrack()?.stop()
+        logger.info("Changed current beatmap to: ${beatmap.beatmapMetadata.artist} - ${beatmap.beatmapMetadata.title}")
         beatmap.loadTrack(startAtPreview)
         beatmap.getTrack().play(volumeGlider.value)
         if (startAtPreview) {

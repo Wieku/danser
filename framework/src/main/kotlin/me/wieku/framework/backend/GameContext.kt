@@ -88,6 +88,7 @@ abstract class GameContext {
             }
             keepRunning = false
         }
+        renderingThread.name = "Draw Thread"
         renderingThread.setUncaughtExceptionHandler { _, e ->
             println("*** Uncaught exception in rendering thread! ***")
             e.printStackTrace()
@@ -101,7 +102,7 @@ abstract class GameContext {
             keepRunning = false
         }
 
-        Thread {
+        val updateThread = Thread {
             lock.lock()
             while (keepRunning) {
                 game.update()
@@ -109,7 +110,9 @@ abstract class GameContext {
                 updateLimiter.sync()
                 game.updateClock.updateClock()
             }
-        }.start()
+        }
+        updateThread.name = "Update Thread"
+        updateThread.start()
 
         try {
             while (keepRunning) {

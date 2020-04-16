@@ -2,10 +2,13 @@ package me.wieku.framework.audio
 
 import jouvieje.bass.Bass
 import jouvieje.bass.BassInit
+import jouvieje.bass.exceptions.BassException
 import jouvieje.bass.structures.BASS_DEVICEINFO
+import jouvieje.bass.structures.BASS_INFO
 import me.wieku.framework.configuration.FrameworkConfig
 import me.wieku.framework.di.bindable.typed.BindableFloat
 import me.wieku.framework.di.bindable.typed.BindableString
+import me.wieku.framework.logging.Logging
 import org.lwjgl.system.Library
 import org.lwjgl.system.Platform
 import java.lang.ref.WeakReference
@@ -13,6 +16,8 @@ import java.net.URL
 import java.nio.channels.FileChannel
 
 object BassSystem {
+
+    private val logger = Logging.getLogger("runtime")
 
     internal var tracks: ArrayList<WeakReference<Track>> = ArrayList()
 
@@ -59,19 +64,27 @@ object BassSystem {
         musicVolume.bindTo(FrameworkConfig.musicVolume)
         effectsVolume.bindTo(FrameworkConfig.effectsVolume)
 
-        println("--Available sound devices--")
+        logger.info("--Available sound devices--")
 
-        getSoundDevices().forEach{println(it)}
+        getSoundDevices().forEach(logger::info)
 
-        println("--End of the list--")
+        logger.info("--End of the list--")
 
         val deviceId = getDeviceId(audioDevice.value)
 
-        println("Device id: $deviceId")
-
         audioDevice.value = getDeviceName(deviceId)
 
-        Bass.BASS_Init(deviceId, 44100, 0, null, null)
+        val initialized = Bass.BASS_Init(deviceId, 44100, 0, null, null)
+
+        check(initialized) {
+            logger.error("BASS failed to initialize")
+            "BASS failed to initialize"
+        }
+
+        logger.info("BASS Initialized")
+        logger.info("BASS Version: ${parseVersion(Bass.BASS_GetVersion())}")
+        logger.info("BASS FX Version: ${parseVersion(Bass.BASS_FX_GetVersion())}")
+        logger.info("Audio Device: ${audioDevice.value}")
 
         audioDevice.addListener { _, newValue, _ ->
             Bass.BASS_SetDevice(getDeviceId(newValue))
@@ -129,6 +142,14 @@ object BassSystem {
                 track.setVolume(track.volume, track.isVolumeAbsolute)
             }
         }
+    }
+
+    private fun parseVersion(version: Int): String {
+        val main = version shr 24 and 0xFF
+        val revision0 = version shr 16 and 0xFF
+        val revision1 = version shr 8 and 0xFF
+        val revision2 = version and 0xFF
+        return "%d.%d.%d.%d".format(main, revision0, revision1, revision2)
     }
 
 }
