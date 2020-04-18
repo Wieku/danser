@@ -22,8 +22,8 @@ class FPSStatistics(private val game: Game) : YogaContainer(), KoinComponent {
     private val updateCounter = FpsCounter()
     private val drawCounter = FpsCounter()
 
-    private var deltaSum = 0f
-    private var deltaSum1 = 0f
+    private var deltaSum = 0.0
+    private var deltaSum1 = 0.0
 
     constructor(game: Game, inContext: FPSStatistics.() -> Unit) : this(game) {
         inContext()

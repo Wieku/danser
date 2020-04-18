@@ -4,6 +4,8 @@ import me.wieku.framework.math.Easing
 import org.joml.Vector2f
 import org.joml.Vector3f
 import org.joml.Vector4f
+import kotlin.math.max
+import kotlin.math.min
 
 class Transform {
 
@@ -14,12 +16,12 @@ class Transform {
     private var endValues = FloatArray(4)
     private var easing = Easing.Linear
 
-    var startTime: Float
+    var startTime: Double
         private set
-    var endTime: Float
+    var endTime: Double
         private set
 
-    constructor(transformType: TransformType, startTime: Float, endTime: Float) {
+    constructor(transformType: TransformType, startTime: Double, endTime: Double) {
         if (transformType != TransformType.HorizontalFlip || transformType != TransformType.VerticalFlip || transformType != TransformType.Additive) {
             throw IllegalStateException("Wrong TransformationType used!")
         }
@@ -31,8 +33,8 @@ class Transform {
 
     constructor(
         transformType: TransformType,
-        startTime: Float,
-        endTime: Float,
+        startTime: Double,
+        endTime: Double,
         startValue: Float,
         endValue: Float,
         easing: Easing = Easing.Out
@@ -51,8 +53,8 @@ class Transform {
 
     constructor(
         transformType: TransformType,
-        startTime: Float,
-        endTime: Float,
+        startTime: Double,
+        endTime: Double,
         startValueX: Float,
         startValueY: Float,
         endValueX: Float,
@@ -75,8 +77,8 @@ class Transform {
 
     constructor(
         transformType: TransformType,
-        startTime: Float,
-        endTime: Float,
+        startTime: Double,
+        endTime: Double,
         start: Vector2f,
         end: Vector2f,
         easing: Easing = Easing.Out
@@ -97,8 +99,8 @@ class Transform {
 
     constructor(
         transformType: TransformType,
-        startTime: Float,
-        endTime: Float,
+        startTime: Double,
+        endTime: Double,
         start: Vector4f,
         end: Vector4f,
         easing: Easing = Easing.Out
@@ -124,7 +126,7 @@ class Transform {
 
 //Missing color
 
-    fun getStatus(time: Float): TransformStatus {
+    fun getStatus(time: Double): TransformStatus {
         if (time < startTime) {
             return TransformStatus.NotStarted
         } else if (time >= endTime) {
@@ -133,18 +135,18 @@ class Transform {
         return TransformStatus.Going
     }
 
-    private fun timeClamp(start: Float, end: Float, time: Float) =
-        Math.max(0f, Math.min(1f, (time - start) / (end - start)))
+    private fun timeClamp(start: Double, end: Double, time: Double) =
+        max(0.0, min(1.0, (time - start) / (end - start)))
 
-    fun getProgress(time: Float): Float {
-        return easing.func(timeClamp(startTime, endTime, time))
+    fun getProgress(time: Double): Float {
+        return easing.func(timeClamp(startTime, endTime, time).toFloat())
     }
 
-    fun getSingle(time: Float): Float {
+    fun getSingle(time: Double): Float {
         return startValues[0] + getProgress(time) * (endValues[0] - startValues[0])
     }
 
-    fun getVector2f(time: Float, to: Vector2f = Vector2f()): Vector2f {
+    fun getVector2f(time: Double, to: Vector2f = Vector2f()): Vector2f {
         val progress = getProgress(time)
         return to.set(
             startValues[0] + progress * (endValues[0] - startValues[0]),
@@ -152,11 +154,11 @@ class Transform {
         )
     }
 
-    fun getBoolean(time: Float): Boolean {
+    fun getBoolean(time: Double): Boolean {
         return time >= startTime && time < endTime
     }
 
-    fun getColor3(time: Float, to: Vector3f = Vector3f()): Vector3f {
+    fun getColor3(time: Double, to: Vector3f = Vector3f()): Vector3f {
         val progress = getProgress(time)
         return to.set(
             startValues[0] + progress * (endValues[0] - startValues[0]),
@@ -165,7 +167,7 @@ class Transform {
         )
     }
 
-    fun getColor3(time: Float, to: Vector4f = Vector4f()): Vector4f {
+    fun getColor3(time: Double, to: Vector4f = Vector4f()): Vector4f {
         val progress = getProgress(time)
         return to.set(
             startValues[0] + progress * (endValues[0] - startValues[0]),
@@ -175,7 +177,7 @@ class Transform {
         )
     }
 
-    fun getColor4(time: Float, to: Vector4f = Vector4f()): Vector4f {
+    fun getColor4(time: Double, to: Vector4f = Vector4f()): Vector4f {
         val progress = getProgress(time)
         return to.set(
             startValues[0] + progress * (endValues[0] - startValues[0]),

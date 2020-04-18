@@ -8,7 +8,6 @@ import me.wieku.framework.graphics.drawables.containers.ColorContainer
 import me.wieku.framework.graphics.drawables.containers.YogaContainer
 import me.wieku.framework.math.Scaling
 import me.wieku.framework.math.color.Color
-import org.joml.Vector4f
 import org.koin.core.inject
 import org.lwjgl.util.yoga.Yoga
 import kotlin.math.min
@@ -70,7 +69,7 @@ class MusicControl: YogaContainer() {
                             beatmapBindable.value?.let {
                                 val track = it.getTrack()
                                 track.pause()
-                                track.setPosition(0f)
+                                track.setPosition(0.0)
                             }
                         }
                     },

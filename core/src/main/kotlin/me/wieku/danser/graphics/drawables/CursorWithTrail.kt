@@ -153,7 +153,7 @@ class CursorWithTrail : Container(), KoinComponent {
         }
 
         if (points.isNotEmpty()) {
-            removeCounter += (points.size.toFloat() + 3) / (360f / clock.time.frameTime) * trailRemoveSpeed
+            removeCounter += (points.size.toFloat() + 3) / (360f / clock.time.frameTime.toFloat()) * trailRemoveSpeed
             val times = floor(removeCounter).toInt()
             val lengthAdjusted = (trailMaxLength / density).toInt()
 

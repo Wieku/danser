@@ -2,12 +2,12 @@ package me.wieku.framework.time
 
 class FramedClock: IFramedClock {
 
-    override var time: FrameInfo = FrameInfo(0f, 0f, 0f)
+    override var time: FrameInfo = FrameInfo(0.0, 0.0, 0.0)
 
-    override var currentTime: Float = 0f
+    override var currentTime: Double = 0.0
         get() = time.currentTime
 
-    override var clockRate: Float = 1f
+    override var clockRate: Double = 1.0
     override var isRunning: Boolean = true
 
 
@@ -23,10 +23,10 @@ class FramedClock: IFramedClock {
             lTime = cTime
          }
 
-        rawTime += ((cTime-lTime).toDouble()*clockRate.toDouble()).toLong()
+        rawTime += ((cTime-lTime).toDouble()*clockRate).toLong()
 
-        time.currentTime = rawTime.toFloat() / 1000000f
-        time.frameTime = time.currentTime - time.lastTime//((cTime-lTime).toDouble()/1000000.0).toFloat()
+        time.currentTime = rawTime.toDouble() / 1000000.0
+        time.frameTime = time.currentTime - time.lastTime
 
         lTime = cTime
     }

@@ -11,7 +11,7 @@ import org.koin.core.inject
 import java.util.*
 import kotlin.math.min
 
-object TrackManager: KoinComponent {
+object TrackManager : KoinComponent {
 
     private val logger = Logging.getLogger("runtime")
 
@@ -23,9 +23,14 @@ object TrackManager: KoinComponent {
 
     private var currentPlayIndex = -1
 
-    fun start(time: Float) {
+    fun start(time: Double) {
         var beatmap = Beatmap("cYsmix - Peer Gynt (Wieku) [Danser Intro].osu")
-        BeatmapParser().parse(FileHandle("assets/beatmaps/cYsmix - Peer Gynt/cYsmix - Peer Gynt (Wieku) [Danser Intro].osu", FileType.Classpath), beatmap)
+        BeatmapParser().parse(
+            FileHandle(
+                "assets/beatmaps/cYsmix - Peer Gynt/cYsmix - Peer Gynt (Wieku) [Danser Intro].osu",
+                FileType.Classpath
+            ), beatmap
+        )
 
         startBeatmap(beatmap, true, -1300f)
         volumeGlider.addEvent(time, time + 1300f, 0f, 1f)
@@ -34,10 +39,10 @@ object TrackManager: KoinComponent {
     fun backwards() {
         if (currentPlayIndex == -1) return
         currentPlayIndex--
-        if (currentPlayIndex >=0) {
+        if (currentPlayIndex >= 0) {
 
             val beatmapSet = playlistHistory[currentPlayIndex]
-            startBeatmap(beatmapSet.beatmaps[beatmapSet.beatmaps.size-1])
+            startBeatmap(beatmapSet.beatmaps[beatmapSet.beatmaps.size - 1])
 
         } else {
             currentPlayIndex = 0
@@ -56,15 +61,15 @@ object TrackManager: KoinComponent {
             } while (lastIndex > -1 && playlistHistory.size - lastIndex < min(BeatmapManager.beatmapSets.size, 20))
 
             playlistHistory.add(beatmapSet)
-            startBeatmap(beatmapSet.beatmaps[beatmapSet.beatmaps.size-1])
+            startBeatmap(beatmapSet.beatmaps[beatmapSet.beatmaps.size - 1])
 
         } else {
             val beatmapSet = playlistHistory[currentPlayIndex]
-            startBeatmap(beatmapSet.beatmaps[beatmapSet.beatmaps.size-1])
+            startBeatmap(beatmapSet.beatmaps[beatmapSet.beatmaps.size - 1])
         }
     }
 
-    fun update(time: Float) {
+    fun update(time: Double) {
 
         volumeGlider.update(time)
 
@@ -82,9 +87,9 @@ object TrackManager: KoinComponent {
         beatmap.loadTrack(startAtPreview)
         beatmap.getTrack().play(volumeGlider.value)
         if (startAtPreview) {
-            beatmap.getTrack().setPosition((beatmap.beatmapMetadata.previewTime.toFloat()+previewOffset) / 1000)
+            beatmap.getTrack().setPosition((beatmap.beatmapMetadata.previewTime.toDouble() + previewOffset) / 1000)
         } else {
-            beatmap.getTrack().setPosition(previewOffset / 1000)
+            beatmap.getTrack().setPosition((previewOffset / 1000).toDouble())
         }
 
         bindableBeatmap.value = beatmap

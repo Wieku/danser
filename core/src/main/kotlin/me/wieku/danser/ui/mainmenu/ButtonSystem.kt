@@ -26,7 +26,7 @@ class ButtonSystem() : ParallaxContainer() {
     private var background: Container
     private var buttons: RightButtonsContainer
 
-    private var introFinish = 0f
+    private var introFinish = 0.0
     private var introFinished = false
 
     constructor(inContext: ButtonSystem.() -> Unit) : this() {

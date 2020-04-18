@@ -56,7 +56,7 @@ class ProgressBar: YogaContainer(), KoinComponent {
         if (beatmapBindable.value != null) {
             val progress = (e.cursorPosition.x-drawPosition.x)/drawSize.x
             val track = beatmapBindable.value!!.getTrack()
-            track.setPosition(progress * track.getLength())
+            track.setPosition(progress.toDouble() * track.getLength())
         }
         return super.onClick(e)
     }

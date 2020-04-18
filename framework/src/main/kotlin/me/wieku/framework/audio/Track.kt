@@ -59,16 +59,16 @@ class Track(val file: FileHandle, val fftMode: FFTMode = FFTMode.FFT512) : ICloc
     var rightChannelLevel: Float = 0.0f
         private set
 
-    override var currentTime: Float
-        get() = getPosition() * 1000
+    override var currentTime: Double
+        get() = (getPosition() * 1000).toDouble()
         set(value) {
             setPosition(value / 1000)
         }
 
-    override var clockRate: Float
-        get() = getTempo()
+    override var clockRate: Double
+        get() = getTempo().toDouble()
         set(value) {
-            setTempo(value)
+            setTempo(value.toFloat())
         }
 
     override var isRunning: Boolean
@@ -128,10 +128,10 @@ class Track(val file: FileHandle, val fftMode: FFTMode = FFTMode.FFT512) : ICloc
         ).toFloat()
     }
 
-    fun setPosition(pos: Float) {
+    fun setPosition(pos: Double) {
         BASS_ChannelSetPosition(
             fxChannel.asInt(),
-            BASS_ChannelSeconds2Bytes(fxChannel.asInt(), pos.toDouble()),
+            BASS_ChannelSeconds2Bytes(fxChannel.asInt(), pos),
             BASS_POS_BYTE
         )
     }

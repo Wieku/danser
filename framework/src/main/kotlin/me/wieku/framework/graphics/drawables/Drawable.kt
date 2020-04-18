@@ -72,8 +72,8 @@ abstract class Drawable : InputHandler(), Disposable, KoinComponent {
     var shearX = 0f
     var shearY = 0f
 
-    var startTime = 0f
-    var endTime = 0f
+    var startTime = 0.0
+    var endTime = 0.0
     var drawForever = true
 
     var pixelSnap = false
@@ -187,7 +187,7 @@ abstract class Drawable : InputHandler(), Disposable, KoinComponent {
                 cursorPosition1.y >= drawPosition.y && cursorPosition1.y < drawPosition.y + drawSize.y
     }
 
-    fun update(time: Float) {
+    fun update(time: Double) {
         transforms.synchronized {
             var i = 0
             while (i < transforms.size) {
@@ -253,8 +253,8 @@ abstract class Drawable : InputHandler(), Disposable, KoinComponent {
     }
 
     fun adjustTimesToTransformations() {
-        var startTime = Float.MAX_VALUE
-        var endTime = -Float.MAX_VALUE
+        var startTime = Double.MAX_VALUE
+        var endTime = -Double.MAX_VALUE
         transforms.synchronized {
             forEach {
                 startTime = min(startTime, it.startTime)

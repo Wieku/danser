@@ -162,7 +162,7 @@ class Triangles() : Container(), KoinComponent {
 
         velocity = max(velocity, min(boost * 0.0725f, 0.3f) * speedMultiplier)
 
-        velocity *= 1.0f - 0.05f * clock.time.frameTime / 16.66667f
+        velocity *= 1.0f - 0.05f * clock.time.frameTime.toFloat() / 16.66667f
 
         val velocityCurrent = baseVelocity + velocity
 
@@ -170,7 +170,7 @@ class Triangles() : Container(), KoinComponent {
 
         triangles.forEach {
             val base =
-                clock.time.frameTime / 1000f * velocityCurrent * (1f + separation * (maxSize - it.size) / (maxSize - minSize))
+                clock.time.frameTime.toFloat() / 1000f * velocityCurrent * (1f + separation * (maxSize - it.size) / (maxSize - minSize))
 
             it.position.add(
                 triangleDirection.directionX * base,
@@ -248,10 +248,10 @@ class Triangles() : Container(), KoinComponent {
         private val newColor = Color(Float.NaN)
         val color = Color(Float.NaN)
 
-        private var currentTime: Float = 0f
+        private var currentTime: Double = 0.0
         private val colorGlider = Glider(1f)
 
-        fun update(time: Float) {
+        fun update(time: Double) {
             currentTime = time
             colorGlider.update(currentTime)
 

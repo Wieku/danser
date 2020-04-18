@@ -15,7 +15,7 @@ class Visualizer() : Drawable(), KoinComponent {
 
     private val beatmapBindable: Bindable<Beatmap?> by inject()
 
-    private val updateDelay = 50f
+    private val updateDelay = 50.0
     private val rounds = 5
     private val bars = 200
     private val baseDecay = 0.0024f
@@ -25,7 +25,7 @@ class Visualizer() : Drawable(), KoinComponent {
     private val amplitudes = FloatArray(bars)
 
     private var jumpCounter = 0
-    private var deltaSum = 0f
+    private var deltaSum = 0.0
 
     var barScale = 1f
 
@@ -38,7 +38,7 @@ class Visualizer() : Drawable(), KoinComponent {
 
         deltaSum += clock.time.frameTime
 
-        var decay = clock.time.frameTime * baseDecay
+        var decay = clock.time.frameTime.toFloat() * baseDecay
 
         if (deltaSum >= updateDelay) {
 

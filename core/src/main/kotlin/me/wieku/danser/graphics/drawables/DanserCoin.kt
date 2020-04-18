@@ -118,7 +118,7 @@ class DanserCoin : Container(), KoinComponent {
 
     override fun update() {
 
-        deltaSum += clock.time.frameTime
+        deltaSum += clock.time.frameTime.toFloat()
 
         if (deltaSum >= 1000f / 60) {
 
@@ -134,7 +134,7 @@ class DanserCoin : Container(), KoinComponent {
 
         val bProg = when (beatmapBindable.value!!.getTrack().isRunning) {
             true -> (bTime - timingPoint.time) / timingPoint.baseBpm
-            false -> clock.currentTime / defaultBeatLength
+            false -> clock.currentTime.toFloat() / defaultBeatLength
         }
 
         beatProgress = bProg - floor(bProg)
@@ -173,7 +173,7 @@ class DanserCoin : Container(), KoinComponent {
         val vprog = if (beatmapBindable.value!!.getTrack().isRunning) 1f - (volume - volumeAverage) / 0.5f else 1f
         val pV = min(1.0f, max(0.0f, 1.0f - (vprog * 0.5f + beatProgress * 0.5f)))
 
-        val ratio = 0.5f.pow(clock.time.frameTime / 16.6666666666667f)
+        val ratio = 0.5f.pow(clock.time.frameTime.toFloat() / 16.6666666666667f)
 
         progress = lastProgress * ratio + pV * (1 - ratio)
         lastProgress = progress
