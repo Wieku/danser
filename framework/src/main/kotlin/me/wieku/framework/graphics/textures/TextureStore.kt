@@ -1,12 +1,9 @@
 package me.wieku.framework.graphics.textures
 
-import me.wieku.framework.logging.Logging
 import org.lwjgl.opengl.ARBTextureStorage.glTexStorage3D
 import org.lwjgl.opengl.GL33.*
 
 internal class TextureStore(var layers: Int, var width: Int, var height: Int, var mipmaps: Int = 1, val format: TextureFormat = TextureFormat.RGBA) {
-
-    private val logger = Logging.getLogger("performance")
 
     var id: Int = -1
     var binding: Int = -1
@@ -42,7 +39,6 @@ internal class TextureStore(var layers: Int, var width: Int, var height: Int, va
             )
         }
 
-        logger.info("TextureStore with size ${width}x${height}x$layers created")
     }
 
     fun bind(loc: Int) {
