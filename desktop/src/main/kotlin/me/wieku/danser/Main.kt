@@ -6,9 +6,9 @@ import me.wieku.framework.backend.DesktopContext
 
 import java.io.File
 
-fun main() {
+fun main(args: Array<String>) {
     //If we have renderdoc library in user directory, load it
-    if (File("renderdoc.dll").exists()) {
+    if (args.contains("-renderdoc") && File("renderdoc.dll").exists()) {
         System.load(System.getProperty("user.dir")+"/renderdoc.dll")
     }
 
