@@ -25,13 +25,16 @@ class Triangles() : Container(), KoinComponent {
     private val triangles = ArrayList<Triangle>()
     private val trianglesToRemove = ArrayList<Triangle>()
 
-    private val tempSprite = TriangleSprite()
+    private val tempSprite = Sprite()
 
-    var drawShadows: Boolean = false
+    private var textureGen = TriangleTextureGenerator()
+    private var regenerateTexture = true
+
+    var shadowAmount: Float = 0.0f
         set(value) {
             if (value == field) return
 
-            tempSprite.useShadow = value
+            regenerateTexture = true
 
             field = value
         }
@@ -186,14 +189,21 @@ class Triangles() : Container(), KoinComponent {
         }
     }
 
-    override fun updateDrawable() {
-        super.updateDrawable()
-        triangleSize.set(Scaling.Fit.apply(1.154506f, 1.0f, drawSize.x, drawSize.y))
-    }
-
     private var drawArray = emptyArray<Triangle?>()
 
+    override fun updateDrawable() {
+        super.updateDrawable()
+        triangleSize.set(Scaling.Fit.apply(tempSprite.size.x, tempSprite.size.y, drawSize.x, drawSize.y))
+    }
+
     override fun draw(batch: SpriteBatch) {
+
+        if (regenerateTexture) {
+            tempSprite.texture = textureGen.generate(shadowAmount)
+            triangleSize.set(Scaling.Fit.apply(tempSprite.size.x, tempSprite.size.y, drawSize.x, drawSize.y))
+            regenerateTexture = false
+        }
+
         if (drawArray.size < triangles.size + 2) {
             drawArray = arrayOfNulls(triangles.size + 2) //hack, but prevents ArrayIndexOutOfBoundsException during triangles.toArray. Needs a better solution.
         }
@@ -225,16 +235,6 @@ class Triangles() : Container(), KoinComponent {
 
     override fun dispose() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    private class TriangleSprite : Sprite("misc/triangle.png") {
-        var useShadow: Boolean = false
-            set(value) {
-                if (value == field) return
-
-                textureName = "misc/triangle" + (if (value) "-shadow" else "") + ".png"
-                field = value
-            }
     }
 
     private class Triangle(val position: Vector2f, val size: Float) {

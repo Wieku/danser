@@ -99,7 +99,7 @@ class MenuBackgroundTest() : ParallaxContainer(), KoinComponent {
                 maxSize = 0.3f
                 spawnRate = 0.175f
                 baseVelocity = 0.05f
-                drawShadows = true
+                shadowAmount = 1f
                 separation = 0.7f
                 triangleOrder = TriangleOrder.Latest
             }.also { triangles = it },
