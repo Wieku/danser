@@ -35,6 +35,7 @@ class DesktopContext: GameContext() {
         if (FrameworkConfig.windowMode.value == WindowMode.Maximized) return
         glfwSetWindowSize(windowHandle, width, height)
         contextSize.set(width, height)
+        logger.info("Window size changed: ${width}x$height")
     }
 
     private fun setWindowMode(windowMode: WindowMode) {
