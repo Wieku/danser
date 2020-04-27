@@ -9,7 +9,11 @@ import org.joml.Vector2i
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.glfw.GLFWErrorCallback
 import org.lwjgl.opengl.GL
+import org.lwjgl.opengl.GL11
+import org.lwjgl.opengl.GL20
+import org.lwjgl.opengl.GL30
 import org.lwjgl.opengl.GL33.*
+
 
 class DesktopContext: GameContext() {
     internal var windowHandle: Long = 0
@@ -34,6 +38,7 @@ class DesktopContext: GameContext() {
     }
 
     private fun setWindowMode(windowMode: WindowMode) {
+        logger.info("Window mode changed: ${FrameworkConfig.windowMode.value} -> $windowMode")
         glfwSetWindowAttrib(windowHandle, GLFW_DECORATED, if(windowMode == WindowMode.Windowed || windowMode == WindowMode.Maximized) GLFW_TRUE else GLFW_FALSE)
 
         when(windowMode) {
@@ -152,6 +157,26 @@ class DesktopContext: GameContext() {
         glfwMakeContextCurrent(windowHandle)
         setVSync(FrameworkConfig.vSync.value)
         GL.createCapabilities()
+
+        val glvendor = GL11.glGetString(GL11.GL_VENDOR)
+        val glrenderer = GL11.glGetString(GL11.GL_RENDERER)
+        val glversion = GL11.glGetString(GL11.GL_VERSION)
+        val glslversion = GL11.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION)
+
+        val extensions = StringBuilder()
+
+        val numExtensions = GL11.glGetInteger(GL30.GL_NUM_EXTENSIONS)
+        for (i in 0 until numExtensions) {
+            extensions.append(GL30.glGetStringi(GL11.GL_EXTENSIONS, i))
+            extensions.append(" ")
+        }
+
+        logger.info("GL Vendor:     $glvendor")
+        logger.info("GL Renderer:   $glrenderer")
+        logger.info("GL Version:    $glversion")
+        logger.info("GLSL Version:  $glslversion")
+        logger.info("GL Extensions: $extensions")
+
         glEnable(GL_MULTISAMPLE)
         glfwShowWindow(windowHandle)
         glfwSetInputMode(windowHandle, GLFW_CURSOR, GLFW_CURSOR_HIDDEN)

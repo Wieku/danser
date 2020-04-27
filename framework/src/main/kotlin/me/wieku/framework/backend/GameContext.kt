@@ -3,6 +3,7 @@ package me.wieku.framework.backend
 import me.wieku.framework.audio.BassSystem
 import me.wieku.framework.configuration.FrameworkConfig
 import me.wieku.framework.input.InputManager
+import me.wieku.framework.logging.Logging
 import me.wieku.framework.utils.FpsLimiter
 import org.joml.Vector2i
 import org.koin.core.context.loadKoinModules
@@ -14,12 +15,11 @@ import kotlin.system.exitProcess
 
 abstract class GameContext {
 
+    protected val logger = Logging.getLogger("runtime")
+
     init {
         startKoin {}
     }
-
-    /*var contextRunning = false
-        private set*/
 
     var focused = true
         protected set
@@ -76,7 +76,9 @@ abstract class GameContext {
 
         val renderingThread = Thread {
             lock.lock()
+            logger.info("Starting graphics context...")
             startGraphicsContext()
+            logger.info("Graphics context started!")
             game.setup()
             lock.unlock()
             while (!handleGameCycle() && keepRunning) {
@@ -90,15 +92,13 @@ abstract class GameContext {
         }
         renderingThread.name = "Draw Thread"
         renderingThread.setUncaughtExceptionHandler { _, e ->
-            println("*** Uncaught exception in rendering thread! ***")
-            e.printStackTrace()
+            logger.error("*** Uncaught exception in rendering thread! ***", e)
             keepRunning = false
         }
         renderingThread.start()
 
         Thread.setDefaultUncaughtExceptionHandler { _, e ->
-            println("*** Uncaught exception in update thread! ***")
-            e.printStackTrace()
+            logger.error("*** Uncaught exception in update thread! ***", e)
             keepRunning = false
         }
 
@@ -121,8 +121,7 @@ abstract class GameContext {
                 game.inputClock.updateClock()
             }
         } catch (e: Throwable) {
-            println("*** Uncaught exception in input thread! ***")
-            e.printStackTrace()
+            logger.error("*** Uncaught exception in input thread! ***", e)
         }
 
         keepRunning = false
