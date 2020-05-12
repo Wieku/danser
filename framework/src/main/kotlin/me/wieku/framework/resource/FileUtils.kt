@@ -1,10 +1,10 @@
 package me.wieku.framework.resource
 
+import me.wieku.framework.logging.Logging
 import java.io.File
-import java.lang.StringBuilder
 import java.security.DigestInputStream
 import java.security.MessageDigest
-import java.util.zip.ZipFile
+import java.util.zip.ZipInputStream
 
 fun FileHandle.md5() = hash("MD5")
 fun FileHandle.sha1() = hash("SHA1")
@@ -32,18 +32,26 @@ fun FileHandle.unpack(
     directory: String = file.absolutePath.substringBefore(".${file.extension}"),
     removeAfter: Boolean = true
 ) {
-    File(directory).mkdirs()
-    ZipFile(file).use { zip ->
-        println("Unpacking ${file.name}")
-        zip.entries().asSequence().forEach { entry ->
-            zip.getInputStream(entry).use { inStream ->
-                File(directory + File.separator + entry.name).outputStream().use { outStream ->
-                    inStream.copyTo(outStream)
-                }
+    val logger = Logging.getLogger("runtime")
+
+    ZipInputStream(fileURL.openStream()).use { zipStream ->
+        logger.info("Unpacking \"${file.name}\"...")
+
+        var next = zipStream.nextEntry
+        while (next != null) {
+            val file = File(directory + File.separator + next.name)
+            file.parentFile.mkdirs()
+
+            file.outputStream().use { outStream ->
+                zipStream.copyTo(outStream)
             }
+
+            next = zipStream.nextEntry
         }
     }
 
-    if (removeAfter)
+    if (removeAfter) {
+        logger.info("Removing \"${file.name}\"...")
         file.delete()
+    }
 }
