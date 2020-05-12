@@ -16,7 +16,7 @@ sourceSets.main.resources.srcDirs = ["src/main/resources"]
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 application {
-    applicationName = 'danser'
+    applicationName = 'danser-desktop'
     mainClassName = 'me.wieku.danser.MainKt'
 }
 
