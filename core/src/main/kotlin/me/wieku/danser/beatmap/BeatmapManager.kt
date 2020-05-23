@@ -19,14 +19,18 @@ object BeatmapManager {
 
     private val logger = Logging.getLogger("database")
 
-    private var entityManagerFactory: EntityManagerFactory
-    private var entityManager: EntityManager
+    private lateinit var entityManagerFactory: EntityManagerFactory
+    private lateinit var entityManager: EntityManager
     private var parser = BeatmapParser()
 
     val beatmapSets = ArrayList<BeatmapSet>()
-    private var beatmapSetCache: HashMap<String, BeatmapSet>
+    private lateinit var beatmapSetCache: HashMap<String, BeatmapSet>
 
-    init {
+    var listener: ((Int, Int, String) -> Unit)? = null
+    var messageListener: ((String) -> Unit)? = null
+
+    fun start() {
+        listener?.invoke(0, 2, "Beatmap Manager is starting...")
         logger.info("Beatmap Manager is starting...")
 
         entityManagerFactory = Persistence.createEntityManagerFactory("default")
@@ -38,6 +42,7 @@ object BeatmapManager {
             entityManagerFactory.close()
         })
 
+        listener?.invoke(1, 2, "Beatmap Manager started! Loading cached beatmaps...")
         logger.info("Beatmap Manager started! Loading cached beatmaps...")
 
         beatmapSets.addAll(
@@ -50,21 +55,36 @@ object BeatmapManager {
         beatmapSetCache = beatmapSets.map { it.directory to it }.toMap().toMutableMap() as HashMap<String, BeatmapSet>
 
         logger.info("Cached beatmaps loaded!")
+        listener?.invoke(2, 2, "Cached beatmaps loaded!")
     }
 
     fun loadBeatmaps(location: String) {
 
         logger.info("Scanning \"$location\"...")
 
-        File(location).listFiles { it -> it.extension == "osz" }?.forEach {
-            FileHandle(it.absolutePath, FileType.Absolute).unpack()
+        val oszCandidates = File(location).listFiles { it -> it.extension == "osz" }
+
+        if (oszCandidates != null && oszCandidates.isNotEmpty()) {
+            val num = oszCandidates.size
+            oszCandidates.forEachIndexed { index, file ->
+                listener?.invoke(index, num, "Unpacking ${file.name}")
+                FileHandle(file.absolutePath, FileType.Absolute).unpack()
+            }
+            listener?.invoke(num, num, "Files unpacked!")
         }
 
         entityManager.transactional {
-            File(location).listFiles { file -> file.isDirectory }?.forEach { file ->
-                loadBeatmapBundle(file.toPath())
+            val candidates = File(location).listFiles { file -> file.isDirectory }
+            if (candidates != null && candidates.isNotEmpty()) {
+                candidates.forEachIndexed { index, file ->
+                    listener?.invoke(index, candidates.size, "Scanning ${file.name}")
+                    loadBeatmapBundle(file.toPath())
+                }
+                listener?.invoke(candidates.size, candidates.size, "Scanning finished!")
             }
         }
+
+        listener?.invoke(1, 1, "Loading finished!")
     }
 
     private fun loadBeatmapBundle(path: Path) {
@@ -74,17 +94,17 @@ object BeatmapManager {
             name.endsWith(".osu")
         }
 
-        if (candidates.isEmpty() && beatmapSet != null) {
+        if ((candidates == null || candidates.isEmpty()) && beatmapSet != null) {
             entityManager.remove(beatmapSet)
         }
 
         if (beatmapSet == null) {
             beatmapSet = BeatmapSet()
 
-            candidates.forEach {
+            candidates?.forEach {
                 val beatmap = Beatmap()
                 logger.info("Importing: ${it.name}")
-
+                messageListener?.invoke("Importing: ${it.name}")
                 try {
                     parser.parse(FileHandle(it.absolutePath, FileType.Absolute), beatmap)
                 } catch (exception: Exception) {
@@ -109,9 +129,11 @@ object BeatmapManager {
         } else {
             val versionsMap = beatmapSet.beatmaps.map { it.beatmapFile to it }.toMap()
 
-            candidates.forEach {
+            candidates?.forEach {
                 var beatmap = versionsMap[it.name]
                 val wasNull = beatmap == null
+
+                messageListener?.invoke("Checking: ${it.name}")
 
                 if (beatmap != null && beatmap.beatmapStatistics.lastModified == it.lastModified()) {
                     return

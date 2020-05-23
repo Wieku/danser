@@ -2,6 +2,7 @@ package me.wieku.danser.ui.screens
 
 import me.wieku.danser.beatmap.BeatmapManager
 import me.wieku.danser.graphics.drawables.triangles.Triangles
+import me.wieku.danser.ui.common.widgets.ProgressBar
 import me.wieku.framework.animation.Glider
 import me.wieku.framework.animation.Transform
 import me.wieku.framework.animation.TransformType
@@ -21,6 +22,8 @@ import org.koin.core.inject
 
 class LoadingScreen : Screen(), KoinComponent {
 
+    private var progressBar: ProgressBar
+    private var messages: TextSprite
     private val stack: ScreenCache by inject()
     private val mainMenu: MainMenu
 
@@ -52,7 +55,7 @@ class LoadingScreen : Screen(), KoinComponent {
                 fillMode = Scaling.Fit
                 scale = Vector2f(0.66f)
             },
-            TextSprite("Exo2") {
+            /*TextSprite("Exo2") {
                 text = "Loading awesomeness"
                 fontSize = 32f
                 anchor = Origin.Custom
@@ -61,7 +64,7 @@ class LoadingScreen : Screen(), KoinComponent {
                 scaleToSize = true
                 fillMode = Scaling.Fit
                 scale = Vector2f(0.3f)
-            },
+            },*/
             TextSprite("Exo2") {
                 text = "Early build. Please visit github.com/Wieku/danser for more info"
                 fillMode = Scaling.Stretch
@@ -70,7 +73,24 @@ class LoadingScreen : Screen(), KoinComponent {
                 scale = Vector2f(1f, 0.02f)
                 anchor = Origin.TopLeft
                 origin = Origin.TopLeft
-            }
+            },
+            ProgressBar {
+                fillMode = Scaling.Fit
+                scale = Vector2f(0.8f, 0.02f)
+                anchor = Origin.Custom
+                //customAnchor = Vector2f(0.5f, 0.94f)
+                customAnchor = Vector2f(0.5f, 0.90f)
+            }. also { progressBar = it  },
+            TextSprite("Exo2") {
+                text = "abcdef"
+                fontSize = 24f
+                anchor = Origin.Custom
+                customAnchor = Vector2f(0.5f, 0.93f)
+
+                scaleToSize = true
+                fillMode = Scaling.FillY
+                scale = Vector2f(0.025f)
+            }.also { messages = it }
         )
 
         mainMenu = MainMenu()
@@ -102,6 +122,9 @@ class LoadingScreen : Screen(), KoinComponent {
         )
 
         Thread {
+            BeatmapManager.listener = ::onLoading
+            BeatmapManager.messageListener = ::onMessage
+            BeatmapManager.start()
             BeatmapManager.loadBeatmaps(System.getenv("localappdata") + "\\osu!\\Songs")
             stack.push(mainMenu)
         }.start()
@@ -124,6 +147,15 @@ class LoadingScreen : Screen(), KoinComponent {
                 0f
             ), false
         )
+    }
+
+    fun onLoading(step: Int, maxSteps: Int, message: String) {
+        progressBar.progress = step.toFloat() / maxSteps
+        messages.text = message
+    }
+
+    fun onMessage(message: String) {
+        messages.text = message
     }
 
 }
