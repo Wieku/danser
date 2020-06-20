@@ -33,14 +33,15 @@ import java.util.*
 
 class MenuBackgroundTest() : ParallaxContainer(), KoinComponent {
 
-    private class Proxy(val drawable: Container): Drawable() {
+    private class Proxy(val drawable: Container) : Drawable() {
 
         var prevChildNum = 0
         var prevColor = Color()
 
         override var wasUpdated: Boolean
             get() {
-                val res = prevChildNum != drawable.childNumber || drawable.childNumber > 1 || prevColor != drawable.drawColor
+                val res =
+                    prevChildNum != drawable.childNumber || drawable.childNumber > 1 || prevColor != drawable.drawColor
                 prevChildNum = drawable.childNumber
                 prevColor.set(drawable.drawColor)
                 return res
@@ -78,7 +79,9 @@ class MenuBackgroundTest() : ParallaxContainer(), KoinComponent {
     private var pixmap: Pixmap? = null
 
     private var oldBackground: Sprite? = null
-    private var currentBackground: Sprite? = null
+    private lateinit var currentBackground: Sprite
+
+    private var camera = Camera()
 
     constructor(inContext: MenuBackgroundTest.() -> Unit) : this() {
         inContext()
@@ -110,7 +113,7 @@ class MenuBackgroundTest() : ParallaxContainer(), KoinComponent {
                 addChild(
                     Proxy(wrapper)
                 )
-            }.also { blurred = it  }
+            }.also { blurred = it }
         )
 
         beatmap.addListener(true) { _, newBeatmap, _ ->
@@ -127,7 +130,8 @@ class MenuBackgroundTest() : ParallaxContainer(), KoinComponent {
                 )
             } else FileHandle("assets/textures/menu/backgrounds/background-1.png", FileType.Classpath)
 
-            oldBackground = currentBackground
+            if (::currentBackground.isInitialized)
+                oldBackground = currentBackground
 
             pixmap = Pixmap(fileHandle)
             updateColors(pixmap!!)
@@ -164,16 +168,14 @@ class MenuBackgroundTest() : ParallaxContainer(), KoinComponent {
         }
     }
 
-    private var camera = Camera()
-
     override fun draw(batch: SpriteBatch) {
 
-        if (currentBackground!!.texture == null && pixmap != null) {
-            currentBackground!!.texture = Texture(pixmap!!).region
-            currentBackground!!.size =
-                Vector2f(currentBackground!!.texture!!.getWidth(), currentBackground!!.texture!!.getHeight())
-            currentBackground!!.invalidate()
-            currentBackground!!.update()
+        if (currentBackground.texture == null && pixmap != null) {
+            currentBackground.texture = Texture(pixmap!!).region
+            currentBackground.size =
+                Vector2f(currentBackground.texture!!.getWidth(), currentBackground.texture!!.getHeight())
+            currentBackground.invalidate()
+            currentBackground.update()
             blurred.forceRedraw()
         }
 
@@ -215,7 +217,14 @@ class MenuBackgroundTest() : ParallaxContainer(), KoinComponent {
 
         batch.camera = oldCamera
 
-        batch.draw(fbo.getTexture()!!, drawPosition.x + drawSize.x / 2, drawPosition.y + drawSize.y / 2, 1f, -1f, Color(1f))
+        batch.draw(
+            fbo.getTexture()!!,
+            drawPosition.x + drawSize.x / 2,
+            drawPosition.y + drawSize.y / 2,
+            1f,
+            -1f,
+            Color(1f)
+        )
     }
 
     private fun updateColors(pixmap: Pixmap) {
