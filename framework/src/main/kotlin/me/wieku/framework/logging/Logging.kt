@@ -7,12 +7,11 @@ import org.apache.logging.log4j.core.config.Configurator
 import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilderFactory
 import org.apache.logging.log4j.core.config.builder.api.LayoutComponentBuilder
 
-
 object Logging {
 
-    private val consolePattern = "%d{yyyy-MM-dd' 'HH:mm:ss.SSS} [%t] [%c] [%p]: %m%n"
-    private val filePattern = "%d{yyyy-MM-dd' 'HH:mm:ss.SSS} [%t] [%p]: %m%n"
-    private val logRoot = "./logs/"
+    private const val consolePattern = "%d{yyyy-MM-dd' 'HH:mm:ss.SSS} [%t] [%c] [%p]: %m%n"
+    private const val filePattern = "%d{yyyy-MM-dd' 'HH:mm:ss.SSS} [%t] [%p]: %m%n"
+    private const val logRoot = "./logs/"
 
     private val builder = ConfigurationBuilderFactory.newConfigurationBuilder()
 
@@ -24,9 +23,11 @@ object Logging {
     init {
         consoleLayout = builder.newLayout("PatternLayout")
         consoleLayout.addAttribute("pattern", consolePattern)
+        consoleLayout.addAttribute("charset", "UTF-8")
 
         fileLayout = builder.newLayout("PatternLayout")
         fileLayout.addAttribute("pattern", filePattern)
+        fileLayout.addAttribute("charset", "UTF-8")
 
 
         val consoleAppender = builder.newAppender("stdout", "Console")
