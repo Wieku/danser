@@ -12,6 +12,7 @@ sourceSets.main.resources.srcDirs = ["src/main/resources"]
 
 dependencies {
     implementation fileTree(dir: 'libs', include: '*.jar')
+    compile 'net.java.dev.jna:jna:5.5.0'
     api 'org.apache.logging.log4j:log4j-core:2.13.0'
     api "org.koin:koin-core:$koin_version"
     api "org.lwjgl:lwjgl:$lwjglVersion"

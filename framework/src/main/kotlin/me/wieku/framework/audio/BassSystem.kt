@@ -1,16 +1,16 @@
 package me.wieku.framework.audio
 
+import com.sun.jna.NativeLibrary
 import jouvieje.bass.Bass
 import jouvieje.bass.BassInit
-import jouvieje.bass.exceptions.BassException
 import jouvieje.bass.structures.BASS_DEVICEINFO
-import jouvieje.bass.structures.BASS_INFO
 import me.wieku.framework.configuration.FrameworkConfig
 import me.wieku.framework.di.bindable.typed.BindableFloat
 import me.wieku.framework.di.bindable.typed.BindableString
 import me.wieku.framework.logging.Logging
 import org.lwjgl.system.Library
 import org.lwjgl.system.Platform
+import java.io.File
 import java.lang.ref.WeakReference
 import java.net.URL
 import java.nio.channels.FileChannel
@@ -32,8 +32,8 @@ object BassSystem {
         field.set(null, true)
 
         val clazz = Class.forName("org.lwjgl.system.SharedLibraryLoader")
-        val method = clazz.getDeclaredMethod("load", String::class.java, String::class.java, URL::class.java)
-        method.isAccessible = true
+        val loadMethod = clazz.getDeclaredMethod("load", String::class.java, String::class.java, URL::class.java)
+        loadMethod.isAccessible = true
 
         val libraries = arrayOf(
             "bass",
@@ -45,15 +45,14 @@ object BassSystem {
 
         libraries.forEach {
             val libraryName = System.mapLibraryName(it)
-            logger.info("Loading $libraryName")
-            method.invoke(
+            loadMethod.invoke(
                 null,
                 it,
                 libraryName,
                 Library::class.java.classLoader.getResource("$use64/$libraryName")
             ) as FileChannel
 
-            //Library.loadSystem(it)
+            NativeLibrary.getInstance(System.getProperty("org.lwjgl.librarypath") + File.separator + libraryName)
             Library.loadSystem("bass", it)
         }
     }
