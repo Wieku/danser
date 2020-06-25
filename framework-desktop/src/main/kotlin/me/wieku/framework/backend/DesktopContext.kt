@@ -119,7 +119,7 @@ class DesktopContext: GameContext() {
                 FrameworkConfig.windowPosition.value = Vector2i(pos2)
         }
 
-        glfwSetWindowSizeCallback(windowHandle) { _, width, height ->
+        glfwSetFramebufferSizeCallback(windowHandle) { _, width, height ->
             if (FrameworkConfig.windowMode.value != WindowMode.Maximized && !minimized)
                 FrameworkConfig.windowSize.value = Vector2i(width, height)
         }
