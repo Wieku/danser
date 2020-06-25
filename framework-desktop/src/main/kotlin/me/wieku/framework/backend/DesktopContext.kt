@@ -23,6 +23,8 @@ class DesktopContext: GameContext() {
     private val pos1 = Vector2i()
     private val pos2 = Vector2i()
 
+    private var sizeFromGLFWCallback = false
+
     private fun setWindowTitle(title: String) {
         glfwSetWindowTitle(windowHandle, title)
     }
@@ -33,7 +35,10 @@ class DesktopContext: GameContext() {
 
     private fun setWindowSize(width: Int, height: Int) {
         if (FrameworkConfig.windowMode.value == WindowMode.Maximized) return
-        glfwSetWindowSize(windowHandle, width, height)
+
+        if (!sizeFromGLFWCallback)
+            glfwSetWindowSize(windowHandle, width, height)
+
         contextSize.set(width, height)
         logger.info("Window size changed: ${width}x$height")
     }
@@ -120,15 +125,20 @@ class DesktopContext: GameContext() {
         }
 
         glfwSetFramebufferSizeCallback(windowHandle) { _, width, height ->
-            if (FrameworkConfig.windowMode.value != WindowMode.Maximized && !minimized)
+            if (FrameworkConfig.windowMode.value != WindowMode.Maximized && !minimized) {
+                sizeFromGLFWCallback = true
                 FrameworkConfig.windowSize.value = Vector2i(width, height)
+                sizeFromGLFWCallback = false
+            }
         }
 
         glfwSetWindowPosCallback(windowHandle) { _, x, y ->
             pos2.set(pos1)
             pos1.set(x, y)
-            if (FrameworkConfig.windowMode.value != WindowMode.Maximized)
+            if (FrameworkConfig.windowMode.value != WindowMode.Maximized) {
                 FrameworkConfig.windowPosition.value = Vector2i(x, y)
+                logger.info("Window position changed: ${x}x$y")
+            }
         }
 
         glfwSetWindowMaximizeCallback(windowHandle) { _, maximized ->
