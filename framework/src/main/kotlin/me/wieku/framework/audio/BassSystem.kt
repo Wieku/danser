@@ -45,6 +45,7 @@ object BassSystem {
 
         libraries.forEach {
             val libraryName = System.mapLibraryName(it)
+            logger.info("Loading $libraryName")
             method.invoke(
                 null,
                 it,
