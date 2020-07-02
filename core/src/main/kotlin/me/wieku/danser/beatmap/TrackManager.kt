@@ -50,6 +50,8 @@ object TrackManager : KoinComponent {
     }
 
     fun forward() {
+        if (BeatmapManager.beatmapSets.size == 0) return
+
         currentPlayIndex++
         if (currentPlayIndex >= playlistHistory.size) {
 
