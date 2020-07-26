@@ -1,9 +1,9 @@
 package me.wieku.framework.configuration
 
 import me.wieku.framework.resource.Parsable
+import org.ini4j.Wini
 import java.io.File
 import java.util.*
-import java.util.Enumeration
 import kotlin.reflect.KClass
 
 //We need to pass a class of an enum, because we can't retrieve its value using parameter only
@@ -11,43 +11,59 @@ abstract class Config<T>(private val enumClass: KClass<T>) where T: Enum<T> {
 
     abstract val configFile: String
 
-    protected val parsableMap = HashMap<T, Parsable>()
+    protected val parsableMap = TreeMap<T, Parsable>()
+    protected val sections = HashMap<T, Any>()
 
     fun addProperty(name: T, parsable: Parsable) {
         parsableMap[name] = parsable
+        sections[name] = "Main"
+    }
+
+    fun addProperty(section: Any, name: T, parsable: Parsable) {
+        parsableMap[name] = parsable
+        sections[name] = section
     }
 
     fun openConfig() {
         if (File(configFile).exists()) {
-            val properties = Properties()
-            properties.load(File(configFile).bufferedReader())
+            val isV2 = File(configFile).bufferedReader().use { it.readLine() }.endsWith("v2")
 
-            for (property in parsableMap) {
-                if (properties.containsKey(property.key.toString())) {
-                    property.value.parseFrom(properties.getProperty(property.key.toString()))
+            if (isV2) {
+                val wini = Wini(File(configFile).bufferedReader())
+
+                for (sectionName in wini.keys) {
+                    val section = wini[sectionName] ?: continue
+
+                    for(key in section.keys) {
+                        val property = parsableMap[java.lang.Enum.valueOf(enumClass.java, key)] ?: continue
+                        property.parseFrom(section[key]!!)
+                    }
+                }
+
+            } else {
+                val properties = Properties()
+                properties.load(File(configFile).bufferedReader())
+
+                for (property in parsableMap) {
+                    if (properties.containsKey(property.key.toString())) {
+                        property.value.parseFrom(properties.getProperty(property.key.toString()))
+                    }
                 }
             }
-
         }
     }
 
     fun saveConfig() {
-        val properties = object: Properties() {
-            override fun keys(): Enumeration<Any> {
-                val keyList = Vector<Any>()
-                keyList.addAll(super.keys().asSequence())
-                keyList.sortWith(Comparator { o1, o2 ->
-                    return@Comparator java.lang.Enum.valueOf(enumClass.java, o1 as String).compareTo(java.lang.Enum.valueOf(enumClass.java, o2 as String))
-                })
-                return keyList.elements()
-            }
-        }
+        val wini = Wini()
 
         for (property in parsableMap) {
-            properties.setProperty(property.key.toString(), property.value.parseToString())
+            wini.put(sections[property.key].toString(), property.key.toString(), property.value.parseToString())
         }
 
-        properties.store(File(configFile).writer(), "rocket2d configuration file")
+        wini.comment = "rocket2d configuration file v2\n"
+        wini.comment += "#Last edited: ${Date()}"
+
+        wini.store(File(configFile).writer())
     }
 
 }

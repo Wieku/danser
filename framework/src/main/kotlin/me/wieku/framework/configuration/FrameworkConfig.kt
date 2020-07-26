@@ -4,7 +4,7 @@ import me.wieku.framework.backend.WindowMode
 import me.wieku.framework.di.bindable.typed.*
 import org.joml.Vector2i
 
-object FrameworkConfig: Config<FrameworkConfig.FrameworkConfigProperties>(FrameworkConfigProperties::class) {
+object FrameworkConfig : Config<FrameworkConfig.FrameworkConfigProperties>(FrameworkConfigProperties::class) {
     override val configFile: String = "framework.ini"
 
     val windowPosition = BindableVector2i(Vector2i(40, 40))
@@ -40,20 +40,28 @@ object FrameworkConfig: Config<FrameworkConfig.FrameworkConfigProperties>(Framew
 
     //It could be done by reflections, but I think it's a cleaner solution
     init {
-        addProperty(FrameworkConfigProperties.WindowPosition, windowPosition)
-        addProperty(FrameworkConfigProperties.WindowSize, windowSize)
-        addProperty(FrameworkConfigProperties.FullScreenResolution, fullScreenResolution)
-        addProperty(FrameworkConfigProperties.WindowMode, windowMode)
-        addProperty(FrameworkConfigProperties.MSAA, msaa)
-        addProperty(FrameworkConfigProperties.VSync, vSync)
-        addProperty(FrameworkConfigProperties.ForegroundFPS, foregroundFPS)
-        addProperty(FrameworkConfigProperties.BackgroundFPS, backgroundFPS)
-        addProperty(FrameworkConfigProperties.UpdateRate, updateRate)
-        addProperty(FrameworkConfigProperties.UpdateRateBackground, updateRateBackground)
-        addProperty(FrameworkConfigProperties.AudioDevice, audioDevice)
-        addProperty(FrameworkConfigProperties.GeneralVolume, generalVolume)
-        addProperty(FrameworkConfigProperties.MusicVolume, musicVolume)
-        addProperty(FrameworkConfigProperties.EffectsVolume, effectsVolume)
+        addProperty(FrameworkConfigSections.Graphics, FrameworkConfigProperties.WindowPosition, windowPosition)
+        addProperty(FrameworkConfigSections.Graphics, FrameworkConfigProperties.WindowSize, windowSize)
+        addProperty(
+            FrameworkConfigSections.Graphics,
+            FrameworkConfigProperties.FullScreenResolution,
+            fullScreenResolution
+        )
+        addProperty(FrameworkConfigSections.Graphics, FrameworkConfigProperties.WindowMode, windowMode)
+        addProperty(FrameworkConfigSections.Graphics, FrameworkConfigProperties.MSAA, msaa)
+        addProperty(FrameworkConfigSections.Graphics, FrameworkConfigProperties.VSync, vSync)
+        addProperty(FrameworkConfigSections.Graphics, FrameworkConfigProperties.ForegroundFPS, foregroundFPS)
+        addProperty(FrameworkConfigSections.Graphics, FrameworkConfigProperties.BackgroundFPS, backgroundFPS)
+        addProperty(FrameworkConfigSections.Performance, FrameworkConfigProperties.UpdateRate, updateRate)
+        addProperty(
+            FrameworkConfigSections.Performance,
+            FrameworkConfigProperties.UpdateRateBackground,
+            updateRateBackground
+        )
+        addProperty(FrameworkConfigSections.Audio, FrameworkConfigProperties.AudioDevice, audioDevice)
+        addProperty(FrameworkConfigSections.Audio, FrameworkConfigProperties.GeneralVolume, generalVolume)
+        addProperty(FrameworkConfigSections.Audio, FrameworkConfigProperties.MusicVolume, musicVolume)
+        addProperty(FrameworkConfigSections.Audio, FrameworkConfigProperties.EffectsVolume, effectsVolume)
     }
 
     enum class FrameworkConfigProperties {
@@ -71,6 +79,12 @@ object FrameworkConfig: Config<FrameworkConfig.FrameworkConfigProperties>(Framew
         GeneralVolume,
         MusicVolume,
         EffectsVolume
+    }
+
+    enum class FrameworkConfigSections {
+        Graphics,
+        Audio,
+        Performance
     }
 
 }
