@@ -1,6 +1,7 @@
 package me.wieku.danser.ui.common.background
 
 import me.wieku.danser.beatmap.Beatmap
+import me.wieku.danser.configuration.DanserConfig
 import me.wieku.danser.graphics.drawables.triangles.TriangleOrder
 import me.wieku.danser.graphics.drawables.triangles.Triangles
 import me.wieku.framework.animation.Transform
@@ -20,6 +21,7 @@ import org.joml.Vector2f
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.io.File
+import java.nio.file.Paths
 import java.util.*
 
 class MenuBackground() : ParallaxContainer(), KoinComponent {
@@ -68,7 +70,7 @@ class MenuBackground() : ParallaxContainer(), KoinComponent {
 
             val fileHandle = if (newBeatmap.beatmapInfo.version != "Danser Intro") {
                 val tmpHandle = FileHandle(
-                    System.getenv("localappdata") + "/osu!/Songs/" + newBeatmap.beatmapSet.directory + File.separator + newBeatmap.beatmapMetadata.backgroundFile,
+                    Paths.get(DanserConfig.osuSongsDir.value, newBeatmap.beatmapSet.directory, newBeatmap.beatmapMetadata.backgroundFile).toString(),
                     FileType.Absolute
                 )
                 if (tmpHandle.file.exists()) tmpHandle else FileHandle(

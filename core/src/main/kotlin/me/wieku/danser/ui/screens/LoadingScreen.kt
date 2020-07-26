@@ -1,6 +1,7 @@
 package me.wieku.danser.ui.screens
 
 import me.wieku.danser.beatmap.BeatmapManager
+import me.wieku.danser.configuration.DanserConfig
 import me.wieku.danser.graphics.drawables.triangles.Triangles
 import me.wieku.danser.ui.common.widgets.ProgressBar
 import me.wieku.framework.animation.Glider
@@ -125,7 +126,7 @@ class LoadingScreen : Screen(), KoinComponent {
             BeatmapManager.listener = ::onLoading
             BeatmapManager.messageListener = ::onMessage
             BeatmapManager.start()
-            BeatmapManager.loadBeatmaps(System.getenv("localappdata") + "\\osu!\\Songs")
+            BeatmapManager.loadBeatmaps(DanserConfig.osuSongsDir.value)
             stack.push(mainMenu)
         }.start()
     }

@@ -4,10 +4,12 @@ import me.wieku.danser.beatmap.parsing.BeatmapParser
 import me.wieku.danser.beatmap.timing.BeatmapTiming
 import me.wieku.danser.audio.SampleData
 import me.wieku.danser.audio.SampleSet
+import me.wieku.danser.configuration.DanserConfig
 import me.wieku.framework.audio.Track
 import me.wieku.framework.resource.FileHandle
 import me.wieku.framework.resource.FileType
 import java.io.File
+import java.nio.file.Paths
 import javax.persistence.*
 import kotlin.jvm.Transient
 
@@ -81,23 +83,16 @@ class Beatmap(
     }
 
     fun loadTrack(local: Boolean = false) {
+        val basePath = if (local) "assets/beatmaps/" else DanserConfig.osuSongsDir.value
         track = Track(
             FileHandle(
-                if (local) {
-                    "assets/beatmaps/"
-                } else {
-                    System.getenv("localappdata") + "/osu!/Songs/"
-                } + beatmapSet.directory + File.separator + beatmapMetadata.audioFile,
+                Paths.get(basePath, beatmapSet.directory, beatmapMetadata.audioFile).toString(),
                 if(local) FileType.Classpath else FileType.Absolute
             )
         )
         BeatmapParser().parse(
             FileHandle(
-                if (local) {
-                    "assets/beatmaps/"
-                } else {
-                    System.getenv("localappdata") + "/osu!/Songs/"
-                } + beatmapSet.directory + File.separator + beatmapFile,
+                Paths.get(basePath, beatmapSet.directory, beatmapFile).toString(),
                 if (local) FileType.Classpath else FileType.Absolute
             ), this, true
         )

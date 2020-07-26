@@ -5,6 +5,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.wieku.danser.beatmap.Beatmap
 import me.wieku.danser.build.Build
+import me.wieku.danser.configuration.DanserConfig
 import me.wieku.danser.graphics.drawables.CursorWithTrail
 import me.wieku.danser.graphics.drawables.triangles.Triangles
 import me.wieku.danser.ui.common.FPSStatistics
@@ -60,6 +61,11 @@ class Danser : Game(), KoinComponent {
 
     override fun setup() {
         logger.info("Starting danser version ${Build.Version}")
+
+        //Quick config load-save
+        DanserConfig.openConfig()
+        DanserConfig.saveConfig()
+
         batch = SpriteBatch()
 
         screenCache = ScreenCache()
