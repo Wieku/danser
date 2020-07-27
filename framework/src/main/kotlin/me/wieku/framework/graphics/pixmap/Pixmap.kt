@@ -5,7 +5,9 @@ import me.wieku.framework.resource.FileHandle
 import org.joml.Vector4f
 import org.lwjgl.stb.STBImage.*
 import org.lwjgl.stb.STBImageWrite.*
+import org.lwjgl.stb.STBImageResize.*
 import org.lwjgl.system.MemoryStack
+import org.lwjgl.system.MemoryUtil
 import java.lang.IllegalArgumentException
 import java.nio.ByteBuffer
 import java.nio.IntBuffer
@@ -26,7 +28,7 @@ class Pixmap {
     constructor(width: Int, height: Int) {
         this.width = width
         this.height = height
-        pixels = ByteArray(width * height)
+        pixels = ByteArray(width * height * 4)
     }
 
     constructor(file: FileHandle) {
@@ -86,17 +88,52 @@ class Pixmap {
         return intVal / 255f
     }
 
+    fun resize(width: Int, height: Int) {
+        val inBuffer = MemoryUtil.memAlloc(this@Pixmap.pixels.size)
+        inBuffer.put(this@Pixmap.pixels)
+        inBuffer.flip()
+
+        val outBuffer = MemoryUtil.memAlloc(width * height * 4)
+
+        stbir_resize_uint8(inBuffer, this@Pixmap.width, this@Pixmap.height, 0, outBuffer, width, height, 0, 4)
+
+        outBuffer.get(pixels)
+        this@Pixmap.width = width
+        this@Pixmap.height = height
+
+        MemoryUtil.memFree(inBuffer)
+        MemoryUtil.memFree(outBuffer)
+    }
+
+    fun copy(width: Int = this.width, height: Int = this.height): Pixmap {
+        val outPixmap = Pixmap(width, height)
+
+        val inBuffer = MemoryUtil.memAlloc(this@Pixmap.pixels.size)
+        inBuffer.put(this@Pixmap.pixels)
+        inBuffer.flip()
+
+        val outBuffer = MemoryUtil.memAlloc(width * height * 4)
+
+        stbir_resize_uint8(inBuffer, this@Pixmap.width, this@Pixmap.height, 0, outBuffer, width, height, 0, 4)
+
+        outBuffer.get(outPixmap.pixels)
+
+        MemoryUtil.memFree(inBuffer)
+        MemoryUtil.memFree(outBuffer)
+
+        return outPixmap
+    }
+
     fun export(file: FileHandle) {
-        MemoryStack.stackPush().use { stack ->
-            val buffer = stack.malloc(pixels.size)
-            buffer.put(pixels)
-            buffer.flip()
-            when (file.file.extension) {
-                "png" -> stbi_write_png(file.file.absolutePath, width, height, 4, buffer, 0)
-                "jpg" -> stbi_write_jpg(file.file.absolutePath, width, height, 4, buffer, 90)
-                else -> throw IllegalArgumentException("Wrong format specified!")
-            }
+        val buffer = MemoryUtil.memAlloc(pixels.size)
+        buffer.put(pixels)
+        buffer.flip()
+        when (file.file.extension) {
+            "png" -> stbi_write_png(file.file.absolutePath, width, height, 4, buffer, 0)
+            "jpg" -> stbi_write_jpg(file.file.absolutePath, width, height, 4, buffer, 90)
+            else -> throw IllegalArgumentException("Wrong format specified!")
         }
+        MemoryUtil.memFree(buffer)
     }
 
 }
