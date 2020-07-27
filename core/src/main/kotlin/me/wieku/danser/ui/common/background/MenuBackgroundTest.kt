@@ -143,7 +143,7 @@ class MenuBackgroundTest() : ParallaxContainer(), KoinComponent {
                 anchor = Origin.Centre
             }
 
-            wrapper.addChild(currentBackground!!)
+            wrapper.addChild(currentBackground)
 
             if (oldBackground != null) {
                 oldBackground!!.addTransform(
@@ -157,7 +157,7 @@ class MenuBackgroundTest() : ParallaxContainer(), KoinComponent {
                 )
                 oldBackground!!.drawForever = false
 
-                currentBackground!!.addTransform(
+                currentBackground.addTransform(
                     Transform(
                         TransformType.Fade,
                         clock.currentTime,
