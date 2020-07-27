@@ -3,6 +3,9 @@ package me.wieku.danser
 import me.wieku.danser.build.Build
 import me.wieku.framework.configuration.FrameworkConfig
 import me.wieku.framework.backend.DesktopContext
+import me.wieku.framework.graphics.pixmap.Pixmap
+import me.wieku.framework.resource.FileHandle
+import me.wieku.framework.resource.FileType
 
 import java.io.File
 
@@ -15,6 +18,7 @@ fun main(args: Array<String>) {
     FrameworkConfig.windowTitle.value = "danser " + Build.Version
 
     val context = DesktopContext()
-    context.start(Danser())
+    context.icon = Pixmap(FileHandle("assets/textures/menu/coinsmall.png", FileType.Classpath))
 
+    context.start(Danser())
 }

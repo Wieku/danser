@@ -3,19 +3,27 @@ package me.wieku.framework.backend
 import me.wieku.framework.configuration.FrameworkConfig
 import me.wieku.framework.di.bindable.Bindable
 import me.wieku.framework.graphics.helpers.ViewportHelper
+import me.wieku.framework.graphics.pixmap.Pixmap
 import me.wieku.framework.input.DesktopInputManager
 import me.wieku.framework.input.InputManager
+import me.wieku.framework.resource.FileHandle
+import me.wieku.framework.resource.FileType
 import org.joml.Vector2i
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.glfw.GLFWErrorCallback
+import org.lwjgl.glfw.GLFWImage
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL20
 import org.lwjgl.opengl.GL30
 import org.lwjgl.opengl.GL33.*
+import org.lwjgl.system.MemoryUtil
+import java.nio.ByteBuffer
 
 
-class DesktopContext: GameContext() {
+class DesktopContext : GameContext() {
+    private val iconSizes = intArrayOf(16, 24, 32, 48, 64)
+
     internal var windowHandle: Long = 0
 
     private var minimized = false
@@ -24,6 +32,8 @@ class DesktopContext: GameContext() {
     private val pos2 = Vector2i()
 
     private var sizeFromGLFWCallback = false
+
+    var icon: Pixmap? = null
 
     private fun setWindowTitle(title: String) {
         glfwSetWindowTitle(windowHandle, title)
@@ -45,27 +55,55 @@ class DesktopContext: GameContext() {
 
     private fun setWindowMode(windowMode: WindowMode) {
         logger.info("Window mode changed: ${FrameworkConfig.windowMode.value} -> $windowMode")
-        glfwSetWindowAttrib(windowHandle, GLFW_DECORATED, if(windowMode == WindowMode.Windowed || windowMode == WindowMode.Maximized) GLFW_TRUE else GLFW_FALSE)
+        glfwSetWindowAttrib(
+            windowHandle,
+            GLFW_DECORATED,
+            if (windowMode == WindowMode.Windowed || windowMode == WindowMode.Maximized) GLFW_TRUE else GLFW_FALSE
+        )
 
-        when(windowMode) {
+        when (windowMode) {
             WindowMode.Windowed -> {
                 val windowPos = FrameworkConfig.windowPosition.value
                 val windowSize = FrameworkConfig.windowSize.value
                 contextSize.set(windowSize)
-                glfwSetWindowMonitor(windowHandle, 0, windowPos.x, windowPos.y, windowSize.x, windowSize.y, GLFW_DONT_CARE)
+                glfwSetWindowMonitor(
+                    windowHandle,
+                    0,
+                    windowPos.x,
+                    windowPos.y,
+                    windowSize.x,
+                    windowSize.y,
+                    GLFW_DONT_CARE
+                )
             }
             WindowMode.Borderless -> {
                 val monitorHandle = glfwGetPrimaryMonitor()
                 val monitorMode = glfwGetVideoMode(monitorHandle)!!
                 contextSize.set(monitorMode.width(), monitorMode.height())
-                glfwSetWindowMonitor(windowHandle, 0, 0, 0, monitorMode.width(), monitorMode.height(), monitorMode.refreshRate())
+                glfwSetWindowMonitor(
+                    windowHandle,
+                    0,
+                    0,
+                    0,
+                    monitorMode.width(),
+                    monitorMode.height(),
+                    monitorMode.refreshRate()
+                )
             }
             WindowMode.Fullscreen -> {
                 val monitorHandle = glfwGetPrimaryMonitor()
                 val monitorMode = glfwGetVideoMode(monitorHandle)!!
                 val fullScreenSize = FrameworkConfig.fullScreenResolution.value
                 contextSize.set(fullScreenSize)
-                glfwSetWindowMonitor(windowHandle, monitorHandle, 0, 0, fullScreenSize.x, fullScreenSize.y, monitorMode.refreshRate())
+                glfwSetWindowMonitor(
+                    windowHandle,
+                    monitorHandle,
+                    0,
+                    0,
+                    fullScreenSize.x,
+                    fullScreenSize.y,
+                    monitorMode.refreshRate()
+                )
             }
             WindowMode.Maximized -> {
                 glfwMaximizeWindow(windowHandle)
@@ -84,32 +122,32 @@ class DesktopContext: GameContext() {
     private fun generateEventBindings() {
 
         val vectorListeners = { _: Vector2i, newValue: Vector2i, bindable: Bindable<Vector2i> ->
-                when (bindable) {
-                    FrameworkConfig.fullScreenResolution -> {
-                        if (FrameworkConfig.windowMode.value == WindowMode.Fullscreen)
-                            setWindowSize(newValue.x, newValue.y)
-                    }
-                    FrameworkConfig.windowSize -> {
-                        if (FrameworkConfig.windowMode.value == WindowMode.Windowed)
-                            setWindowSize(newValue.x, newValue.y)
-                    }
+            when (bindable) {
+                FrameworkConfig.fullScreenResolution -> {
+                    if (FrameworkConfig.windowMode.value == WindowMode.Fullscreen)
+                        setWindowSize(newValue.x, newValue.y)
+                }
+                FrameworkConfig.windowSize -> {
+                    if (FrameworkConfig.windowMode.value == WindowMode.Windowed)
+                        setWindowSize(newValue.x, newValue.y)
                 }
             }
+        }
 
         FrameworkConfig.fullScreenResolution.addListener(vectorListeners)
         FrameworkConfig.windowSize.addListener(vectorListeners)
 
         FrameworkConfig.windowTitle.addListener { _, newValue, _ ->
-                setWindowTitle(newValue)
-            }
+            setWindowTitle(newValue)
+        }
 
         FrameworkConfig.windowMode.addListener { _, newValue, _ ->
-                setWindowMode(newValue)
-            }
+            setWindowMode(newValue)
+        }
 
         FrameworkConfig.vSync.addListener { _, newValue, _ ->
-                setVSync(newValue)
-            }
+            setVSync(newValue)
+        }
     }
 
     private fun generateGLFWCallbacks() {
@@ -142,8 +180,9 @@ class DesktopContext: GameContext() {
         }
 
         glfwSetWindowMaximizeCallback(windowHandle) { _, maximized ->
-            if(maximized) FrameworkConfig.windowPosition.value = Vector2i(pos2)
-            FrameworkConfig.windowMode.value = if (maximized) WindowMode.Maximized else WindowMode.Windowed }
+            if (maximized) FrameworkConfig.windowPosition.value = Vector2i(pos2)
+            FrameworkConfig.windowMode.value = if (maximized) WindowMode.Maximized else WindowMode.Windowed
+        }
 
     }
 
@@ -160,6 +199,32 @@ class DesktopContext: GameContext() {
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE)
 
         windowHandle = glfwCreateWindow(100, 100, FrameworkConfig.windowTitle.value, 0, 0)
+
+        icon?.let { icon ->
+            val imageBuffer = GLFWImage.malloc(iconSizes.size)
+            val buffersToFree = ArrayList<ByteBuffer>()
+
+            iconSizes.forEachIndexed { index, size ->
+                val image = GLFWImage.malloc()
+
+                val scaled = icon.copy(size, size)
+
+                val buffer = MemoryUtil.memAlloc(size * size * 4)
+                buffer.put(scaled.pixels)
+                buffer.flip()
+
+                image.set(size, size, buffer)
+
+                imageBuffer.put(index, image)
+
+                buffersToFree.add(buffer)
+            }
+
+            glfwSetWindowIcon(windowHandle, imageBuffer)
+
+            buffersToFree.forEach(MemoryUtil::memFree)
+        }
+
         setWindowMode(WindowMode.Windowed)
         setWindowMode(FrameworkConfig.windowMode.value)
     }
