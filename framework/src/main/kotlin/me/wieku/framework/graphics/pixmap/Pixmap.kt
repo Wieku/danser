@@ -95,7 +95,7 @@ class Pixmap {
 
         val outBuffer = MemoryUtil.memAlloc(width * height * 4)
 
-        stbir_resize_uint8(inBuffer, this@Pixmap.width, this@Pixmap.height, 0, outBuffer, width, height, 0, 4)
+        stbir_resize_uint8_generic(inBuffer, this@Pixmap.width, this@Pixmap.height, 0, outBuffer, width, height, 0, 4, 3, 0, STBIR_EDGE_CLAMP, STBIR_FILTER_BOX, STBIR_COLORSPACE_SRGB)
 
         outBuffer.get(pixels)
         this@Pixmap.width = width
@@ -113,8 +113,7 @@ class Pixmap {
         inBuffer.flip()
 
         val outBuffer = MemoryUtil.memAlloc(width * height * 4)
-
-        stbir_resize_uint8(inBuffer, this@Pixmap.width, this@Pixmap.height, 0, outBuffer, width, height, 0, 4)
+        stbir_resize_uint8_generic(inBuffer, this@Pixmap.width, this@Pixmap.height, 0, outBuffer, width, height, 0, 4, 3, 0, STBIR_EDGE_CLAMP, STBIR_FILTER_BOX, STBIR_COLORSPACE_SRGB)
 
         outBuffer.get(outPixmap.pixels)
 
