@@ -89,17 +89,19 @@ class Pixmap {
     }
 
     fun resize(width: Int, height: Int) {
-        val inBuffer = MemoryUtil.memAlloc(this@Pixmap.pixels.size)
-        inBuffer.put(this@Pixmap.pixels)
+        val inBuffer = MemoryUtil.memAlloc(pixels.size)
+        inBuffer.put(pixels)
         inBuffer.flip()
 
         val outBuffer = MemoryUtil.memAlloc(width * height * 4)
 
-        stbir_resize_uint8_generic(inBuffer, this@Pixmap.width, this@Pixmap.height, 0, outBuffer, width, height, 0, 4, 3, 0, STBIR_EDGE_CLAMP, STBIR_FILTER_BOX, STBIR_COLORSPACE_SRGB)
+        stbir_resize_uint8_generic(inBuffer, this.width, this.height, 0, outBuffer, width, height, 0, 4, 3, 0, STBIR_EDGE_CLAMP, STBIR_FILTER_BOX, STBIR_COLORSPACE_SRGB)
 
+        pixels = ByteArray(width * height * 4)
         outBuffer.get(pixels)
-        this@Pixmap.width = width
-        this@Pixmap.height = height
+
+        this.width = width
+        this.height = height
 
         MemoryUtil.memFree(inBuffer)
         MemoryUtil.memFree(outBuffer)
