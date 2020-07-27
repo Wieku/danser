@@ -2,7 +2,6 @@ package me.wieku.framework.graphics.pixmap
 
 import me.wieku.framework.math.color.Color
 import me.wieku.framework.resource.FileHandle
-import org.joml.Vector4f
 import org.lwjgl.stb.STBImage.*
 import org.lwjgl.stb.STBImageWrite.*
 import org.lwjgl.stb.STBImageResize.*
@@ -45,7 +44,7 @@ class Pixmap {
                 throw RuntimeException("Failed to read image information: " + stbi_failure_reason())
             }
 
-            var image: ByteBuffer? =
+            val image: ByteBuffer? =
                 stbi_load_from_memory(imageBuffer, w, h, comp, 4)
                     ?: throw RuntimeException("Failed to load image: " + stbi_failure_reason())
 
